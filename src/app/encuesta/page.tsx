@@ -30,9 +30,9 @@ export default async function EncuestaPage({ searchParams }: Props) {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
             </svg>
           </div>
-          <h2 className="text-xl font-semibold text-gray-900 mb-2">¡Gracias por tu respuesta!</h2>
+          <h2 className="text-xl font-semibold text-gray-900 mb-2">¡Encuesta Respondida!</h2>
           <p className="text-gray-500 text-sm">
-            Ya completaste esta encuesta. Tu opinión fue registrada exitosamente.
+            Esta encuesta ya fue respondida por uno de los contactos que se proporcionaron al momento de la puesta en marcha de la maquina. 
           </p>
         </div>
       </main>
