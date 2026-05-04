@@ -2,6 +2,7 @@ import Badge from '@/components/ui/Badge'
 import { Card, CardContent, CardHeader } from '@/components/ui/Card'
 import type { ConcesionarioNpsRow, NpsDistribucionRow } from '../services/dashboard.service'
 import { getNpsScoreVariant } from '../utils/nps'
+import NpsDistribucionPieChart from './NpsDistribucionPieChart'
 
 interface NpsInsightsPanelProps {
   rows: ConcesionarioNpsRow[]
@@ -74,25 +75,8 @@ export default function NpsInsightsPanel({ rows, distribucion }: NpsInsightsPane
           <CardHeader>
             <h2 className="text-sm font-semibold text-gray-900">Distribución NPS</h2>
           </CardHeader>
-          <CardContent className="space-y-5">
-            {distribucion.map((item) => (
-              <div key={item.label} className="space-y-2">
-                <div className="flex items-center justify-between gap-3">
-                  <p className="text-sm font-medium text-gray-900">{item.label}</p>
-                  <p className="text-xs text-gray-500">{item.total} respuestas</p>
-                </div>
-                <div className="flex h-3 overflow-hidden rounded-full bg-gray-100">
-                  <div className="bg-red-500" style={{ width: `${item.detractoresPct}%` }} />
-                  <div className="bg-yellow-400" style={{ width: `${item.pasivosPct}%` }} />
-                  <div className="bg-green-500" style={{ width: `${item.promotoresPct}%` }} />
-                </div>
-                <div className="grid grid-cols-3 gap-2 text-xs text-gray-500">
-                  <span>Detractores {item.detractoresPct}%</span>
-                  <span>Pasivos {item.pasivosPct}%</span>
-                  <span>Promotores {item.promotoresPct}%</span>
-                </div>
-              </div>
-            ))}
+          <CardContent>
+            <NpsDistribucionPieChart distribucion={distribucion} />
           </CardContent>
         </Card>
 

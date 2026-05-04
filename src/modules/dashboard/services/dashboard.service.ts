@@ -389,8 +389,12 @@ function calcularDistribucion(label: string, values: number[]): NpsDistribucionR
 export async function getNpsDistribucion(filters: DashboardFilters = {}): Promise<NpsDistribucionRow[]> {
   const respuestas = await getRespuestas(filters)
 
+  const sembradoras = respuestas.filter((item) => item.tipoMaquina === 'sembradora')
+  const fertilizadoras = respuestas.filter((item) => item.tipoMaquina === 'fertilizadora')
+
   return [
-    calcularDistribucion('Producto', respuestas.map((item) => item.npsProducto)),
+    calcularDistribucion('Producto · Sembradora', sembradoras.map((item) => item.npsProducto)),
+    calcularDistribucion('Producto · Fertilizadora', fertilizadoras.map((item) => item.npsProducto)),
     calcularDistribucion('Concesionario', respuestas.map((item) => item.npsConcesionario)),
     calcularDistribucion('Empresa', respuestas.map((item) => item.npsEmpresa)),
   ]
