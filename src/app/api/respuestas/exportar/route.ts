@@ -3,6 +3,7 @@ import { createSupabaseServer } from '@/lib/supabase/server'
 import { generarCSVRespuestas } from '@/lib/utils/exportar'
 import { formatTecnologia, normalizeTecnologiaInput } from '@/lib/utils/tecnologia'
 import { getRespuestas } from '@/modules/dashboard/services/dashboard.service'
+import { normalizeNpsAnswerStatus, normalizeNpsDimension } from '@/modules/dashboard/utils/nps'
 
 export async function GET(request: Request) {
   const supabase = await createSupabaseServer()
@@ -21,6 +22,8 @@ export async function GET(request: Request) {
   const fechaDesde = searchParams.get('fechaDesde') ?? undefined
   const fechaHasta = searchParams.get('fechaHasta') ?? undefined
   const tecnologia = normalizeTecnologiaInput(searchParams.get('tecnologia'))
+  const estadoNps = normalizeNpsAnswerStatus(searchParams.get('estadoNps'))
+  const npsDimension = normalizeNpsDimension(searchParams.get('npsDimension'))
 
   const respuestas = await getRespuestas({
     q,
@@ -29,6 +32,8 @@ export async function GET(request: Request) {
     fechaDesde,
     fechaHasta,
     tecnologia: tecnologia ?? undefined,
+    estadoNps,
+    npsDimension,
   })
 
   const csv = generarCSVRespuestas(

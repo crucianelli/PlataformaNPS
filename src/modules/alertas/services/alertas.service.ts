@@ -62,8 +62,9 @@ export async function enviarAlertaNpsCritico({
     detalleUrl,
   })
 
+  // BCC: cada destinatario recibe el mail sin ver a los demás
   await sendEmail({
-    to: recipients,
+    bcc: recipients,
     subject: email.subject,
     html: email.html,
     text: email.text,
