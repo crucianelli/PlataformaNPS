@@ -1,5 +1,10 @@
 import { createSupabaseServer } from '@/lib/supabase/server'
 import { TECNOLOGIAS, type Tecnologia } from '@/lib/utils/tecnologia'
+import {
+  matchesNpsAnswerStatus,
+  type NpsAnswerStatus,
+  type NpsDimension,
+} from '../utils/nps'
 
 type RawEncuestaConRespuesta = {
   id: string
@@ -128,6 +133,8 @@ export type DashboardFilters = {
   fechaHasta?: string
   tipoMaquina?: 'sembradora' | 'fertilizadora'
   tecnologia?: Tecnologia
+  estadoNps?: NpsAnswerStatus
+  npsDimension?: NpsDimension
 }
 
 export type NpsResumenExtendido = {
@@ -177,6 +184,14 @@ function calcularNps(values: number[]) {
   const detractores = values.filter((value) => value <= 6).length
 
   return Math.round(((promotores / values.length) * 100 - (detractores / values.length) * 100) * 10) / 10
+}
+
+function getNpsValues(respuesta: RespuestaDetalle, dimension?: NpsDimension) {
+  if (dimension === 'concesionario') return [respuesta.npsConcesionario]
+  if (dimension === 'producto') return [respuesta.npsProducto]
+  if (dimension === 'empresa') return [respuesta.npsEmpresa]
+
+  return [respuesta.npsConcesionario, respuesta.npsProducto, respuesta.npsEmpresa]
 }
 
 function mapRespuesta(row: RawEncuestaConRespuesta): RespuestaDetalle | null {
@@ -319,6 +334,15 @@ export async function getRespuestas(filters: DashboardFilters = {}) {
 
   if (filters.tipoMaquina) {
     respuestas = respuestas.filter((item) => item.tipoMaquina === filters.tipoMaquina)
+  }
+
+  if (filters.estadoNps) {
+    const estadoNps = filters.estadoNps
+    respuestas = respuestas.filter((item) =>
+      getNpsValues(item, filters.npsDimension).some((value) =>
+        matchesNpsAnswerStatus(value, estadoNps)
+      )
+    )
   }
 
   return respuestas

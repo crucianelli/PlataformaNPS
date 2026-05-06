@@ -8,10 +8,15 @@ interface PageContainerProps {
 
 export default function PageContainer({ children, title, actions }: PageContainerProps) {
   return (
-    <div className="p-6 max-w-7xl mx-auto w-full">
+    <div className="mx-auto w-full max-w-7xl px-6 py-8">
       {(title || actions) && (
-        <div className="flex items-center justify-between mb-6">
-          {title && <h1 className="text-xl font-semibold text-gray-900">{title}</h1>}
+        <div className="mb-7 flex items-center justify-between">
+          {title && (
+            <div>
+              <h1 className="text-lg font-semibold text-gray-900">{title}</h1>
+              <div className="mt-1.5 h-0.5 w-8 rounded-full bg-brand" />
+            </div>
+          )}
           {actions && <div className="flex items-center gap-3">{actions}</div>}
         </div>
       )}

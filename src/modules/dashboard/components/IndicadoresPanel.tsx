@@ -10,7 +10,17 @@ interface IndicadoresPanelProps {
 }
 
 function renderNps(value: number | null) {
-  return value === null ? '—' : value.toLocaleString('es-AR')
+  if (value === null) return '—'
+  const formatted = value.toLocaleString('es-AR')
+  return value > 0 ? `+${formatted}` : formatted
+}
+
+function npsLabel(value: number | null): string {
+  if (value === null) return ''
+  if (value < 0) return 'Bajo'
+  if (value < 30) return 'Regular'
+  if (value < 70) return 'Bueno'
+  return 'Excelente'
 }
 
 function renderPorcentaje(value: number | null) {
@@ -23,30 +33,35 @@ export default function IndicadoresPanel({ resumen, efectividad, label }: Indica
     {
       title: 'NPS producto sembradoras',
       value: renderNps(resumen.npsSembradora),
+      label: npsLabel(resumen.npsSembradora),
       score: resumen.npsSembradora,
       sub: `${resumen.totalSembradora} respuestas`,
     },
     {
       title: 'NPS producto fertilizadoras',
       value: renderNps(resumen.npsFertilizadora),
+      label: npsLabel(resumen.npsFertilizadora),
       score: resumen.npsFertilizadora,
       sub: `${resumen.totalFertilizadora} respuestas`,
     },
     {
       title: 'NPS Concesionario',
       value: renderNps(resumen.npsConcesionario),
+      label: npsLabel(resumen.npsConcesionario),
       score: resumen.npsConcesionario,
       sub: `${resumen.totalRespuestas} respuestas`,
     },
     {
       title: 'NPS Empresa (Crucianelli)',
       value: renderNps(resumen.npsEmpresa),
+      label: npsLabel(resumen.npsEmpresa),
       score: resumen.npsEmpresa,
       sub: `${resumen.totalRespuestas} respuestas`,
     },
     {
       title: 'Efectividad encuestas',
       value: renderPorcentaje(efectividad.porcentaje),
+      label: '',
       score: null,
       sub: `${efectividad.respondidas} de ${efectividad.enviadas} enviadas`,
     },
@@ -61,8 +76,8 @@ export default function IndicadoresPanel({ resumen, efectividad, label }: Indica
             <CardContent className="pt-4">
               <div className="flex items-start justify-between gap-3">
                 <p className="text-xs uppercase tracking-wide text-gray-500">{card.title}</p>
-                {card.score !== undefined && card.score !== null && (
-                  <Badge variant={getNpsScoreVariant(card.score)}>activo</Badge>
+                {card.label && (
+                  <Badge variant={getNpsScoreVariant(card.score)}>{card.label}</Badge>
                 )}
               </div>
               <p className="mt-2 text-3xl font-bold text-gray-900 tabular-nums">{card.value}</p>
