@@ -5,6 +5,7 @@ import Badge from '@/components/ui/Badge'
 import { Card, CardContent, CardHeader } from '@/components/ui/Card'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/Table'
 import CambiarEstadoForm from '@/modules/campanas/components/CambiarEstadoForm'
+import EliminarCampanaForm from '@/modules/campanas/components/EliminarCampanaForm'
 import RecordatoriosTimeline from '@/modules/recordatorios/components/RecordatoriosTimeline'
 import { getRecordatoriosByCampana, puedeCrearRecordatorio } from '@/modules/recordatorios/services/recordatorios.service'
 import { formatTecnologia } from '@/lib/utils/tecnologia'
@@ -48,12 +49,15 @@ export default async function CampanaDetallePage({
     <PageContainer
       title={campana.nombre}
       actions={
-        <a
-          href={`/api/campanas/${id}/exportar`}
-          className="inline-flex items-center justify-center h-10 px-4 rounded-md text-sm font-medium bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors"
-        >
-          Exportar pendientes
-        </a>
+        <>
+          <a
+            href={`/api/campanas/${id}/exportar`}
+            className="inline-flex items-center justify-center h-10 px-4 rounded-md text-sm font-medium bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors"
+          >
+            Exportar pendientes
+          </a>
+          <EliminarCampanaForm campanaId={id} campanaNombre={campana.nombre} />
+        </>
       }
     >
       <div className="space-y-6">
