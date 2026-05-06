@@ -2,6 +2,7 @@ import Link from 'next/link'
 import Badge from '@/components/ui/Badge'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/Table'
 import type { CampanaConConteos } from '../types/campana.types'
+import EliminarCampanaForm from './EliminarCampanaForm'
 
 const estadoBadge: Record<string, 'success' | 'info' | 'default'> = {
   activa:     'success',
@@ -55,12 +56,15 @@ export default function CampanasTable({ campanas }: CampanasTableProps) {
               <TableCell className="text-right tabular-nums text-yellow-700">{c.pendientes}</TableCell>
               <TableCell className="text-right tabular-nums font-medium">{tasa}%</TableCell>
               <TableCell className="text-right">
-                <Link
-                  href={`/campanas/${c.id}`}
-                  className="text-sm text-brand hover:underline font-medium"
-                >
-                  Ver detalle
-                </Link>
+                <div className="flex flex-wrap items-center justify-end gap-3">
+                  <Link
+                    href={`/campanas/${c.id}`}
+                    className="text-sm text-brand hover:underline font-medium"
+                  >
+                    Ver detalle
+                  </Link>
+                  <EliminarCampanaForm campanaId={c.id} campanaNombre={c.nombre} compact />
+                </div>
               </TableCell>
             </TableRow>
           )
