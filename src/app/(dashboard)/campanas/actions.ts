@@ -16,6 +16,10 @@ const CambiarEstadoSchema = z.object({
   estado: z.enum(['activa', 'completada', 'archivada']),
 })
 
+const EliminarCampanaSchema = z.object({
+  id: z.string().uuid('Campaña inválida.'),
+})
+
 type ActionState = { error?: string }
 
 export async function crearCampanaAction(
@@ -109,4 +113,83 @@ export async function cambiarEstadoCampanaAction(
   revalidatePath(`/campanas/${parsed.data.id}`)
   revalidatePath('/campanas')
   return {}
+}
+
+export async function eliminarCampanaAction(
+  _prevState: ActionState,
+  formData: FormData
+): Promise<ActionState> {
+  const parsed = EliminarCampanaSchema.safeParse({
+    id: formData.get('campana_id'),
+  })
+
+  if (!parsed.success) return { error: parsed.error.issues[0]?.message ?? 'Campaña inválida.' }
+
+  const supabase = createSupabaseAdmin()
+  const campanaId = parsed.data.id
+
+  const { data: encuestas, error: encuestasError } = await supabase
+    .from('encuestas')
+    .select('id, cliente_id')
+    .eq('campana_id', campanaId)
+
+  if (encuestasError) return { error: 'No se pudo preparar la eliminación de la campaña.' }
+
+  const encuestaIds = encuestas?.map((encuesta) => encuesta.id) ?? []
+  const clienteIds = Array.from(
+    new Set((encuestas ?? []).map((encuesta) => encuesta.cliente_id).filter(Boolean))
+  )
+
+  let clientesParaEliminar: string[] = []
+  if (clienteIds.length > 0) {
+    const [{ data: encuestasExternas, error: encuestasExternasError }, { data: enviosExternos, error: enviosExternosError }] =
+      await Promise.all([
+        supabase
+          .from('encuestas')
+          .select('cliente_id')
+          .in('cliente_id', clienteIds)
+          .neq('campana_id', campanaId),
+        supabase
+          .from('envios')
+          .select('cliente_id')
+          .in('cliente_id', clienteIds)
+          .neq('campana_id', campanaId),
+      ])
+
+    if (encuestasExternasError || enviosExternosError) {
+      return { error: 'No se pudo verificar si los clientes pertenecen a otras campañas.' }
+    }
+
+    const clientesUsados = new Set([
+      ...(encuestasExternas ?? []).map((item) => item.cliente_id),
+      ...(enviosExternos ?? []).map((item) => item.cliente_id),
+    ])
+    clientesParaEliminar = clienteIds.filter((id) => !clientesUsados.has(id))
+  }
+
+  if (encuestaIds.length > 0) {
+    const { error } = await supabase.from('respuestas').delete().in('encuesta_id', encuestaIds)
+    if (error) return { error: 'No se pudieron eliminar las respuestas asociadas.' }
+  }
+
+  const { error: enviosError } = await supabase.from('envios').delete().eq('campana_id', campanaId)
+  if (enviosError) return { error: 'No se pudieron eliminar los envíos asociados.' }
+
+  const { error: encuestasDeleteError } = await supabase.from('encuestas').delete().eq('campana_id', campanaId)
+  if (encuestasDeleteError) return { error: 'No se pudieron eliminar las encuestas asociadas.' }
+
+  const { error: campanaError } = await supabase.from('campanas').delete().eq('id', campanaId)
+  if (campanaError) return { error: 'No se pudo eliminar la campaña.' }
+
+  if (clientesParaEliminar.length > 0) {
+    const { error } = await supabase.from('clientes').delete().in('id', clientesParaEliminar)
+    if (error) {
+      console.error('La campaña fue eliminada, pero no se pudieron limpiar clientes sin referencias.', error)
+    }
+  }
+
+  revalidatePath('/campanas')
+  revalidatePath('/clientes')
+  revalidatePath('/respuestas')
+  redirect('/campanas')
 }
