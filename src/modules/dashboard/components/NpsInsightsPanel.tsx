@@ -2,6 +2,7 @@ import Badge from '@/components/ui/Badge'
 import { Card, CardContent, CardHeader } from '@/components/ui/Card'
 import type { ConcesionarioNpsRow, NpsDistribucionRow } from '../services/dashboard.service'
 import { getNpsScoreVariant } from '../utils/nps'
+import NpsDistribucionPieChart from './NpsDistribucionPieChart'
 
 interface NpsInsightsPanelProps {
   rows: ConcesionarioNpsRow[]
@@ -22,28 +23,43 @@ function rankingRows(rows: ConcesionarioNpsRow[]) {
     })
 }
 
-function NpsSummaryCard({
+function NpsRankingCard({
   label,
-  row,
+  rows,
 }: {
   label: string
-  row: ConcesionarioNpsRow | null
+  rows: ConcesionarioNpsRow[]
 }) {
   return (
     <Card>
-      <CardContent className="pt-4">
-        <div className="flex items-start justify-between gap-3">
-          <p className="text-xs uppercase tracking-wide text-gray-500">{label}</p>
-          {row?.npsConcesionario !== null && row?.npsConcesionario !== undefined && (
-            <Badge variant={getNpsScoreVariant(row.npsConcesionario)}>
-              {formatNps(row.npsConcesionario)}
-            </Badge>
-          )}
-        </div>
-        <p className="mt-2 text-lg font-semibold text-gray-900">{row?.concesionario ?? '—'}</p>
-        <p className="mt-1 text-xs text-gray-500">
-          {row ? `${row.totalRespuestas} respuesta${row.totalRespuestas !== 1 ? 's' : ''}` : 'Sin datos'}
-        </p>
+      <CardHeader>
+        <h2 className="text-sm font-semibold text-gray-900">{label}</h2>
+      </CardHeader>
+      <CardContent>
+        {rows.length === 0 ? (
+          <p className="text-sm text-gray-500">Sin datos</p>
+        ) : (
+          <div className="space-y-3">
+            {rows.map((row, index) => (
+              <div key={row.concesionario} className="flex items-center justify-between gap-3">
+                <div className="flex min-w-0 items-center gap-2">
+                  <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-gray-100 text-xs font-semibold text-gray-600">
+                    {index + 1}
+                  </span>
+                  <p className="truncate text-sm font-medium text-gray-900">{row.concesionario}</p>
+                </div>
+                <div className="flex shrink-0 items-center gap-2">
+                  <span className="text-xs text-gray-500">
+                    {row.totalRespuestas} resp.
+                  </span>
+                  <Badge variant={getNpsScoreVariant(row.npsConcesionario)}>
+                    {formatNps(row.npsConcesionario)}
+                  </Badge>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </CardContent>
     </Card>
   )
@@ -56,17 +72,15 @@ function normalizedWidth(value: number | null) {
 
 export default function NpsInsightsPanel({ rows, distribucion }: NpsInsightsPanelProps) {
   const ranked = rankingRows(rows)
-  const best = ranked[0] ?? null
-  const worst = ranked.length > 0 ? ranked[ranked.length - 1] : null
-  const mostAnswered = [...rows].sort((a, b) => b.totalRespuestas - a.totalRespuestas)[0] ?? null
+  const top5Best = ranked.slice(0, 5)
+  const top5Worst = ranked.slice(-5).reverse()
   const topRows = ranked.slice(0, 8)
 
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-        <NpsSummaryCard label="Mejor NPS concesionario" row={best} />
-        <NpsSummaryCard label="Peor NPS concesionario" row={worst} />
-        <NpsSummaryCard label="Mayor volumen" row={mostAnswered} />
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+        <NpsRankingCard label="Top 5 mejores NPS concesionario" rows={top5Best} />
+        <NpsRankingCard label="Top 5 peores NPS concesionario" rows={top5Worst} />
       </div>
 
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
@@ -74,25 +88,8 @@ export default function NpsInsightsPanel({ rows, distribucion }: NpsInsightsPane
           <CardHeader>
             <h2 className="text-sm font-semibold text-gray-900">Distribución NPS</h2>
           </CardHeader>
-          <CardContent className="space-y-5">
-            {distribucion.map((item) => (
-              <div key={item.label} className="space-y-2">
-                <div className="flex items-center justify-between gap-3">
-                  <p className="text-sm font-medium text-gray-900">{item.label}</p>
-                  <p className="text-xs text-gray-500">{item.total} respuestas</p>
-                </div>
-                <div className="flex h-3 overflow-hidden rounded-full bg-gray-100">
-                  <div className="bg-red-500" style={{ width: `${item.detractoresPct}%` }} />
-                  <div className="bg-yellow-400" style={{ width: `${item.pasivosPct}%` }} />
-                  <div className="bg-green-500" style={{ width: `${item.promotoresPct}%` }} />
-                </div>
-                <div className="grid grid-cols-3 gap-2 text-xs text-gray-500">
-                  <span>Detractores {item.detractoresPct}%</span>
-                  <span>Pasivos {item.pasivosPct}%</span>
-                  <span>Promotores {item.promotoresPct}%</span>
-                </div>
-              </div>
-            ))}
+          <CardContent>
+            <NpsDistribucionPieChart distribucion={distribucion} />
           </CardContent>
         </Card>
 

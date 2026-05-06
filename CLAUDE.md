@@ -1,4 +1,4 @@
-# CLAUDE.md — NPS Survey Platform
+ CLAUDE.md — NPS Survey Platform
 
 Este archivo es la guía principal para trabajar en este proyecto. Leer completamente antes de tocar cualquier archivo. La carpeta `/docs` contiene la documentación completa del sistema.
 

@@ -6,6 +6,12 @@ import {
   getRespuestas,
 } from '@/modules/dashboard/services/dashboard.service'
 import { normalizeTecnologiaInput } from '@/lib/utils/tecnologia'
+import {
+  normalizeNpsAnswerStatus,
+  normalizeNpsDimension,
+  NPS_ANSWER_STATUS_OPTIONS,
+  NPS_DIMENSION_OPTIONS,
+} from '@/modules/dashboard/utils/nps'
 
 export default async function RespuestasPage({
   searchParams,
@@ -17,13 +23,35 @@ export default async function RespuestasPage({
     fechaDesde?: string
     fechaHasta?: string
     tecnologia?: string
+    estadoNps?: string
+    npsDimension?: string
   }>
 }) {
-  const { concesionario, campanaId, q, fechaDesde, fechaHasta, tecnologia } = await searchParams
+  const {
+    concesionario,
+    campanaId,
+    q,
+    fechaDesde,
+    fechaHasta,
+    tecnologia,
+    estadoNps,
+    npsDimension,
+  } = await searchParams
   const tecnologiaFilter = normalizeTecnologiaInput(tecnologia) ?? undefined
+  const estadoNpsFilter = normalizeNpsAnswerStatus(estadoNps)
+  const npsDimensionFilter = normalizeNpsDimension(npsDimension)
   const [options, respuestas] = await Promise.all([
     getDashboardFilterOptions(),
-    getRespuestas({ concesionario, campanaId, q, fechaDesde, fechaHasta, tecnologia: tecnologiaFilter }),
+    getRespuestas({
+      concesionario,
+      campanaId,
+      q,
+      fechaDesde,
+      fechaHasta,
+      tecnologia: tecnologiaFilter,
+      estadoNps: estadoNpsFilter,
+      npsDimension: npsDimensionFilter,
+    }),
   ])
 
   const exportParams = new URLSearchParams()
@@ -33,6 +61,8 @@ export default async function RespuestasPage({
   if (fechaDesde) exportParams.set('fechaDesde', fechaDesde)
   if (fechaHasta) exportParams.set('fechaHasta', fechaHasta)
   if (tecnologiaFilter) exportParams.set('tecnologia', tecnologiaFilter)
+  if (estadoNpsFilter) exportParams.set('estadoNps', estadoNpsFilter)
+  if (npsDimensionFilter) exportParams.set('npsDimension', npsDimensionFilter)
   const exportHref = `/api/respuestas/exportar${exportParams.toString() ? `?${exportParams.toString()}` : ''}`
 
   return (
@@ -41,113 +71,149 @@ export default async function RespuestasPage({
         <Card>
           <CardContent className="pt-4">
             <form className="space-y-4">
-              <div className="grid grid-cols-1 gap-4 lg:grid-cols-6">
-              <div>
-                <label htmlFor="q" className="mb-1 block text-sm font-medium text-gray-700">
-                  Buscar
-                </label>
-                <input
-                  id="q"
-                  name="q"
-                  defaultValue={q}
-                  placeholder="Cliente, email, campaña..."
-                  className="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand"
-                />
-              </div>
-              <div>
-                <label htmlFor="concesionario" className="mb-1 block text-sm font-medium text-gray-700">
-                  Concesionario
-                </label>
-                <select
-                  id="concesionario"
-                  name="concesionario"
-                  defaultValue={concesionario ?? ''}
-                  className="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand"
-                >
-                  <option value="">Todos</option>
-                  {options.concesionarios.map((item) => (
-                    <option key={item} value={item}>
-                      {item}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div>
-                <label htmlFor="campanaId" className="mb-1 block text-sm font-medium text-gray-700">
-                  Campaña
-                </label>
-                <select
-                  id="campanaId"
-                  name="campanaId"
-                  defaultValue={campanaId ?? ''}
-                  className="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand"
-                >
-                  <option value="">Todas</option>
-                  {options.campanas.map((item) => (
-                    <option key={item.id ?? item.nombre} value={item.id ?? ''}>
-                      {item.nombre}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div>
-                <label htmlFor="fechaDesde" className="mb-1 block text-sm font-medium text-gray-700">
-                  Desde
-                </label>
-                <input
-                  id="fechaDesde"
-                  name="fechaDesde"
-                  type="date"
-                  defaultValue={fechaDesde}
-                  className="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand"
-                />
-              </div>
-              <div>
-                <label htmlFor="tecnologia" className="mb-1 block text-sm font-medium text-gray-700">
-                  Tecnología
-                </label>
-                <select
-                  id="tecnologia"
-                  name="tecnologia"
-                  defaultValue={tecnologiaFilter ?? ''}
-                  className="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand"
-                >
-                  <option value="">Todas</option>
-                  {options.tecnologias.map((item) => (
-                    <option key={item.value} value={item.value}>
-                      {item.label}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div>
-                <label htmlFor="fechaHasta" className="mb-1 block text-sm font-medium text-gray-700">
-                  Hasta
-                </label>
-                <input
-                  id="fechaHasta"
-                  name="fechaHasta"
-                  type="date"
-                  defaultValue={fechaHasta}
-                  className="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand"
-                />
-              </div>
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
+                <div>
+                  <label htmlFor="q" className="mb-1 block text-sm font-medium text-gray-700">
+                    Buscar
+                  </label>
+                  <input
+                    id="q"
+                    name="q"
+                    defaultValue={q}
+                    placeholder="Cliente, email, campaña..."
+                    className="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="concesionario" className="mb-1 block text-sm font-medium text-gray-700">
+                    Concesionario
+                  </label>
+                  <select
+                    id="concesionario"
+                    name="concesionario"
+                    defaultValue={concesionario ?? ''}
+                    className="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand"
+                  >
+                    <option value="">Todos</option>
+                    {options.concesionarios.map((item) => (
+                      <option key={item} value={item}>
+                        {item}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label htmlFor="campanaId" className="mb-1 block text-sm font-medium text-gray-700">
+                    Campaña
+                  </label>
+                  <select
+                    id="campanaId"
+                    name="campanaId"
+                    defaultValue={campanaId ?? ''}
+                    className="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand"
+                  >
+                    <option value="">Todas</option>
+                    {options.campanas.map((item) => (
+                      <option key={item.id ?? item.nombre} value={item.id ?? ''}>
+                        {item.nombre}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label htmlFor="fechaDesde" className="mb-1 block text-sm font-medium text-gray-700">
+                    Desde
+                  </label>
+                  <input
+                    id="fechaDesde"
+                    name="fechaDesde"
+                    type="date"
+                    defaultValue={fechaDesde}
+                    className="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="tecnologia" className="mb-1 block text-sm font-medium text-gray-700">
+                    Tecnología
+                  </label>
+                  <select
+                    id="tecnologia"
+                    name="tecnologia"
+                    defaultValue={tecnologiaFilter ?? ''}
+                    className="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand"
+                  >
+                    <option value="">Todas</option>
+                    {options.tecnologias.map((item) => (
+                      <option key={item.value} value={item.value}>
+                        {item.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label htmlFor="fechaHasta" className="mb-1 block text-sm font-medium text-gray-700">
+                    Hasta
+                  </label>
+                  <input
+                    id="fechaHasta"
+                    name="fechaHasta"
+                    type="date"
+                    defaultValue={fechaHasta}
+                    className="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="estadoNps" className="mb-1 block text-sm font-medium text-gray-700">
+                    Estado NPS
+                  </label>
+                  <select
+                    id="estadoNps"
+                    name="estadoNps"
+                    defaultValue={estadoNpsFilter ?? ''}
+                    className="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand"
+                  >
+                    <option value="">Todos</option>
+                    {NPS_ANSWER_STATUS_OPTIONS.map((item) => (
+                      <option key={item.value} value={item.value}>
+                        {item.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label htmlFor="npsDimension" className="mb-1 block text-sm font-medium text-gray-700">
+                    NPS
+                  </label>
+                  <select
+                    id="npsDimension"
+                    name="npsDimension"
+                    defaultValue={npsDimensionFilter ?? ''}
+                    className="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand"
+                  >
+                    <option value="">Cualquiera</option>
+                    {NPS_DIMENSION_OPTIONS.map((item) => (
+                      <option key={item.value} value={item.value}>
+                        {item.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
               </div>
               <div className="flex flex-col gap-3 border-t border-gray-100 pt-4 sm:flex-row sm:items-center sm:justify-between">
                 <p className="text-xs text-gray-500">{respuestas.length} respuesta{respuestas.length !== 1 ? 's' : ''} encontrada{respuestas.length !== 1 ? 's' : ''}</p>
                 <div className="flex flex-wrap items-center gap-3">
-                <button
-                  type="submit"
-                  className="inline-flex h-10 items-center justify-center rounded-md bg-gray-100 px-4 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-200"
-                >
-                  Filtrar
-                </button>
-                <a
-                  href="/respuestas"
-                  className="inline-flex h-10 items-center justify-center rounded-md px-4 text-sm font-medium text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-900"
-                >
-                  Limpiar
-                </a>
+                  <button
+                    type="submit"
+                    className="inline-flex h-10 items-center justify-center rounded-md bg-gray-100 px-4 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-200"
+                  >
+                    Filtrar
+                  </button>
+                  <a
+                    href="/respuestas"
+                    className="inline-flex h-10 items-center justify-center rounded-md px-4 text-sm font-medium text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-900"
+                  >
+                    Limpiar
+                  </a>
                 </div>
               </div>
             </form>
