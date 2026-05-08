@@ -176,6 +176,15 @@ export type NpsDistribucionRow = {
   detractoresPct: number
 }
 
+export type CalificacionResumen = {
+  key: string
+  label: string
+  labelCorto: string
+  promedio: number | null
+  total: number
+  distribucion: Array<{ score: number; count: number }>
+}
+
 export type ComparativoPorCanal = {
   canal: 'mensaje' | 'llamado'
   total: number
@@ -507,6 +516,49 @@ export async function getEfectividadEnvios(
     porcentaje:
       enviadas === 0 ? null : Math.round((respondidas / enviadas) * 1000) / 10,
   }
+}
+
+const CALIFICACIONES_CONFIG: Array<{
+  key: keyof RespuestaDetalle
+  label: string
+  labelCorto: string
+}> = [
+  { key: 'calificacionEntregaPresentacion', label: 'Entrega y presentación', labelCorto: 'Entrega' },
+  { key: 'calificacionPuestaMarcha', label: 'Puesta en marcha', labelCorto: 'Puesta en marcha' },
+  { key: 'calificacionCapacitacion', label: 'Capacitación', labelCorto: 'Capacitación' },
+  { key: 'calificacionFuncionamientoGeneral', label: 'Funcionamiento general', labelCorto: 'Funcionamiento' },
+  { key: 'calificacionTecnico', label: 'Técnico', labelCorto: 'Técnico' },
+  { key: 'npsConcesionario', label: 'NPS concesionario', labelCorto: 'NPS Concesion.' },
+  { key: 'npsProducto', label: 'NPS producto', labelCorto: 'NPS Producto' },
+  { key: 'npsEmpresa', label: 'NPS empresa', labelCorto: 'NPS Empresa' },
+]
+
+export async function getCalificacionesResumen(
+  filters: DashboardFilters = {}
+): Promise<CalificacionResumen[]> {
+  const respuestas = await getRespuestas(filters)
+
+  return CALIFICACIONES_CONFIG.map(({ key, label, labelCorto }) => {
+    const values = respuestas
+      .map((r) => r[key] as number | null)
+      .filter((v): v is number => v !== null)
+
+    const total = values.length
+    const promedio =
+      total > 0
+        ? Math.round((values.reduce((acc, v) => acc + v, 0) / total) * 10) / 10
+        : null
+
+    const countMap = new Map<number, number>()
+    for (let s = 1; s <= 10; s++) countMap.set(s, 0)
+    for (const v of values) countMap.set(v, (countMap.get(v) ?? 0) + 1)
+
+    const distribucion = Array.from(countMap.entries())
+      .map(([score, count]) => ({ score, count }))
+      .sort((a, b) => a.score - b.score)
+
+    return { key, label, labelCorto, promedio, total, distribucion }
+  })
 }
 
 export async function getComparativoPorCanal(
