@@ -24,6 +24,8 @@ export async function GET(request: Request) {
   const tecnologia = normalizeTecnologiaInput(searchParams.get('tecnologia'))
   const estadoNps = normalizeNpsAnswerStatus(searchParams.get('estadoNps'))
   const npsDimension = normalizeNpsDimension(searchParams.get('npsDimension'))
+  const canalParam = searchParams.get('canal')
+  const canal = canalParam === 'mensaje' || canalParam === 'llamado' ? canalParam : undefined
 
   const respuestas = await getRespuestas({
     q,
@@ -34,6 +36,7 @@ export async function GET(request: Request) {
     tecnologia: tecnologia ?? undefined,
     estadoNps,
     npsDimension,
+    canal,
   })
 
   const csv = generarCSVRespuestas(
@@ -66,6 +69,7 @@ export async function GET(request: Request) {
       comentario_producto: item.comentarioProducto,
       comentario_empresa: item.comentarioEmpresa,
       comentario_general: item.comentarioGeneral,
+      canal_respuesta: item.canalRespuesta,
     }))
   )
 

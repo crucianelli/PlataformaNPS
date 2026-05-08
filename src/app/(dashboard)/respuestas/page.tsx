@@ -25,6 +25,7 @@ export default async function RespuestasPage({
     tecnologia?: string
     estadoNps?: string
     npsDimension?: string
+    canal?: string
   }>
 }) {
   const {
@@ -36,10 +37,12 @@ export default async function RespuestasPage({
     tecnologia,
     estadoNps,
     npsDimension,
+    canal,
   } = await searchParams
   const tecnologiaFilter = normalizeTecnologiaInput(tecnologia) ?? undefined
   const estadoNpsFilter = normalizeNpsAnswerStatus(estadoNps)
   const npsDimensionFilter = normalizeNpsDimension(npsDimension)
+  const canalFilter = canal === 'mensaje' || canal === 'llamado' ? canal : undefined
   const [options, respuestas] = await Promise.all([
     getDashboardFilterOptions(),
     getRespuestas({
@@ -51,6 +54,7 @@ export default async function RespuestasPage({
       tecnologia: tecnologiaFilter,
       estadoNps: estadoNpsFilter,
       npsDimension: npsDimensionFilter,
+      canal: canalFilter,
     }),
   ])
 
@@ -63,6 +67,7 @@ export default async function RespuestasPage({
   if (tecnologiaFilter) exportParams.set('tecnologia', tecnologiaFilter)
   if (estadoNpsFilter) exportParams.set('estadoNps', estadoNpsFilter)
   if (npsDimensionFilter) exportParams.set('npsDimension', npsDimensionFilter)
+  if (canalFilter) exportParams.set('canal', canalFilter)
   const exportHref = `/api/respuestas/exportar${exportParams.toString() ? `?${exportParams.toString()}` : ''}`
 
   return (
@@ -196,6 +201,21 @@ export default async function RespuestasPage({
                         {item.label}
                       </option>
                     ))}
+                  </select>
+                </div>
+                <div>
+                  <label htmlFor="canal" className="mb-1 block text-sm font-medium text-gray-700">
+                    Canal
+                  </label>
+                  <select
+                    id="canal"
+                    name="canal"
+                    defaultValue={canalFilter ?? ''}
+                    className="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand"
+                  >
+                    <option value="">Todos</option>
+                    <option value="mensaje">Mensaje</option>
+                    <option value="llamado">Llamado</option>
                   </select>
                 </div>
               </div>

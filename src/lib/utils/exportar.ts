@@ -39,6 +39,7 @@ type FilaRespuestaExport = {
   comentario_producto: string | null
   comentario_empresa: string | null
   comentario_general: string | null
+  canal_respuesta: string
 }
 
 function escaparCSV(val: string | null | undefined): string {
@@ -92,6 +93,7 @@ export function generarCSVRespuestas(respuestas: FilaRespuestaExport[]): string 
     'comentario_producto',
     'comentario_empresa',
     'comentario_general',
+    'canal_respuesta',
   ]
 
   const rows = respuestas.map((respuesta) => [
@@ -123,6 +125,7 @@ export function generarCSVRespuestas(respuestas: FilaRespuestaExport[]): string 
     escaparCSV(respuesta.comentario_producto),
     escaparCSV(respuesta.comentario_empresa),
     escaparCSV(respuesta.comentario_general),
+    escaparCSV(respuesta.canal_respuesta),
   ])
 
   return [headers.join(','), ...rows.map((row) => row.join(','))].join('\n')
