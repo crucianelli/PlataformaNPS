@@ -57,6 +57,7 @@ type RawEncuestaConRespuesta = {
         comentario_producto: string | null
         comentario_empresa: string | null
         comentario_general: string | null
+        canal_respuesta: 'mensaje' | 'llamado'
       }[]
     | {
         fecha_respuesta: string
@@ -83,6 +84,7 @@ type RawEncuestaConRespuesta = {
         comentario_producto: string | null
         comentario_empresa: string | null
         comentario_general: string | null
+        canal_respuesta: 'mensaje' | 'llamado'
       }
     | null
 }
@@ -122,6 +124,7 @@ export type RespuestaDetalle = {
   comentarioProducto: string | null
   comentarioEmpresa: string | null
   comentarioGeneral: string | null
+  canalRespuesta: 'mensaje' | 'llamado'
   fechaRespuestaDate: Date
 }
 
@@ -135,6 +138,7 @@ export type DashboardFilters = {
   tecnologia?: Tecnologia
   estadoNps?: NpsAnswerStatus
   npsDimension?: NpsDimension
+  canal?: 'mensaje' | 'llamado'
 }
 
 export type NpsResumenExtendido = {
@@ -170,6 +174,15 @@ export type NpsDistribucionRow = {
   promotoresPct: number
   pasivosPct: number
   detractoresPct: number
+}
+
+export type ComparativoPorCanal = {
+  canal: 'mensaje' | 'llamado'
+  total: number
+  porcentaje: number | null
+  npsProducto: number | null
+  npsEmpresa: number | null
+  npsConcesionario: number | null
 }
 
 function pickOne<T>(value: T | T[] | null): T | null {
@@ -236,6 +249,7 @@ function mapRespuesta(row: RawEncuestaConRespuesta): RespuestaDetalle | null {
     comentarioProducto: respuesta.comentario_producto,
     comentarioEmpresa: respuesta.comentario_empresa,
     comentarioGeneral: respuesta.comentario_general,
+    canalRespuesta: respuesta.canal_respuesta,
     fechaRespuestaDate: new Date(respuesta.fecha_respuesta),
   }
 }
@@ -273,7 +287,8 @@ export async function getRespuestas(filters: DashboardFilters = {}) {
         nps_concesionario,
         comentario_producto,
         comentario_empresa,
-        comentario_general
+        comentario_general,
+        canal_respuesta
       )
     `)
     .eq('estado', 'respondida')
@@ -343,6 +358,10 @@ export async function getRespuestas(filters: DashboardFilters = {}) {
         matchesNpsAnswerStatus(value, estadoNps)
       )
     )
+  }
+
+  if (filters.canal) {
+    respuestas = respuestas.filter((item) => item.canalRespuesta === filters.canal)
   }
 
   return respuestas
@@ -488,4 +507,25 @@ export async function getEfectividadEnvios(
     porcentaje:
       enviadas === 0 ? null : Math.round((respondidas / enviadas) * 1000) / 10,
   }
+}
+
+export async function getComparativoPorCanal(
+  filters: DashboardFilters = {}
+): Promise<ComparativoPorCanal[]> {
+  const respuestas = await getRespuestas(filters)
+  const total = respuestas.length
+
+  const canales: Array<'mensaje' | 'llamado'> = ['mensaje', 'llamado']
+
+  return canales.map((canal) => {
+    const grupo = respuestas.filter((item) => item.canalRespuesta === canal)
+    return {
+      canal,
+      total: grupo.length,
+      porcentaje: total === 0 ? null : Math.round((grupo.length / total) * 1000) / 10,
+      npsProducto: calcularNps(grupo.map((item) => item.npsProducto)),
+      npsEmpresa: calcularNps(grupo.map((item) => item.npsEmpresa)),
+      npsConcesionario: calcularNps(grupo.map((item) => item.npsConcesionario)),
+    }
+  })
 }

@@ -234,6 +234,7 @@ export type Database = {
           calificacion_puesta_marcha: number | null
           calificacion_tecnico: number | null
           calle_numero: string | null
+          canal_respuesta: string
           codigo_postal: string | null
           comentario_empresa: string | null
           comentario_general: string | null
@@ -262,6 +263,7 @@ export type Database = {
           calificacion_puesta_marcha?: number | null
           calificacion_tecnico?: number | null
           calle_numero?: string | null
+          canal_respuesta?: string
           codigo_postal?: string | null
           comentario_empresa?: string | null
           comentario_general?: string | null
@@ -290,6 +292,7 @@ export type Database = {
           calificacion_puesta_marcha?: number | null
           calificacion_tecnico?: number | null
           calle_numero?: string | null
+          canal_respuesta?: string
           codigo_postal?: string | null
           comentario_empresa?: string | null
           comentario_general?: string | null
@@ -389,7 +392,7 @@ export type Database = {
       }
     }
     Functions: {
-      [_ in never]: never
+      sync_encuestas_necesidad_llamado: { Args: never; Returns: number }
     }
     Enums: {
       campana_estado: "activa" | "completada" | "archivada"

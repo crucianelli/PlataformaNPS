@@ -255,6 +255,19 @@ Agrega soporte de tecnología por `OF`:
 - `CHECK` para `leaf` o `precision_planting`
 - índice parcial `idx_clientes_tecnologia`
 
+## 6.12 `012_add_canal_respuesta.sql`
+
+Agrega trazabilidad del canal de respuesta:
+
+- columna `respuestas.canal_respuesta TEXT NOT NULL DEFAULT 'mensaje'`
+- `CHECK` para `mensaje` o `llamado`
+- índice `idx_respuestas_canal_respuesta`
+
+Lógica de asignación:
+
+- `mensaje`: la encuesta se respondió estando en estado `pendiente` o `recordatorio_enviado`
+- `llamado`: la encuesta se respondió estando en estado `necesidad_de_llamado`
+
 ## 7. Lógica de estado en datos
 
 ## 7.1 Creación de campaña
