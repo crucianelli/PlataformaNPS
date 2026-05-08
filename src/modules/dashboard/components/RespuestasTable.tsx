@@ -73,6 +73,7 @@ export default function RespuestasTable({ respuestas }: RespuestasTableProps) {
           <TableHead>Concesionario</TableHead>
           <TableHead>Máquina</TableHead>
           <TableHead>Tecnología</TableHead>
+          <TableHead>Canal</TableHead>
           <TableHead className="text-right">NPS concesionario</TableHead>
           <TableHead className="text-right">NPS producto</TableHead>
           <TableHead className="text-right">NPS empresa</TableHead>
@@ -98,6 +99,11 @@ export default function RespuestasTable({ respuestas }: RespuestasTableProps) {
               <TableCell>{respuesta.concesionario}</TableCell>
               <TableCell>{respuesta.maquinaModelo ?? '—'}</TableCell>
               <TableCell className="text-gray-500">{formatTecnologia(respuesta.tecnologia)}</TableCell>
+              <TableCell>
+                <Badge variant={respuesta.canalRespuesta === 'llamado' ? 'warning' : 'info'}>
+                  {respuesta.canalRespuesta === 'llamado' ? 'Llamado' : 'Mensaje'}
+                </Badge>
+              </TableCell>
               <TableCell className="text-right">
                 <NpsBadge value={respuesta.npsConcesionario} />
               </TableCell>
@@ -120,7 +126,7 @@ export default function RespuestasTable({ respuestas }: RespuestasTableProps) {
             ...(expanded
               ? [
                   <TableRow key={`${respuesta.encuestaId}-detail`} className="bg-gray-50 hover:bg-gray-50">
-                    <TableCell colSpan={10}>
+                    <TableCell colSpan={11}>
                       <div className="grid grid-cols-1 gap-6 p-3 xl:grid-cols-4">
                         <div className="space-y-2">
                           <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">Contacto</p>
@@ -146,6 +152,7 @@ export default function RespuestasTable({ respuestas }: RespuestasTableProps) {
                             <DetailItem label="Tecnología" value={formatTecnologia(respuesta.tecnologia)} />
                             <DetailItem label="Firma factura" value={respuesta.nombreFirmaFactura} />
                             <DetailItem label="Orden fabricación" value={respuesta.ordenFabricacion} />
+                            <DetailItem label="Canal" value={respuesta.canalRespuesta === 'llamado' ? 'Llamado' : 'Mensaje'} />
                             <DetailItem label="Enviada" value={new Date(respuesta.fechaEnvioEncuesta).toLocaleString('es-AR')} />
                             <DetailItem label="Respondida" value={new Date(respuesta.fechaRespuesta).toLocaleString('es-AR')} />
                           </div>

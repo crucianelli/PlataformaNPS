@@ -94,8 +94,10 @@ export async function guardarRespuestaAction(
   }
 
   // 3. Insertar respuesta (el trigger actualiza encuesta.estado automáticamente)
+  const canalRespuesta = encuesta.estado === 'necesidad_de_llamado' ? 'llamado' : 'mensaje'
   const { error: errInsert } = await supabase.from('respuestas').insert({
     encuesta_id: encuesta.id,
+    canal_respuesta: canalRespuesta,
     nombre_apellido: result.data.nombre_apellido,
     calle_numero: result.data.calle_numero,
     piso_departamento: result.data.piso_departamento || null,

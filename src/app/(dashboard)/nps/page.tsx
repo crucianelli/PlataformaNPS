@@ -3,12 +3,14 @@ import { Card, CardContent, CardHeader } from '@/components/ui/Card'
 import IndicadoresPanel from '@/modules/dashboard/components/IndicadoresPanel'
 import ConcesionariosNpsTable from '@/modules/dashboard/components/ConcesionariosNpsTable'
 import NpsInsightsPanel from '@/modules/dashboard/components/NpsInsightsPanel'
+import ComparativoCanalPanel from '@/modules/dashboard/components/ComparativoCanalPanel'
 import {
   getDashboardFilterOptions,
   getEfectividadEnvios,
   getNpsDistribucion,
   getNpsPorConcesionario,
   getNpsResumenExtendido,
+  getComparativoPorCanal,
 } from '@/modules/dashboard/services/dashboard.service'
 import { formatTecnologia, normalizeTecnologiaInput } from '@/lib/utils/tecnologia'
 
@@ -36,12 +38,13 @@ export default async function NpsPage({
   const comparacionFiltros = { fechaDesde, fechaHasta, tipoMaquina: tipoMaquinaFilter, tecnologia: tecnologiaFilter }
   const tecnologiaLabel = tecnologiaFilter ? formatTecnologia(tecnologiaFilter) : undefined
 
-  const [options, resumen, efectividad, rows, distribucion] = await Promise.all([
+  const [options, resumen, efectividad, rows, distribucion, comparativoCanal] = await Promise.all([
     getDashboardFilterOptions(),
     getNpsResumenExtendido(filtros),
     getEfectividadEnvios(filtros),
     getNpsPorConcesionario(comparacionFiltros),
     getNpsDistribucion(filtros),
+    getComparativoPorCanal(filtros),
   ])
 
   return (
@@ -152,6 +155,8 @@ export default async function NpsPage({
               : `Indicadores generales${tipoMaquinaFilter ? ` filtrados por ${tipoMaquinaFilter}` : ''}${tecnologiaLabel ? ` · ${tecnologiaLabel}` : ''}${fechaDesde || fechaHasta ? ' del rango seleccionado.' : '.'}`
           }
         />
+
+        <ComparativoCanalPanel comparativo={comparativoCanal} />
 
         <NpsInsightsPanel rows={rows} distribucion={distribucion} />
 
