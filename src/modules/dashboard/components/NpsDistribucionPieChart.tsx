@@ -26,8 +26,8 @@ function SinglePie({ row }: { row: NpsDistribucionRow }) {
 
   return (
     <div className="flex flex-col items-center gap-1">
-      <p className="text-sm font-semibold text-gray-900">{row.label}</p>
-      <p className="text-xs text-gray-400">{row.total} respuestas</p>
+      <p className="text-sm font-semibold text-foreground">{row.label}</p>
+      <p className="text-xs text-muted-foreground">{row.total} respuestas</p>
 
       <ResponsiveContainer width="100%" height={170}>
         <PieChart>
@@ -70,7 +70,7 @@ function SinglePie({ row }: { row: NpsDistribucionRow }) {
         </PieChart>
       </ResponsiveContainer>
 
-      <div className="flex flex-wrap justify-center gap-x-4 gap-y-1 text-xs text-gray-600">
+      <div className="flex flex-wrap justify-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
         {slices.map((slice) => (
           <span key={slice.name} className="flex items-center gap-1.5">
             <span

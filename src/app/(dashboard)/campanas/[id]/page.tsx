@@ -52,7 +52,7 @@ export default async function CampanaDetallePage({
         <>
           <a
             href={`/api/campanas/${id}/exportar`}
-            className="inline-flex items-center justify-center h-10 px-4 rounded-md text-sm font-medium bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors"
+            className="inline-flex items-center justify-center h-10 px-4 rounded-md text-sm font-medium bg-muted text-foreground hover:bg-muted transition-colors"
           >
             Exportar pendientes
           </a>
@@ -65,7 +65,7 @@ export default async function CampanaDetallePage({
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <Card>
             <CardContent className="pt-4">
-              <p className="text-xs text-gray-500 uppercase tracking-wide">Estado</p>
+              <p className="text-xs text-muted-foreground uppercase tracking-wide">Estado</p>
               <div className="mt-1">
                 <Badge variant={estadoBadge[campana.estado] ?? 'default'}>{campana.estado}</Badge>
               </div>
@@ -73,28 +73,28 @@ export default async function CampanaDetallePage({
           </Card>
           <Card>
             <CardContent className="pt-4">
-              <p className="text-xs text-gray-500 uppercase tracking-wide">Total clientes</p>
-              <p className="mt-1 text-2xl font-bold text-gray-900 tabular-nums">{total}</p>
+              <p className="text-xs text-muted-foreground uppercase tracking-wide">Total clientes</p>
+              <p className="mt-1 text-2xl font-bold text-foreground tabular-nums">{total}</p>
             </CardContent>
           </Card>
           <Card>
             <CardContent className="pt-4">
-              <p className="text-xs text-gray-500 uppercase tracking-wide">Respondidas</p>
+              <p className="text-xs text-muted-foreground uppercase tracking-wide">Respondidas</p>
               <p className="mt-1 text-2xl font-bold text-green-700 tabular-nums">{respondidas}</p>
             </CardContent>
           </Card>
           <Card>
             <CardContent className="pt-4">
-              <p className="text-xs text-gray-500 uppercase tracking-wide">Sin respuesta</p>
-              <p className="mt-1 text-2xl font-bold text-gray-900 tabular-nums">{sinRespuesta}</p>
+              <p className="text-xs text-muted-foreground uppercase tracking-wide">Sin respuesta</p>
+              <p className="mt-1 text-2xl font-bold text-foreground tabular-nums">{sinRespuesta}</p>
             </CardContent>
           </Card>
         </div>
 
         <Card>
           <CardContent className="pt-4">
-            <p className="text-xs text-gray-500 uppercase tracking-wide">Tasa de respuesta</p>
-            <p className="mt-1 text-2xl font-bold text-gray-900 tabular-nums">{tasa}%</p>
+            <p className="text-xs text-muted-foreground uppercase tracking-wide">Tasa de respuesta</p>
+            <p className="mt-1 text-2xl font-bold text-foreground tabular-nums">{tasa}%</p>
           </CardContent>
         </Card>
 
@@ -110,7 +110,7 @@ export default async function CampanaDetallePage({
         {/* Tabla de encuestas */}
         <Card>
           <CardHeader>
-            <h2 className="text-sm font-semibold text-gray-900">
+            <h2 className="text-sm font-semibold text-foreground">
               Clientes ({pendientes} pendientes · {respondidas} respondidas)
             </h2>
           </CardHeader>
@@ -136,8 +136,8 @@ export default async function CampanaDetallePage({
                     <TableCell>{e.clientes?.telefono_2 ?? '—'}</TableCell>
                     <TableCell>{e.clientes?.telefono_3 ?? '—'}</TableCell>
                     <TableCell>{e.clientes?.concesionario ?? '—'}</TableCell>
-                    <TableCell className="text-gray-500">{e.clientes?.orden_fabricacion ?? '—'}</TableCell>
-                    <TableCell className="text-gray-500">{formatTecnologia(e.clientes?.tecnologia)}</TableCell>
+                    <TableCell className="text-muted-foreground">{e.clientes?.orden_fabricacion ?? '—'}</TableCell>
+                    <TableCell className="text-muted-foreground">{formatTecnologia(e.clientes?.tecnologia)}</TableCell>
                     <TableCell>
                       <Badge variant={encuestaBadge[e.estado] ?? 'default'}>
                         {e.estado}

@@ -13,14 +13,14 @@ export default async function LlamadosPage() {
     <PageContainer title={`Necesidad de llamado (${encuestas.length})`}>
       <Card>
         <CardHeader>
-          <h2 className="text-sm font-semibold text-gray-900">OF pendientes de llamado</h2>
-          <p className="mt-1 text-sm text-gray-500">
+          <h2 className="text-sm font-semibold text-foreground">OF pendientes de llamado</h2>
+          <p className="mt-1 text-sm text-muted-foreground">
             Desde esta vista se gestionan las OF que no respondieron luego del recordatorio.
           </p>
         </CardHeader>
         <CardContent className="p-0">
           {encuestas.length === 0 ? (
-            <div className="py-12 text-center text-sm text-gray-500">
+            <div className="py-12 text-center text-sm text-muted-foreground">
               No hay OF en necesidad de llamado.
             </div>
           ) : (

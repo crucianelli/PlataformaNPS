@@ -17,7 +17,7 @@ function NpsScoreBadge({ value }: { value: number | null }) {
 
 export default function ConcesionariosNpsTable({ rows }: ConcesionariosNpsTableProps) {
   if (rows.length === 0) {
-    return <div className="py-12 text-center text-sm text-gray-500">No hay respuestas para mostrar.</div>
+    return <div className="py-12 text-center text-sm text-muted-foreground">No hay respuestas para mostrar.</div>
   }
 
   return (
@@ -35,7 +35,7 @@ export default function ConcesionariosNpsTable({ rows }: ConcesionariosNpsTableP
       <TableBody>
         {rows.map((row, index) => (
           <TableRow key={row.concesionario}>
-            <TableCell className="text-gray-500 tabular-nums">{index + 1}</TableCell>
+            <TableCell className="text-muted-foreground tabular-nums">{index + 1}</TableCell>
             <TableCell className="font-medium">{row.concesionario}</TableCell>
             <TableCell className="text-right tabular-nums">{row.totalRespuestas}</TableCell>
             <TableCell className="text-right"><NpsScoreBadge value={row.npsConcesionario} /></TableCell>

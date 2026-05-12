@@ -39,7 +39,7 @@ export default function NuevaCampanaForm() {
       {/* Datos de la campaña */}
       <Card>
         <CardHeader>
-          <h2 className="text-sm font-semibold text-gray-900">Datos de la campaña</h2>
+          <h2 className="text-sm font-semibold text-foreground">Datos de la campaña</h2>
         </CardHeader>
         <CardContent className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <Input
@@ -63,13 +63,13 @@ export default function NuevaCampanaForm() {
       {/* CSV */}
       <Card>
         <CardHeader>
-          <h2 className="text-sm font-semibold text-gray-900">Clientes (CSV)</h2>
-          <p className="text-xs text-gray-500 mt-1">
+          <h2 className="text-sm font-semibold text-foreground">Clientes (CSV)</h2>
+          <p className="text-xs text-muted-foreground mt-1">
             Columnas esperadas:{' '}
-            <code className="bg-gray-100 px-1 rounded text-xs">
+            <code className="bg-muted px-1 rounded text-xs">
               CONCESIONARIO, CLIENTE (según factura), ORDEN DE FABRICACION MÁQUINA, Teléfono del Cliente
             </code>
-            {' '}+ opcionales <code className="bg-gray-100 px-1 rounded text-xs">Teléfono del Cliente 2</code>, <code className="bg-gray-100 px-1 rounded text-xs">Teléfono del Cliente 3</code> y <code className="bg-gray-100 px-1 rounded text-xs">TECNOLOGIA</code>/<code className="bg-gray-100 px-1 rounded text-xs">TECNOLOGÍA</code>
+            {' '}+ opcionales <code className="bg-muted px-1 rounded text-xs">Teléfono del Cliente 2</code>, <code className="bg-muted px-1 rounded text-xs">Teléfono del Cliente 3</code> y <code className="bg-muted px-1 rounded text-xs">TECNOLOGIA</code>/<code className="bg-muted px-1 rounded text-xs">TECNOLOGÍA</code>
           </p>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -80,45 +80,45 @@ export default function NuevaCampanaForm() {
             required
             disabled={isPending}
             onChange={handleFileChange}
-            className="block w-full text-sm text-gray-600
+            className="block w-full text-sm text-muted-foreground
               file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0
-              file:text-sm file:font-medium file:bg-gray-100 file:text-gray-700
-              hover:file:bg-gray-200 cursor-pointer"
+              file:text-sm file:font-medium file:bg-muted file:text-foreground
+              hover:file:bg-muted cursor-pointer"
           />
 
           {csvError && <p className="text-sm text-red-600">{csvError}</p>}
 
           {preview.length > 0 && (
-            <div className="rounded-md border border-gray-200 overflow-hidden">
-              <div className="bg-gray-50 px-4 py-2 text-xs font-medium text-gray-600 border-b border-gray-200">
+            <div className="rounded-md border border-border overflow-hidden">
+              <div className="bg-muted/30 px-4 py-2 text-xs font-medium text-muted-foreground border-b border-border">
                 Vista previa — {preview.length} cliente{preview.length !== 1 ? 's' : ''} detectado{preview.length !== 1 ? 's' : ''}
               </div>
               <div className="overflow-x-auto">
                 <table className="w-full text-xs">
-                  <thead className="bg-gray-50 border-b border-gray-200">
+                  <thead className="bg-muted/30 border-b border-border">
                     <tr>
                       {['Nombre', 'Tel. 1', 'Tel. 2', 'Tel. 3', 'Concesionario', 'OF', 'Tecnología'].map((h) => (
-                        <th key={h} className="px-3 py-2 text-left text-gray-500 font-medium">{h}</th>
+                        <th key={h} className="px-3 py-2 text-left text-muted-foreground font-medium">{h}</th>
                       ))}
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-100">
                     {preview.slice(0, 10).map((row, i) => (
-                      <tr key={i} className="hover:bg-gray-50">
-                        <td className="px-3 py-2 text-gray-900">{row.nombre}</td>
-                        <td className="px-3 py-2 text-gray-600">{row.telefono}</td>
-                        <td className="px-3 py-2 text-gray-600">{row.telefono_2 ?? '—'}</td>
-                        <td className="px-3 py-2 text-gray-600">{row.telefono_3 ?? '—'}</td>
-                        <td className="px-3 py-2 text-gray-600">{row.concesionario}</td>
-                        <td className="px-3 py-2 text-gray-500">{row.orden_fabricacion}</td>
-                        <td className="px-3 py-2 text-gray-500">{formatTecnologia(row.tecnologia)}</td>
+                      <tr key={i} className="hover:bg-muted/30">
+                        <td className="px-3 py-2 text-foreground">{row.nombre}</td>
+                        <td className="px-3 py-2 text-muted-foreground">{row.telefono}</td>
+                        <td className="px-3 py-2 text-muted-foreground">{row.telefono_2 ?? '—'}</td>
+                        <td className="px-3 py-2 text-muted-foreground">{row.telefono_3 ?? '—'}</td>
+                        <td className="px-3 py-2 text-muted-foreground">{row.concesionario}</td>
+                        <td className="px-3 py-2 text-muted-foreground">{row.orden_fabricacion}</td>
+                        <td className="px-3 py-2 text-muted-foreground">{formatTecnologia(row.tecnologia)}</td>
                       </tr>
                     ))}
                   </tbody>
                 </table>
               </div>
               {preview.length > 10 && (
-                <div className="px-4 py-2 text-xs text-gray-500 border-t border-gray-200">
+                <div className="px-4 py-2 text-xs text-muted-foreground border-t border-border">
                   y {preview.length - 10} cliente{preview.length - 10 !== 1 ? 's' : ''} más...
                 </div>
               )}
@@ -134,7 +134,7 @@ export default function NuevaCampanaForm() {
       <div className="flex justify-end gap-3">
         <Link
           href="/campanas"
-          className="inline-flex items-center justify-center h-10 px-4 rounded-md text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors"
+          className="inline-flex items-center justify-center h-10 px-4 rounded-md text-sm font-medium text-muted-foreground hover:bg-muted transition-colors"
         >
           Cancelar
         </Link>

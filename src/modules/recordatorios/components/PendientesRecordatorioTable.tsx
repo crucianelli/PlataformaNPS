@@ -11,7 +11,7 @@ export default function PendientesRecordatorioTable({
 }: PendientesRecordatorioTableProps) {
   if (clientes.length === 0) {
     return (
-      <div className="py-12 text-center text-sm text-gray-500">
+      <div className="py-12 text-center text-sm text-muted-foreground">
         No hay clientes pendientes para este recordatorio.
       </div>
     )
@@ -38,7 +38,7 @@ export default function PendientesRecordatorioTable({
             <TableCell>{item.clientes?.telefono_2 ?? '—'}</TableCell>
             <TableCell>{item.clientes?.telefono_3 ?? '—'}</TableCell>
             <TableCell>{item.clientes?.concesionario ?? '—'}</TableCell>
-            <TableCell className="text-gray-500">{item.clientes?.orden_fabricacion ?? '—'}</TableCell>
+            <TableCell className="text-muted-foreground">{item.clientes?.orden_fabricacion ?? '—'}</TableCell>
             <TableCell>
               <Badge
                 variant={

@@ -26,8 +26,8 @@ export default function RecordatoriosTimeline({
     <Card>
       <CardHeader className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h2 className="text-sm font-semibold text-gray-900">Recordatorios</h2>
-          <p className="mt-1 text-sm text-gray-500">
+          <h2 className="text-sm font-semibold text-foreground">Recordatorios</h2>
+          <p className="mt-1 text-sm text-muted-foreground">
             Se reutiliza siempre el mismo link por OF. Máximo 3 recordatorios por campaña.
           </p>
         </div>
@@ -36,26 +36,26 @@ export default function RecordatoriosTimeline({
             <Button>Crear recordatorio {permiso.nextNumero}</Button>
           </Link>
         ) : (
-          <span className="text-sm text-gray-500">{permiso.reason}</span>
+          <span className="text-sm text-muted-foreground">{permiso.reason}</span>
         )}
       </CardHeader>
       <CardContent className="space-y-3">
         {recordatorios.length === 0 ? (
-          <p className="text-sm text-gray-500">Todavía no hay envíos registrados para esta campaña.</p>
+          <p className="text-sm text-muted-foreground">Todavía no hay envíos registrados para esta campaña.</p>
         ) : (
           recordatorios.map((item) => (
             <div
               key={item.numero_recordatorio}
-              className="flex flex-col gap-3 rounded-lg border border-gray-200 px-4 py-4 sm:flex-row sm:items-center sm:justify-between"
+              className="flex flex-col gap-3 rounded-lg border border-border px-4 py-4 sm:flex-row sm:items-center sm:justify-between"
             >
               <div className="space-y-1">
                 <div className="flex items-center gap-2">
-                  <p className="text-sm font-medium text-gray-900">{getLabel(item.numero_recordatorio)}</p>
+                  <p className="text-sm font-medium text-foreground">{getLabel(item.numero_recordatorio)}</p>
                   <Badge variant={item.estado_envio === 'enviado' ? 'success' : 'warning'}>
                     {item.estado_envio}
                   </Badge>
                 </div>
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-muted-foreground">
                   {item.total_clientes} cliente{item.total_clientes !== 1 ? 's' : ''}
                   {item.fecha_envio
                     ? ` · enviado el ${new Date(item.fecha_envio).toLocaleDateString('es-AR')}`

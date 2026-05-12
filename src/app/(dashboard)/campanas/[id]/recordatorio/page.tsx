@@ -38,10 +38,10 @@ export default async function RecordatorioPage({
         {!recordatorioActivo ? (
           <Card>
             <CardHeader>
-              <h2 className="text-sm font-semibold text-gray-900">
+              <h2 className="text-sm font-semibold text-foreground">
                 Preparar recordatorio {permisoCreacion.nextNumero}
               </h2>
-              <p className="mt-1 text-sm text-gray-500">
+              <p className="mt-1 text-sm text-muted-foreground">
                 Se crearán registros de envío para todos los clientes que todavía no respondieron.
               </p>
             </CardHeader>
@@ -54,33 +54,33 @@ export default async function RecordatorioPage({
             <Card>
               <CardHeader className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <div>
-                  <h2 className="text-sm font-semibold text-gray-900">
+                  <h2 className="text-sm font-semibold text-foreground">
                     Recordatorio {recordatorioActivo.numero_recordatorio}
                   </h2>
-                  <p className="mt-1 text-sm text-gray-500">
+                  <p className="mt-1 text-sm text-muted-foreground">
                     Exporta los clientes pendientes, realiza el envío externo y luego confirma este recordatorio.
                   </p>
                 </div>
                 <a
                   href={`/api/campanas/${id}/exportar`}
-                  className="inline-flex items-center justify-center h-10 px-4 rounded-md text-sm font-medium bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors"
+                  className="inline-flex items-center justify-center h-10 px-4 rounded-md text-sm font-medium bg-muted text-foreground hover:bg-muted transition-colors"
                 >
                   Exportar pendientes
                 </a>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-                  <div className="rounded-lg border border-gray-200 px-4 py-4">
-                    <p className="text-xs uppercase tracking-wide text-gray-500">Clientes pendientes</p>
-                    <p className="mt-1 text-2xl font-bold text-gray-900">{pendientes.length}</p>
+                  <div className="rounded-lg border border-border px-4 py-4">
+                    <p className="text-xs uppercase tracking-wide text-muted-foreground">Clientes pendientes</p>
+                    <p className="mt-1 text-2xl font-bold text-foreground">{pendientes.length}</p>
                   </div>
-                  <div className="rounded-lg border border-gray-200 px-4 py-4">
-                    <p className="text-xs uppercase tracking-wide text-gray-500">Estado</p>
+                  <div className="rounded-lg border border-border px-4 py-4">
+                    <p className="text-xs uppercase tracking-wide text-muted-foreground">Estado</p>
                     <p className="mt-1 text-lg font-semibold text-yellow-700">pendiente_envio</p>
                   </div>
-                  <div className="rounded-lg border border-gray-200 px-4 py-4">
-                    <p className="text-xs uppercase tracking-wide text-gray-500">Acción</p>
-                    <p className="mt-1 text-sm text-gray-600">Confirmar manualmente después del envío externo</p>
+                  <div className="rounded-lg border border-border px-4 py-4">
+                    <p className="text-xs uppercase tracking-wide text-muted-foreground">Acción</p>
+                    <p className="mt-1 text-sm text-muted-foreground">Confirmar manualmente después del envío externo</p>
                   </div>
                 </div>
 
@@ -93,7 +93,7 @@ export default async function RecordatorioPage({
 
             <Card>
               <CardHeader>
-                <h2 className="text-sm font-semibold text-gray-900">Clientes incluidos en este recordatorio</h2>
+                <h2 className="text-sm font-semibold text-foreground">Clientes incluidos en este recordatorio</h2>
               </CardHeader>
               <CardContent className="p-0">
                 <PendientesRecordatorioTable clientes={pendientes} />

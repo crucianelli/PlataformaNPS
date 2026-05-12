@@ -57,14 +57,14 @@ export default async function NpsPage({
           <CardContent className="pt-4">
             <form className="grid grid-cols-1 gap-4 lg:grid-cols-6">
               <div className="w-full max-w-md">
-                <label htmlFor="concesionario" className="mb-1 block text-sm font-medium text-gray-700">
+                <label htmlFor="concesionario" className="mb-1 block text-sm font-medium text-foreground">
                   Filtrar por concesionario
                 </label>
                 <select
                   id="concesionario"
                   name="concesionario"
                   defaultValue={concesionario ?? ''}
-                  className="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand"
+                  className="block w-full rounded-md border border-border bg-card px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
                 >
                   <option value="">Todos los concesionarios</option>
                   {options.concesionarios.map((item) => (
@@ -75,14 +75,14 @@ export default async function NpsPage({
                 </select>
               </div>
               <div>
-                <label htmlFor="tipoMaquina" className="mb-1 block text-sm font-medium text-gray-700">
+                <label htmlFor="tipoMaquina" className="mb-1 block text-sm font-medium text-foreground">
                   Tipo de máquina
                 </label>
                 <select
                   id="tipoMaquina"
                   name="tipoMaquina"
                   defaultValue={tipoMaquinaFilter ?? ''}
-                  className="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand"
+                  className="block w-full rounded-md border border-border bg-card px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
                 >
                   <option value="">Todas</option>
                   <option value="sembradora">Sembradoras</option>
@@ -90,14 +90,14 @@ export default async function NpsPage({
                 </select>
               </div>
               <div>
-                <label htmlFor="tecnologia" className="mb-1 block text-sm font-medium text-gray-700">
+                <label htmlFor="tecnologia" className="mb-1 block text-sm font-medium text-foreground">
                   Tecnología
                 </label>
                 <select
                   id="tecnologia"
                   name="tecnologia"
                   defaultValue={tecnologiaFilter ?? ''}
-                  className="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand"
+                  className="block w-full rounded-md border border-border bg-card px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
                 >
                   <option value="">Todas</option>
                   {options.tecnologias.map((item) => (
@@ -108,7 +108,7 @@ export default async function NpsPage({
                 </select>
               </div>
               <div>
-                <label htmlFor="fechaDesde" className="mb-1 block text-sm font-medium text-gray-700">
+                <label htmlFor="fechaDesde" className="mb-1 block text-sm font-medium text-foreground">
                   Desde
                 </label>
                 <input
@@ -116,11 +116,11 @@ export default async function NpsPage({
                   name="fechaDesde"
                   type="date"
                   defaultValue={fechaDesde}
-                  className="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand"
+                  className="block w-full rounded-md border border-border bg-card px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
                 />
               </div>
               <div>
-                <label htmlFor="fechaHasta" className="mb-1 block text-sm font-medium text-gray-700">
+                <label htmlFor="fechaHasta" className="mb-1 block text-sm font-medium text-foreground">
                   Hasta
                 </label>
                 <input
@@ -128,19 +128,19 @@ export default async function NpsPage({
                   name="fechaHasta"
                   type="date"
                   defaultValue={fechaHasta}
-                  className="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand"
+                  className="block w-full rounded-md border border-border bg-card px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
                 />
               </div>
               <div className="flex items-end gap-3">
               <button
                 type="submit"
-                className="inline-flex h-10 items-center justify-center rounded-md bg-gray-100 px-4 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-200"
+                className="inline-flex h-10 items-center justify-center rounded-md bg-muted px-4 text-sm font-medium text-foreground transition-colors hover:bg-muted"
               >
                 Aplicar filtro
               </button>
               <a
                 href="/nps"
-                className="inline-flex h-10 items-center justify-center rounded-md px-4 text-sm font-medium text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-900"
+                className="inline-flex h-10 items-center justify-center rounded-md px-4 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
               >
                 Limpiar
               </a>
@@ -167,7 +167,7 @@ export default async function NpsPage({
 
         <Card>
           <CardHeader>
-            <h2 className="text-sm font-semibold text-gray-900">Ranking completo por concesionario</h2>
+            <h2 className="text-sm font-semibold text-foreground">Ranking completo por concesionario</h2>
           </CardHeader>
           <CardContent className="p-0">
             <ConcesionariosNpsTable rows={rows} />

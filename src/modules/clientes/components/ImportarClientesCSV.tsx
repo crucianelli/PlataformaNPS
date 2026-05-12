@@ -11,8 +11,8 @@ export default function ImportarClientesCSV() {
   return (
     <Card>
       <CardHeader>
-        <h2 className="text-sm font-semibold text-gray-900">Importar clientes desde CSV</h2>
-        <p className="text-xs text-gray-500 mt-1">
+        <h2 className="text-sm font-semibold text-foreground">Importar clientes desde CSV</h2>
+        <p className="text-xs text-muted-foreground mt-1">
           Columnas esperadas (en cualquier orden):
         </p>
         <ul className="mt-1 space-y-0.5">
@@ -26,7 +26,7 @@ export default function ImportarClientesCSV() {
             'TECNOLOGIA / TECNOLOGÍA (Leaf o Precision Planting, opcional)',
           ].map((col) => (
             <li key={col}>
-              <code className="text-xs bg-gray-100 text-gray-700 px-1.5 py-0.5 rounded">{col}</code>
+              <code className="text-xs bg-muted text-foreground px-1.5 py-0.5 rounded">{col}</code>
             </li>
           ))}
         </ul>
@@ -40,12 +40,12 @@ export default function ImportarClientesCSV() {
               accept=".csv,text/csv"
               required
               disabled={isPending}
-              className="block w-full text-sm text-gray-600
+              className="block w-full text-sm text-muted-foreground
                 file:mr-4 file:py-2 file:px-4
                 file:rounded-md file:border-0
                 file:text-sm file:font-medium
-                file:bg-gray-100 file:text-gray-700
-                hover:file:bg-gray-200
+                file:bg-muted file:text-foreground
+                hover:file:bg-muted
                 cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
             />
           </div>

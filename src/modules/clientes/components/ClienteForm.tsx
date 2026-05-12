@@ -20,7 +20,7 @@ export default function ClienteForm() {
   return (
     <Card>
       <CardHeader>
-        <h2 className="text-sm font-semibold text-gray-900">Agregar OF manualmente</h2>
+        <h2 className="text-sm font-semibold text-foreground">Agregar OF manualmente</h2>
       </CardHeader>
       <CardContent>
         <form ref={formRef} action={formAction} className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -31,7 +31,7 @@ export default function ClienteForm() {
           <Input label="Concesionario" name="concesionario" required disabled={isPending} />
           <Input label="OF" name="orden_fabricacion" required disabled={isPending} />
           <div className="space-y-1">
-            <label htmlFor="tecnologia" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="tecnologia" className="block text-sm font-medium text-foreground">
               Tecnología
             </label>
             <select
@@ -39,7 +39,7 @@ export default function ClienteForm() {
               name="tecnologia"
               disabled={isPending}
               defaultValue=""
-              className="block h-10 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-500"
+              className="block h-10 w-full rounded-md border border-border bg-card px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary disabled:cursor-not-allowed disabled:bg-muted/30 disabled:text-muted-foreground"
             >
               <option value="">Sin tecnología</option>
               {TECNOLOGIAS.map((item) => (

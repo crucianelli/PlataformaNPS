@@ -1,16 +1,23 @@
-import Sidebar from '@/components/layout/Sidebar'
-import Header from '@/components/layout/Header'
+import AppSidebar from '@/components/layout/AppSidebar'
+import Topbar from '@/components/layout/Topbar'
+import { SidebarProvider } from '@/hooks/use-sidebar'
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="flex h-screen bg-gray-50">
-      <Sidebar />
-      <div className="flex flex-col flex-1 overflow-hidden">
-        <Header />
-        <main className="flex-1 overflow-y-auto">
-          {children}
-        </main>
+    <SidebarProvider>
+      <div className="flex h-screen overflow-hidden bg-background">
+        <AppSidebar />
+        <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
+          <Topbar />
+          <main
+            id="main-content"
+            className="flex-1 overflow-y-auto overflow-x-hidden"
+            tabIndex={-1}
+          >
+            {children}
+          </main>
+        </div>
       </div>
-    </div>
+    </SidebarProvider>
   )
 }

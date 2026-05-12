@@ -43,9 +43,9 @@ function PromedioTooltip({ active, payload }: { active?: boolean; payload?: Arra
   if (!active || !payload?.length) return null
   const { payload: item, value } = payload[0]
   return (
-    <div className="rounded-md border border-gray-200 bg-white px-3 py-2 text-xs shadow-md">
-      <p className="font-medium text-gray-900">{item.label}</p>
-      <p className="text-gray-600">Promedio: <span className="font-semibold">{value.toFixed(1)} / 10</span></p>
+    <div className="rounded-md border border-border bg-card px-3 py-2 text-xs shadow-md">
+      <p className="font-medium text-foreground">{item.label}</p>
+      <p className="text-muted-foreground">Promedio: <span className="font-semibold">{value.toFixed(1)} / 10</span></p>
     </div>
   )
 }
@@ -94,8 +94,8 @@ function DistribucionMiniChart({ calificacion }: { calificacion: CalificacionRes
 
   return (
     <div>
-      <p className="mb-0.5 truncate text-xs font-medium text-gray-800">{calificacion.label}</p>
-      <p className="mb-2 text-[11px] text-gray-400">
+      <p className="mb-0.5 truncate text-xs font-medium text-foreground">{calificacion.label}</p>
+      <p className="mb-2 text-[11px] text-muted-foreground">
         {calificacion.total > 0
           ? `Prom. ${calificacion.promedio?.toFixed(1)} · ${calificacion.total} resp.`
           : 'Sin datos'}
@@ -140,11 +140,11 @@ export default function CalificacionesPanel({ calificaciones }: CalificacionesPa
     <div className="space-y-4">
       <Card>
         <CardHeader>
-          <h2 className="text-sm font-semibold text-gray-900">Promedio por pregunta</h2>
+          <h2 className="text-sm font-semibold text-foreground">Promedio por pregunta</h2>
         </CardHeader>
         <CardContent>
           {!conDatos ? (
-            <p className="py-8 text-center text-sm text-gray-500">Sin datos para mostrar.</p>
+            <p className="py-8 text-center text-sm text-muted-foreground">Sin datos para mostrar.</p>
           ) : (
             <PromediosChart calificaciones={calificaciones} />
           )}
@@ -153,11 +153,11 @@ export default function CalificacionesPanel({ calificaciones }: CalificacionesPa
 
       <Card>
         <CardHeader>
-          <h2 className="text-sm font-semibold text-gray-900">Distribución de respuestas por score</h2>
+          <h2 className="text-sm font-semibold text-foreground">Distribución de respuestas por score</h2>
         </CardHeader>
         <CardContent>
           {!conDatos ? (
-            <p className="py-8 text-center text-sm text-gray-500">Sin datos para mostrar.</p>
+            <p className="py-8 text-center text-sm text-muted-foreground">Sin datos para mostrar.</p>
           ) : (
             <div className="grid grid-cols-2 gap-x-8 gap-y-6 sm:grid-cols-4">
               {calificaciones.map((c) => (
