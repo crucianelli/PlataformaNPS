@@ -22,8 +22,8 @@ export default function ConfigForm({ config }: ConfigFormProps) {
     <div className="space-y-6">
       <Card>
         <CardHeader>
-          <h2 className="text-sm font-semibold text-gray-900">Configuración global</h2>
-          <p className="mt-1 text-sm text-gray-500">
+          <h2 className="text-sm font-semibold text-foreground">Configuración global</h2>
+          <p className="mt-1 text-sm text-muted-foreground">
             Estos valores controlan las notificaciones y los destinatarios del sistema.
           </p>
         </CardHeader>
@@ -55,7 +55,7 @@ export default function ConfigForm({ config }: ConfigFormProps) {
             <div className="space-y-1">
               <label
                 htmlFor="emails_notificacion"
-                className="block text-sm font-medium text-gray-700"
+                className="block text-sm font-medium text-foreground"
               >
                 Emails de notificación
               </label>
@@ -66,9 +66,9 @@ export default function ConfigForm({ config }: ConfigFormProps) {
                 disabled={isPending}
                 defaultValue={config.emails_notificacion.join('\n')}
                 placeholder={'responsable@empresa.com\nsupervision@empresa.com'}
-                className="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 shadow-sm placeholder-gray-400 focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-500"
+                className="block w-full rounded-md border border-border bg-card px-3 py-2 text-sm text-foreground shadow-sm placeholder-gray-400 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary disabled:cursor-not-allowed disabled:bg-muted/30 disabled:text-muted-foreground"
               />
-              <p className="text-xs text-gray-500">
+              <p className="text-xs text-muted-foreground">
                 Ingresa un email por línea o separados por coma.
               </p>
             </div>
@@ -91,8 +91,8 @@ export default function ConfigForm({ config }: ConfigFormProps) {
 
       <Card>
         <CardHeader>
-          <h2 className="text-sm font-semibold text-gray-900">Prueba de email SMTP</h2>
-          <p className="mt-1 text-sm text-gray-500">
+          <h2 className="text-sm font-semibold text-foreground">Prueba de email SMTP</h2>
+          <p className="mt-1 text-sm text-muted-foreground">
             Envía un correo de prueba con la configuración SMTP actual.
           </p>
         </CardHeader>
@@ -106,7 +106,7 @@ export default function ConfigForm({ config }: ConfigFormProps) {
               disabled={isSendingTest}
             />
 
-            <p className="text-xs text-gray-500">
+            <p className="text-xs text-muted-foreground">
               Si dejas este campo vacío, se usará el primer email configurado en notificaciones.
             </p>
 

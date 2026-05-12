@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { cn } from '@/lib/utils/cn'
 
 interface PaginationProps {
@@ -7,6 +8,7 @@ interface PaginationProps {
   totalItems: number
   pageSize: number
   getPageUrl: (page: number) => string
+  itemLabel?: string
 }
 
 function getPageRange(current: number, total: number): (number | null)[] {
@@ -28,49 +30,52 @@ export default function Pagination({
   totalItems,
   pageSize,
   getPageUrl,
+  itemLabel = 'resultados',
 }: PaginationProps) {
   if (totalPages <= 1) return null
 
   const from = (currentPage - 1) * pageSize + 1
-  const to = Math.min(currentPage * pageSize, totalItems)
+  const to   = Math.min(currentPage * pageSize, totalItems)
   const pages = getPageRange(currentPage, totalPages)
 
-  const linkBase =
-    'inline-flex items-center justify-center h-8 min-w-8 px-2 rounded text-sm font-medium transition-colors'
+  const btnBase = cn(
+    'inline-flex items-center justify-center h-8 min-w-8 px-2 rounded-md text-sm font-medium',
+    'transition-colors duration-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring'
+  )
 
   return (
-    <div className="flex flex-col sm:flex-row items-center justify-between gap-3 px-4 py-3 border-t border-gray-200">
-      <p className="text-sm text-gray-500">
-        Mostrando <span className="font-medium text-gray-700">{from}–{to}</span> de{' '}
-        <span className="font-medium text-gray-700">{totalItems}</span> clientes
+    <div className="flex flex-col items-center justify-between gap-3 border-t border-border px-4 py-3 sm:flex-row">
+      <p className="font-mono text-xs text-muted-foreground">
+        <span className="font-semibold text-foreground">{from}–{to}</span> de{' '}
+        <span className="font-semibold text-foreground">{totalItems}</span> {itemLabel}
       </p>
 
       <div className="flex items-center gap-1">
         {currentPage > 1 ? (
-          <Link
-            href={getPageUrl(currentPage - 1)}
-            className={cn(linkBase, 'text-gray-600 hover:bg-gray-100')}
-          >
-            ← Anterior
+          <Link href={getPageUrl(currentPage - 1)} className={cn(btnBase, 'text-muted-foreground hover:bg-muted hover:text-foreground')} aria-label="Página anterior">
+            <ChevronLeft size={14} />
           </Link>
         ) : (
-          <span className={cn(linkBase, 'text-gray-300 cursor-not-allowed')}>← Anterior</span>
+          <span className={cn(btnBase, 'cursor-not-allowed text-muted-foreground/40')} aria-disabled="true">
+            <ChevronLeft size={14} />
+          </span>
         )}
 
         {pages.map((page, idx) =>
           page === null ? (
-            <span key={`ellipsis-${idx}`} className="px-1 text-gray-400 text-sm">
-              …
+            <span key={`ellipsis-${idx}`} className="w-6 text-center text-xs text-muted-foreground">
+              ···
             </span>
           ) : (
             <Link
               key={page}
               href={getPageUrl(page)}
+              aria-current={page === currentPage ? 'page' : undefined}
               className={cn(
-                linkBase,
+                btnBase,
                 page === currentPage
-                  ? 'bg-brand text-white'
-                  : 'text-gray-600 hover:bg-gray-100'
+                  ? 'bg-primary text-primary-foreground'
+                  : 'text-muted-foreground hover:bg-muted hover:text-foreground'
               )}
             >
               {page}
@@ -79,14 +84,13 @@ export default function Pagination({
         )}
 
         {currentPage < totalPages ? (
-          <Link
-            href={getPageUrl(currentPage + 1)}
-            className={cn(linkBase, 'text-gray-600 hover:bg-gray-100')}
-          >
-            Siguiente →
+          <Link href={getPageUrl(currentPage + 1)} className={cn(btnBase, 'text-muted-foreground hover:bg-muted hover:text-foreground')} aria-label="Página siguiente">
+            <ChevronRight size={14} />
           </Link>
         ) : (
-          <span className={cn(linkBase, 'text-gray-300 cursor-not-allowed')}>Siguiente →</span>
+          <span className={cn(btnBase, 'cursor-not-allowed text-muted-foreground/40')} aria-disabled="true">
+            <ChevronRight size={14} />
+          </span>
         )}
       </div>
     </div>

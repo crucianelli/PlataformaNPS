@@ -78,7 +78,7 @@ export default async function RespuestasPage({
             <form className="space-y-4">
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
                 <div>
-                  <label htmlFor="q" className="mb-1 block text-sm font-medium text-gray-700">
+                  <label htmlFor="q" className="mb-1 block text-sm font-medium text-foreground">
                     Buscar
                   </label>
                   <input
@@ -86,18 +86,18 @@ export default async function RespuestasPage({
                     name="q"
                     defaultValue={q}
                     placeholder="Cliente, email, campaña..."
-                    className="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand"
+                    className="block w-full rounded-md border border-border bg-card px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
                   />
                 </div>
                 <div>
-                  <label htmlFor="concesionario" className="mb-1 block text-sm font-medium text-gray-700">
+                  <label htmlFor="concesionario" className="mb-1 block text-sm font-medium text-foreground">
                     Concesionario
                   </label>
                   <select
                     id="concesionario"
                     name="concesionario"
                     defaultValue={concesionario ?? ''}
-                    className="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand"
+                    className="block w-full rounded-md border border-border bg-card px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
                   >
                     <option value="">Todos</option>
                     {options.concesionarios.map((item) => (
@@ -108,14 +108,14 @@ export default async function RespuestasPage({
                   </select>
                 </div>
                 <div>
-                  <label htmlFor="campanaId" className="mb-1 block text-sm font-medium text-gray-700">
+                  <label htmlFor="campanaId" className="mb-1 block text-sm font-medium text-foreground">
                     Campaña
                   </label>
                   <select
                     id="campanaId"
                     name="campanaId"
                     defaultValue={campanaId ?? ''}
-                    className="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand"
+                    className="block w-full rounded-md border border-border bg-card px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
                   >
                     <option value="">Todas</option>
                     {options.campanas.map((item) => (
@@ -126,7 +126,7 @@ export default async function RespuestasPage({
                   </select>
                 </div>
                 <div>
-                  <label htmlFor="fechaDesde" className="mb-1 block text-sm font-medium text-gray-700">
+                  <label htmlFor="fechaDesde" className="mb-1 block text-sm font-medium text-foreground">
                     Desde
                   </label>
                   <input
@@ -134,18 +134,18 @@ export default async function RespuestasPage({
                     name="fechaDesde"
                     type="date"
                     defaultValue={fechaDesde}
-                    className="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand"
+                    className="block w-full rounded-md border border-border bg-card px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
                   />
                 </div>
                 <div>
-                  <label htmlFor="tecnologia" className="mb-1 block text-sm font-medium text-gray-700">
+                  <label htmlFor="tecnologia" className="mb-1 block text-sm font-medium text-foreground">
                     Tecnología
                   </label>
                   <select
                     id="tecnologia"
                     name="tecnologia"
                     defaultValue={tecnologiaFilter ?? ''}
-                    className="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand"
+                    className="block w-full rounded-md border border-border bg-card px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
                   >
                     <option value="">Todas</option>
                     {options.tecnologias.map((item) => (
@@ -156,7 +156,7 @@ export default async function RespuestasPage({
                   </select>
                 </div>
                 <div>
-                  <label htmlFor="fechaHasta" className="mb-1 block text-sm font-medium text-gray-700">
+                  <label htmlFor="fechaHasta" className="mb-1 block text-sm font-medium text-foreground">
                     Hasta
                   </label>
                   <input
@@ -164,18 +164,18 @@ export default async function RespuestasPage({
                     name="fechaHasta"
                     type="date"
                     defaultValue={fechaHasta}
-                    className="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand"
+                    className="block w-full rounded-md border border-border bg-card px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
                   />
                 </div>
                 <div>
-                  <label htmlFor="estadoNps" className="mb-1 block text-sm font-medium text-gray-700">
+                  <label htmlFor="estadoNps" className="mb-1 block text-sm font-medium text-foreground">
                     Estado NPS
                   </label>
                   <select
                     id="estadoNps"
                     name="estadoNps"
                     defaultValue={estadoNpsFilter ?? ''}
-                    className="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand"
+                    className="block w-full rounded-md border border-border bg-card px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
                   >
                     <option value="">Todos</option>
                     {NPS_ANSWER_STATUS_OPTIONS.map((item) => (
@@ -186,14 +186,14 @@ export default async function RespuestasPage({
                   </select>
                 </div>
                 <div>
-                  <label htmlFor="npsDimension" className="mb-1 block text-sm font-medium text-gray-700">
+                  <label htmlFor="npsDimension" className="mb-1 block text-sm font-medium text-foreground">
                     NPS
                   </label>
                   <select
                     id="npsDimension"
                     name="npsDimension"
                     defaultValue={npsDimensionFilter ?? ''}
-                    className="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand"
+                    className="block w-full rounded-md border border-border bg-card px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
                   >
                     <option value="">Cualquiera</option>
                     {NPS_DIMENSION_OPTIONS.map((item) => (
@@ -204,14 +204,14 @@ export default async function RespuestasPage({
                   </select>
                 </div>
                 <div>
-                  <label htmlFor="canal" className="mb-1 block text-sm font-medium text-gray-700">
+                  <label htmlFor="canal" className="mb-1 block text-sm font-medium text-foreground">
                     Canal
                   </label>
                   <select
                     id="canal"
                     name="canal"
                     defaultValue={canalFilter ?? ''}
-                    className="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand"
+                    className="block w-full rounded-md border border-border bg-card px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
                   >
                     <option value="">Todos</option>
                     <option value="mensaje">Mensaje</option>
@@ -219,18 +219,18 @@ export default async function RespuestasPage({
                   </select>
                 </div>
               </div>
-              <div className="flex flex-col gap-3 border-t border-gray-100 pt-4 sm:flex-row sm:items-center sm:justify-between">
-                <p className="text-xs text-gray-500">{respuestas.length} respuesta{respuestas.length !== 1 ? 's' : ''} encontrada{respuestas.length !== 1 ? 's' : ''}</p>
+              <div className="flex flex-col gap-3 border-t border-border pt-4 sm:flex-row sm:items-center sm:justify-between">
+                <p className="text-xs text-muted-foreground">{respuestas.length} respuesta{respuestas.length !== 1 ? 's' : ''} encontrada{respuestas.length !== 1 ? 's' : ''}</p>
                 <div className="flex flex-wrap items-center gap-3">
                   <button
                     type="submit"
-                    className="inline-flex h-10 items-center justify-center rounded-md bg-gray-100 px-4 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-200"
+                    className="inline-flex h-10 items-center justify-center rounded-md bg-muted px-4 text-sm font-medium text-foreground transition-colors hover:bg-muted"
                   >
                     Filtrar
                   </button>
                   <a
                     href="/respuestas"
-                    className="inline-flex h-10 items-center justify-center rounded-md px-4 text-sm font-medium text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-900"
+                    className="inline-flex h-10 items-center justify-center rounded-md px-4 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
                   >
                     Limpiar
                   </a>
@@ -242,12 +242,12 @@ export default async function RespuestasPage({
 
         <Card>
           <CardHeader className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <h2 className="text-sm font-semibold text-gray-900">Listado de respuestas</h2>
+            <h2 className="text-sm font-semibold text-foreground">Listado de respuestas</h2>
             <a
               href={exportHref}
-              className="inline-flex h-9 items-center justify-center gap-2 rounded-md border border-gray-300 bg-white px-3 text-sm font-medium text-gray-700 transition-colors hover:border-brand hover:text-brand"
+              className="inline-flex h-9 items-center justify-center gap-2 rounded-md border border-border bg-card px-3 text-sm font-medium text-foreground transition-colors hover:border-brand hover:text-brand"
             >
-              <span className="rounded bg-gray-100 px-1.5 py-0.5 text-[10px] font-semibold leading-none text-gray-600">
+              <span className="rounded bg-muted px-1.5 py-0.5 text-[10px] font-semibold leading-none text-muted-foreground">
                 CSV
               </span>
               Exportar

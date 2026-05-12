@@ -69,19 +69,19 @@ export default function IndicadoresPanel({ resumen, efectividad, label }: Indica
 
   return (
     <div className="space-y-4">
-      {label && <p className="text-sm text-gray-500">{label}</p>}
+      {label && <p className="text-sm text-muted-foreground">{label}</p>}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-5">
         {cards.map((card) => (
           <Card key={card.title}>
             <CardContent className="pt-4">
               <div className="flex items-start justify-between gap-3">
-                <p className="text-xs uppercase tracking-wide text-gray-500">{card.title}</p>
+                <p className="text-xs uppercase tracking-wide text-muted-foreground">{card.title}</p>
                 {card.label && (
                   <Badge variant={getNpsScoreVariant(card.score)}>{card.label}</Badge>
                 )}
               </div>
-              <p className="mt-2 text-3xl font-bold text-gray-900 tabular-nums">{card.value}</p>
-              <p className="mt-1 text-xs text-gray-500">{card.sub}</p>
+              <p className="mt-2 text-3xl font-bold text-foreground tabular-nums">{card.value}</p>
+              <p className="mt-1 text-xs text-muted-foreground">{card.sub}</p>
             </CardContent>
           </Card>
         ))}
