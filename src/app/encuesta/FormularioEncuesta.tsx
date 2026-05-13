@@ -9,6 +9,9 @@ interface FormularioEncuestaProps {
   concesionario: string
 }
 
+const inputClass =
+  'block w-full rounded-lg border border-gray-300 bg-white px-3.5 py-2.5 text-sm text-gray-900 placeholder-gray-400 transition-colors focus:border-[#C0272D] focus:outline-none focus:ring-2 focus:ring-[#C0272D]/20 disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-500'
+
 function CampoTexto({
   label,
   name,
@@ -27,10 +30,9 @@ function CampoTexto({
   defaultValue?: string
 }) {
   return (
-    <div className="space-y-1">
+    <div className="space-y-1.5">
       <label htmlFor={name} className="block text-sm font-medium text-gray-700">
-        {label}
-        {required ? ' *' : ''}
+        {label}{required && <span className="text-[#C0272D] ml-0.5">*</span>}
       </label>
       <input
         id={name}
@@ -40,7 +42,7 @@ function CampoTexto({
         disabled={disabled}
         defaultValue={defaultValue}
         placeholder={placeholder}
-        className="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-500"
+        className={inputClass}
       />
     </div>
   )
@@ -62,10 +64,9 @@ function CampoSelect({
   defaultValue?: string
 }) {
   return (
-    <div className="space-y-1">
+    <div className="space-y-1.5">
       <label htmlFor={name} className="block text-sm font-medium text-gray-700">
-        {label}
-        {required ? ' *' : ''}
+        {label}{required && <span className="text-[#C0272D] ml-0.5">*</span>}
       </label>
       <select
         id={name}
@@ -73,15 +74,11 @@ function CampoSelect({
         required={required}
         disabled={disabled}
         defaultValue={defaultValue ?? ''}
-        className="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-500"
+        className={inputClass}
       >
-        <option value="" disabled>
-          Seleccionar...
-        </option>
+        <option value="" disabled>Seleccionar...</option>
         {options.map((option) => (
-          <option key={option} value={option}>
-            {option}
-          </option>
+          <option key={option} value={option}>{option}</option>
         ))}
       </select>
     </div>
@@ -90,9 +87,9 @@ function CampoSelect({
 
 function CampoSelectMaquina({ disabled }: { disabled?: boolean }) {
   return (
-    <div className="space-y-1">
+    <div className="space-y-1.5">
       <label htmlFor="maquina_modelo" className="block text-sm font-medium text-gray-700">
-        Sobre qué máquina está realizando esta encuesta *
+        Sobre qué máquina está realizando esta encuesta<span className="text-[#C0272D] ml-0.5">*</span>
       </label>
       <select
         id="maquina_modelo"
@@ -100,26 +97,20 @@ function CampoSelectMaquina({ disabled }: { disabled?: boolean }) {
         required
         disabled={disabled}
         defaultValue=""
-        className="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-500"
+        className={inputClass}
       >
-        <option value="" disabled>
-          Seleccionar...
-        </option>
+        <option value="" disabled>Seleccionar...</option>
         {MAQUINAS_SEMBRADORA.length > 0 && (
           <optgroup label="Sembradoras">
             {MAQUINAS_SEMBRADORA.map((option) => (
-              <option key={option} value={option}>
-                {option}
-              </option>
+              <option key={option} value={option}>{option}</option>
             ))}
           </optgroup>
         )}
         {MAQUINAS_FERTILIZADORA.length > 0 && (
           <optgroup label="Fertilizadoras">
             {MAQUINAS_FERTILIZADORA.map((option) => (
-              <option key={option} value={option}>
-                {option}
-              </option>
+              <option key={option} value={option}>{option}</option>
             ))}
           </optgroup>
         )}
@@ -144,15 +135,15 @@ function EscalaSelector({
   const [selected, setSelected] = useState<number | null>(null)
 
   function getColor(n: number, isSelected: boolean) {
-    if (!isSelected) return 'bg-white border-gray-300 text-gray-700 hover:border-brand hover:text-brand'
-    if (n <= 6) return 'bg-red-600 border-red-600 text-white'
-    if (n <= 8) return 'bg-yellow-500 border-yellow-500 text-white'
-    return 'bg-green-600 border-green-600 text-white'
+    if (!isSelected) return 'bg-white border-gray-300 text-gray-600 hover:border-[#C0272D] hover:text-[#C0272D] hover:bg-red-50'
+    if (n <= 6) return 'bg-[#C0272D] border-[#C0272D] text-white shadow-md'
+    if (n <= 8) return 'bg-amber-500 border-amber-500 text-white shadow-md'
+    return 'bg-green-600 border-green-600 text-white shadow-md'
   }
 
   return (
-    <div className="space-y-3">
-      <p className="text-sm font-medium text-gray-800">{label}</p>
+    <div className="space-y-4">
+      <p className="text-sm text-gray-600 leading-relaxed">{label}</p>
       <div className="flex flex-wrap gap-2">
         {Array.from({ length: max - min + 1 }, (_, i) => i + min).map((n) => (
           <label key={n} className="cursor-pointer">
@@ -164,39 +155,40 @@ function EscalaSelector({
               className="sr-only"
               onChange={() => setSelected(n)}
             />
-            <span
-              className={`flex items-center justify-center h-10 w-10 rounded-lg border-2 text-sm font-semibold transition-all select-none ${getColor(n, selected === n)}`}
-            >
+            <span className={`flex items-center justify-center h-12 w-12 rounded-xl border-2 text-base font-bold transition-all select-none ${getColor(n, selected === n)}`}>
               {n}
             </span>
           </label>
         ))}
       </div>
-      <div className="flex justify-between text-xs text-gray-400">
-        <span>{min} — Muy improbable / Muy insatisfecho</span>
-        <span>{max} — Muy probable / Muy satisfecho</span>
+      <div className="flex justify-between text-xs text-gray-400 pt-1">
+        <span className="flex items-center gap-1">
+          <span className="inline-block w-2 h-2 rounded-full bg-[#C0272D]" />
+          {min} = Muy insatisfecho / Muy improbable
+        </span>
+        <span className="flex items-center gap-1">
+          {max} = Muy satisfecho / Muy probable
+          <span className="inline-block w-2 h-2 rounded-full bg-green-600" />
+        </span>
       </div>
     </div>
   )
 }
 
-function BloquePregunta({
-  numero,
-  title,
-  children,
-}: {
-  numero: number
-  title: string
-  children: React.ReactNode
-}) {
+function SeccionHeader({ numero, titulo }: { numero: number; titulo: string }) {
   return (
-    <div className="space-y-4 rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
-      <div className="flex items-start gap-3">
-        <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-brand text-xs font-bold text-white">
-          {numero}
-        </span>
-        <h3 className="pt-0.5 text-base font-semibold text-gray-900">{title}</h3>
-      </div>
+    <div className="flex items-start gap-3 mb-5">
+      <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#C0272D] text-sm font-bold text-white mt-0.5">
+        {numero}
+      </span>
+      <h3 className="text-base font-semibold text-gray-900 leading-snug">{titulo}</h3>
+    </div>
+  )
+}
+
+function Card({ children, className = '' }: { children: React.ReactNode; className?: string }) {
+  return (
+    <div className={`bg-white rounded-2xl border border-gray-100 shadow-sm p-6 ${className}`}>
       {children}
     </div>
   )
@@ -207,33 +199,43 @@ export default function FormularioEncuesta({ token, concesionario }: FormularioE
 
   if (state.success) {
     return (
-      <div className="px-4 py-16 text-center">
-        <div className="mb-4 inline-flex h-16 w-16 items-center justify-center rounded-full bg-green-100">
+      <Card className="text-center py-14">
+        <img src="/CrucianelliLogo.png" alt="Crucianelli" width={180} className="mx-auto mb-8" />
+        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-green-100 mb-5">
           <svg className="h-8 w-8 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
           </svg>
         </div>
-        <h2 className="mb-2 text-xl font-semibold text-gray-900">¡Muchas gracias!</h2>
-        <p className="mx-auto max-w-lg text-sm text-gray-500">
-          Se registró tu respuesta correctamente. Tu opinión es clave para mejorar el producto, la atención del concesionario y la experiencia con Crucianelli.
+        <h2 className="text-xl font-bold text-gray-900 mb-2">¡Muchas gracias!</h2>
+        <p className="text-gray-500 text-sm max-w-md mx-auto leading-relaxed">
+          Tu respuesta fue registrada correctamente. Tu opinión es clave para mejorar el producto, la atención del concesionario y la experiencia con Crucianelli.
         </p>
-      </div>
+      </Card>
     )
   }
 
   return (
-    <form action={formAction} className="space-y-8">
+    <form action={formAction} className="space-y-5">
       <input type="hidden" name="token" value={token} />
 
-      <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
-        <h2 className="text-lg font-semibold text-gray-900">2026 - Encuesta de satisfacción oficial Crucianelli</h2>
-        <p className="mt-2 text-sm leading-6 text-gray-600">
-          Gracias por participar. Completá esta breve encuesta para ayudarnos a mejorar el producto, la atención del concesionario y la experiencia general con Crucianelli.
+      {/* Intro */}
+      <Card>
+        <p className="text-sm leading-relaxed text-gray-600">
+          Gracias por participar. Completá esta breve encuesta para ayudarnos a mejorar el producto, la atención del concesionario y la experiencia general con Crucianelli. Tus respuestas son confidenciales.
         </p>
-      </div>
+      </Card>
 
-      <div className="space-y-6 rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
-        <h2 className="text-base font-semibold text-gray-900">Información de contacto, para envio de presente</h2>
+      {/* Datos personales */}
+      <Card>
+        <div className="flex items-center gap-2 mb-5 pb-4 border-b border-gray-100">
+          <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-red-50">
+            <svg className="h-4 w-4 text-[#C0272D]" fill="none" viewBox="0 0 24 24" strokeWidth={1.8} stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
+            </svg>
+          </div>
+          <h2 className="text-sm font-semibold text-gray-900">Información de contacto</h2>
+          <span className="text-xs text-gray-400 ml-auto">Para el envío de presente</span>
+        </div>
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <CampoTexto label="Nombre y apellido" name="nombre_apellido" required disabled={isPending} />
           <CampoTexto label="Calle y número" name="calle_numero" required disabled={isPending} />
@@ -244,10 +246,18 @@ export default function FormularioEncuesta({ token, concesionario }: FormularioE
           <CampoTexto label="Email" name="email" type="email" required disabled={isPending} />
           <CampoTexto label="Teléfono" name="telefono" required disabled={isPending} />
         </div>
-      </div>
+      </Card>
 
-      <div className="space-y-6 rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
-        <h3 className="text-base font-semibold text-gray-900">Datos de la experiencia</h3>
+      {/* Datos de la experiencia */}
+      <Card>
+        <div className="flex items-center gap-2 mb-5 pb-4 border-b border-gray-100">
+          <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-red-50">
+            <svg className="h-4 w-4 text-[#C0272D]" fill="none" viewBox="0 0 24 24" strokeWidth={1.8} stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M11.42 15.17 17.25 21A2.652 2.652 0 0 0 21 17.25l-5.877-5.877M11.42 15.17l2.496-3.03c.317-.384.74-.626 1.208-.766M11.42 15.17l-4.655 5.653a2.548 2.548 0 1 1-3.586-3.586l6.837-5.63m5.108-.233c.55-.164 1.163-.188 1.743-.14a4.5 4.5 0 0 0 4.486-6.336l-3.276 3.277a3.004 3.004 0 0 1-2.25-2.25l3.276-3.276a4.5 4.5 0 0 0-6.336 4.486c.091 1.076-.071 2.264-.904 2.95l-.102.085m-1.745 1.437L5.909 7.5H4.5L2.25 3.75l1.5-1.5L7.5 4.5v1.409l4.26 4.26m-1.745 1.437 1.745-1.437m6.615 8.206L15.75 15.75M4.867 19.125h.008v.008h-.008v-.008Z" />
+            </svg>
+          </div>
+          <h2 className="text-sm font-semibold text-gray-900">Datos de la experiencia</h2>
+        </div>
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <CampoSelect
             label="Concesionario sede"
@@ -267,100 +277,94 @@ export default function FormularioEncuesta({ token, concesionario }: FormularioE
             />
           </div>
         </div>
-      </div>
+      </Card>
 
-      <BloquePregunta
-        numero={1}
-        title="¿Cómo fue el proceso de entrega y presentación de la unidad adquirida?"
-      >
+      {/* Preguntas */}
+      <Card>
+        <SeccionHeader numero={1} titulo="¿Cómo fue el proceso de entrega y presentación de la unidad adquirida?" />
         <EscalaSelector
           name="calificacion_entrega_presentacion"
           label="En una escala del 1 al 10, donde 1 es muy insatisfecho y 10 muy satisfecho."
           required
         />
-      </BloquePregunta>
+      </Card>
 
-      <BloquePregunta
-        numero={2}
-        title="¿Cómo estuvo el trato, la predisposición y el compromiso del técnico durante la entrega de la unidad?"
-      >
+      <Card>
+        <SeccionHeader numero={2} titulo="¿Cómo estuvo el trato, la predisposición y el compromiso del técnico durante la entrega de la unidad?" />
         <EscalaSelector
           name="calificacion_tecnico"
-          label="Pensando en la atención del técnico durante la entrega de la unidad. Puntúa del 1 al 10."
+          label="Pensando en la atención del técnico durante la entrega de la unidad. Puntuá del 1 al 10."
           required
         />
-      </BloquePregunta>
+      </Card>
 
-      <BloquePregunta
-        numero={3}
-        title="¿Qué tan satisfecho estás con la capacitación recibida sobre el uso y mantenimiento del producto?"
-      >
+      <Card>
+        <SeccionHeader numero={3} titulo="¿Qué tan satisfecho estás con la capacitación recibida sobre el uso y mantenimiento del producto?" />
         <EscalaSelector
           name="calificacion_capacitacion"
-          label="Contempla producto y monitor. Puntúa del 1 al 10."
+          label="Contempla producto y monitor. Puntuá del 1 al 10."
           required
         />
-      </BloquePregunta>
+      </Card>
 
-      <BloquePregunta
-        numero={4}
-        title="Teniendo en cuenta tu experiencia con el producto Crucianelli (calidad, funcionamiento y desempeño en campo): ¿Qué tan probable es que recomiendes un producto Crucianelli a un colega, amigo o familiar?"
-      >
+      <Card>
+        <SeccionHeader numero={4} titulo="Teniendo en cuenta tu experiencia con el producto Crucianelli (calidad, funcionamiento y desempeño en campo): ¿Qué tan probable es que lo recomiendes a un colega, amigo o familiar?" />
         <EscalaSelector
           name="nps_producto"
           label="En una escala del 1 al 10, donde 1 es muy improbable y 10 muy probable."
           required
         />
-        <div>
-          <label className="mb-1 block text-xs text-gray-500">
-            ¿Desea dejarnos algún comentario para saber cómo podemos mejorar nuestro producto? (opcional)
+        <div className="mt-5">
+          <label className="block text-sm font-medium text-gray-700 mb-1.5">
+            Comentario sobre el producto <span className="text-gray-400 font-normal">(opcional)</span>
           </label>
           <textarea
             name="comentario_producto"
-            rows={4}
+            rows={3}
             maxLength={1000}
             disabled={isPending}
-            className="block w-full resize-none rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand"
+            placeholder="¿Algo que podamos mejorar?"
+            className="block w-full resize-none rounded-lg border border-gray-300 bg-white px-3.5 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:border-[#C0272D] focus:outline-none focus:ring-2 focus:ring-[#C0272D]/20"
           />
         </div>
-      </BloquePregunta>
+      </Card>
 
-      <BloquePregunta
-        numero={5}
-        title="Teniendo en cuenta la entrega, capacitación y puesta en marcha: ¿Qué tan probable es que recomiendes al concesionario Crucianelli a un colega o amigo?"
-      >
+      <Card>
+        <SeccionHeader numero={5} titulo="Teniendo en cuenta la entrega, capacitación y puesta en marcha: ¿Qué tan probable es que recomiendes al concesionario Crucianelli a un colega o amigo?" />
         <EscalaSelector
           name="nps_concesionario"
           label="En una escala del 1 al 10, donde 1 es muy improbable y 10 muy probable."
           required
         />
-      </BloquePregunta>
+      </Card>
 
-      <BloquePregunta
-        numero={6}
-        title="Teniendo en cuenta tu experiencia general con Crucianelli (atención, capacitación, entrega y soporte): ¿Qué tan probable es que recomiendes la empresa Crucianelli a un colega, amigo o familiar?"
-      >
+      <Card>
+        <SeccionHeader numero={6} titulo="Teniendo en cuenta tu experiencia general con Crucianelli (atención, capacitación, entrega y soporte): ¿Qué tan probable es que recomiendes la empresa a un colega, amigo o familiar?" />
         <EscalaSelector
           name="nps_empresa"
           label="En una escala del 1 al 10, donde 1 es muy improbable y 10 muy probable."
           required
         />
-        <div>
-          <label className="mb-1 block text-xs text-gray-500">
-            ¿Desea dejarnos algún comentario para saber cómo podemos mejorar como empresa? (opcional)
+        <div className="mt-5">
+          <label className="block text-sm font-medium text-gray-700 mb-1.5">
+            Comentario sobre la empresa <span className="text-gray-400 font-normal">(opcional)</span>
           </label>
           <textarea
             name="comentario_empresa"
-            rows={4}
+            rows={3}
             maxLength={1000}
             disabled={isPending}
-            className="block w-full resize-none rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand"
+            placeholder="¿Algo que podamos mejorar?"
+            className="block w-full resize-none rounded-lg border border-gray-300 bg-white px-3.5 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:border-[#C0272D] focus:outline-none focus:ring-2 focus:ring-[#C0272D]/20"
           />
         </div>
-      </BloquePregunta>
+      </Card>
 
       {state?.error && (
-        <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+        <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 flex items-center gap-2">
+          <svg className="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" />
+          </svg>
           {state.error}
         </div>
       )}
@@ -368,9 +372,24 @@ export default function FormularioEncuesta({ token, concesionario }: FormularioE
       <button
         type="submit"
         disabled={isPending}
-        className="h-12 w-full rounded-xl bg-brand text-sm font-semibold text-white transition-colors hover:bg-brand-dark disabled:cursor-not-allowed disabled:opacity-50"
+        className="w-full h-13 rounded-xl bg-[#C0272D] text-white font-semibold text-base shadow-lg shadow-red-200 transition-all hover:bg-[#9B1E23] hover:shadow-red-300 disabled:cursor-not-allowed disabled:opacity-50 flex items-center justify-center gap-2 py-3.5"
       >
-        {isPending ? 'Enviando...' : 'Enviar respuesta'}
+        {isPending ? (
+          <>
+            <svg className="h-4 w-4 animate-spin" fill="none" viewBox="0 0 24 24">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+            </svg>
+            Enviando respuesta...
+          </>
+        ) : (
+          <>
+            Enviar respuesta
+            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+            </svg>
+          </>
+        )}
       </button>
     </form>
   )

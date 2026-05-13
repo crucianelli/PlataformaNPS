@@ -60,10 +60,8 @@ export default function LoginPage() {
         {/* Contenido principal */}
         <div className="relative z-10 flex flex-col items-center text-center">
 
-          {/* Monograma */}
-          <div className="mb-8 flex h-20 w-20 items-center justify-center rounded-2xl bg-brand shadow-2xl shadow-brand/40">
-            <span className="text-4xl font-bold tracking-tight text-white">C</span>
-          </div>
+          {/* Logo */}
+          <img src="/Logo.jpg" alt="Crucianelli" width={100} className="mb-8 rounded-2xl shadow-2xl shadow-brand/40" />
 
           <h1 className="text-4xl font-bold tracking-tight text-white">
             Crucianelli
@@ -95,9 +93,7 @@ export default function LoginPage() {
 
         {/* Logo visible solo en mobile */}
         <div className="mb-10 flex flex-col items-center lg:hidden">
-          <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-xl bg-brand shadow-lg shadow-brand/30">
-            <span className="text-2xl font-bold text-white">C</span>
-          </div>
+          <img src="/Logo.jpg" alt="Crucianelli" width={56} className="mb-4 rounded-xl shadow-lg" />
           <p className="text-xs font-semibold uppercase tracking-widest text-brand">Plataforma NPS</p>
         </div>
 
