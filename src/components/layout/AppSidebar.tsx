@@ -161,12 +161,7 @@ export default function AppSidebar({
       >
         {/* Logo + close btn */}
         <div className="flex items-center gap-3 px-4 py-5">
-          <div
-            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-brand text-white"
-            aria-hidden
-          >
-            <span className="text-sm font-bold">C</span>
-          </div>
+          <img src="/Logo.jpg" alt="Crucianelli" width={32} height={32} className="shrink-0 rounded-lg" />
           <div className="min-w-0 flex-1">
             <p className="truncate text-sm font-semibold leading-none text-white">Crucianelli</p>
             <p className="mt-1 text-[10px] font-medium uppercase tracking-widest text-sidebar-foreground/35">

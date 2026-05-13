@@ -53,7 +53,10 @@ export async function crearCampanaAction(
     .insert({ nombre: result.data.nombre, fecha: result.data.fecha })
     .select()
     .single()
-  if (errCampana) return { error: 'Error al crear la campaña.' }
+  if (errCampana) {
+    console.error('Error al crear la campana', errCampana)
+    return { error: 'Error al crear la campaña.' }
+  }
 
   // 2. Crear clientes en batch
   const { data: clientes, error: errClientes } = await supabase
@@ -61,6 +64,7 @@ export async function crearCampanaAction(
     .insert(rows)
     .select('id, orden_fabricacion')
   if (errClientes || !clientes) {
+    console.error('Error al crear los clientes', errClientes)
     // Rollback: eliminar campaña creada
     await supabase.from('campanas').delete().eq('id', campana.id)
     return { error: 'Error al crear los clientes.' }
@@ -74,7 +78,10 @@ export async function crearCampanaAction(
   const { error: errEncuestas } = await supabase
     .from('encuestas')
     .insert(encuestasInsert)
-  if (errEncuestas) return { error: 'Error al crear las encuestas.' }
+  if (errEncuestas) {
+    console.error('Error al crear las encuestas', errEncuestas)
+    return { error: 'Error al crear las encuestas.' }
+  }
 
   // 4. Crear envíos iniciales en batch (1 por OF)
   const fechaEnvioInicial = new Date().toISOString()
@@ -86,7 +93,10 @@ export async function crearCampanaAction(
     fecha_envio: fechaEnvioInicial,
   }))
   const { error: errEnvios } = await supabase.from('envios').insert(enviosInsert)
-  if (errEnvios) return { error: 'Error al crear los envios.' }
+  if (errEnvios) {
+    console.error('Error al crear los envios', errEnvios)
+    return { error: 'Error al crear los envios.' }
+  }
 
   revalidatePath('/campanas')
   redirect(`/campanas/${campana.id}`)
