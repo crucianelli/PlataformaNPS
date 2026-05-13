@@ -233,7 +233,7 @@ export default function FormularioEncuesta({ token, concesionario }: FormularioE
       </div>
 
       <div className="space-y-6 rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
-        <h3 className="text-base font-semibold text-gray-900">Información de contacto</h3>
+        <h2 className="text-base font-semibold text-gray-900">Información de contacto, para envio de presente</h2>
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <CampoTexto label="Nombre y apellido" name="nombre_apellido" required disabled={isPending} />
           <CampoTexto label="Calle y número" name="calle_numero" required disabled={isPending} />
@@ -271,7 +271,7 @@ export default function FormularioEncuesta({ token, concesionario }: FormularioE
 
       <BloquePregunta
         numero={1}
-        title="¿Cómo fue el proceso de entrega y presentación de tu producto?"
+        title="¿Cómo fue el proceso de entrega y presentación de la unidad adquirida?"
       >
         <EscalaSelector
           name="calificacion_entrega_presentacion"
@@ -282,11 +282,11 @@ export default function FormularioEncuesta({ token, concesionario }: FormularioE
 
       <BloquePregunta
         numero={2}
-        title="¿Cómo fue la puesta en marcha realizada por el concesionario o técnico?"
+        title="¿Cómo estuvo el trato, la predisposición y el compromiso del técnico durante la entrega de la unidad?"
       >
         <EscalaSelector
-          name="calificacion_puesta_marcha"
-          label="En una escala del 1 al 10."
+          name="calificacion_tecnico"
+          label="Pensando en la atención del técnico durante la entrega de la unidad. Puntúa del 1 al 10."
           required
         />
       </BloquePregunta>
@@ -304,44 +304,11 @@ export default function FormularioEncuesta({ token, concesionario }: FormularioE
 
       <BloquePregunta
         numero={4}
-        title="¿Cómo describirías el funcionamiento general del producto?"
-      >
-        <EscalaSelector
-          name="calificacion_funcionamiento_general"
-          label="Hasta el momento, puntúa del 1 al 10."
-          required
-        />
-      </BloquePregunta>
-
-      <BloquePregunta
-        numero={5}
-        title="¿Cómo fue el trato, la predisposición y el conocimiento del técnico presente?"
-      >
-        <EscalaSelector
-          name="calificacion_tecnico"
-          label="Pensando en la atención del técnico o representante durante la entrega y puesta en marcha. Puntúa del 1 al 10."
-          required
-        />
-      </BloquePregunta>
-
-      <BloquePregunta
-        numero={6}
-        title="NPS concesionario"
-      >
-        <EscalaSelector
-          name="nps_concesionario"
-          label="Teniendo en cuenta la entrega, capacitación y puesta en marcha: ¿Qué tan probable es que recomiendes al concesionario Crucianelli a un colega o amigo?"
-          required
-        />
-      </BloquePregunta>
-
-      <BloquePregunta
-        numero={7}
-        title="NPS producto"
+        title="Teniendo en cuenta tu experiencia con el producto Crucianelli (calidad, funcionamiento y desempeño en campo): ¿Qué tan probable es que recomiendes un producto Crucianelli a un colega, amigo o familiar?"
       >
         <EscalaSelector
           name="nps_producto"
-          label="Teniendo en cuenta tu experiencia con el producto Crucianelli (calidad, funcionamiento y desempeño en campo): ¿Qué tan probable es que recomiendes un producto Crucianelli a un colega, amigo o familiar?"
+          label="En una escala del 1 al 10, donde 1 es muy improbable y 10 muy probable."
           required
         />
         <div>
@@ -359,12 +326,23 @@ export default function FormularioEncuesta({ token, concesionario }: FormularioE
       </BloquePregunta>
 
       <BloquePregunta
-        numero={8}
-        title="NPS empresa"
+        numero={5}
+        title="Teniendo en cuenta la entrega, capacitación y puesta en marcha: ¿Qué tan probable es que recomiendes al concesionario Crucianelli a un colega o amigo?"
+      >
+        <EscalaSelector
+          name="nps_concesionario"
+          label="En una escala del 1 al 10, donde 1 es muy improbable y 10 muy probable."
+          required
+        />
+      </BloquePregunta>
+
+      <BloquePregunta
+        numero={6}
+        title="Teniendo en cuenta tu experiencia general con Crucianelli (atención, capacitación, entrega y soporte): ¿Qué tan probable es que recomiendes la empresa Crucianelli a un colega, amigo o familiar?"
       >
         <EscalaSelector
           name="nps_empresa"
-          label="Teniendo en cuenta tu experiencia general con Crucianelli (atención, capacitación, entrega y soporte): ¿Qué tan probable es que recomiendes la empresa Crucianelli a un colega, amigo o familiar?"
+          label="En una escala del 1 al 10, donde 1 es muy improbable y 10 muy probable."
           required
         />
         <div>
