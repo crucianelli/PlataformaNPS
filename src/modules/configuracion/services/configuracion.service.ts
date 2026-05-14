@@ -10,6 +10,23 @@ export async function getSystemConfig() {
     .maybeSingle()
 
   if (error) throw error
+
+  if (!data) {
+    const { data: created, error: insertError } = await supabase
+      .from('system_config')
+      .insert({
+        dias_notificacion_inicial: 2,
+        dias_notificacion_recordatorio: 2,
+        dias_hasta_llamado: 2,
+        emails_notificacion: [],
+      })
+      .select()
+      .single()
+
+    if (insertError) throw insertError
+    return created
+  }
+
   return data
 }
 

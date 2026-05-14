@@ -34,18 +34,18 @@ export default async function ClientesPage({
                 name="q"
                 defaultValue={q}
                 placeholder="Buscar por nombre o concesionario..."
-                className="block w-full max-w-sm rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 shadow-sm placeholder-gray-400 focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand"
+                className="block w-full max-w-sm rounded-md border border-border bg-card px-3 py-2 text-sm text-foreground shadow-sm placeholder-gray-400 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
               />
               <button
                 type="submit"
-                className="rounded-md bg-gray-100 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-200 transition-colors"
+                className="rounded-md bg-muted px-4 py-2 text-sm font-medium text-foreground hover:bg-muted transition-colors"
               >
                 Buscar
               </button>
               {q && (
                 <a
                   href="/clientes"
-                  className="rounded-md px-4 py-2 text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors"
+                  className="rounded-md px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
                 >
                   Limpiar
                 </a>

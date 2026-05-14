@@ -9,7 +9,7 @@ interface ClientesTableProps {
 export default function ClientesTable({ clientes }: ClientesTableProps) {
   if (clientes.length === 0) {
     return (
-      <div className="text-center py-12 text-sm text-gray-500">
+      <div className="text-center py-12 text-sm text-muted-foreground">
         No hay clientes registrados.
       </div>
     )
@@ -34,12 +34,12 @@ export default function ClientesTable({ clientes }: ClientesTableProps) {
           <TableRow key={cliente.id}>
             <TableCell className="font-medium">{cliente.nombre}</TableCell>
             <TableCell>{cliente.telefono}</TableCell>
-            <TableCell className="text-gray-500">{cliente.telefono_2 ?? '—'}</TableCell>
-            <TableCell className="text-gray-500">{cliente.telefono_3 ?? '—'}</TableCell>
+            <TableCell className="text-muted-foreground">{cliente.telefono_2 ?? '—'}</TableCell>
+            <TableCell className="text-muted-foreground">{cliente.telefono_3 ?? '—'}</TableCell>
             <TableCell>{cliente.concesionario}</TableCell>
-            <TableCell className="text-gray-500">{cliente.orden_fabricacion ?? '—'}</TableCell>
-            <TableCell className="text-gray-500">{formatTecnologia(cliente.tecnologia)}</TableCell>
-            <TableCell className="text-gray-500">
+            <TableCell className="text-muted-foreground">{cliente.orden_fabricacion ?? '—'}</TableCell>
+            <TableCell className="text-muted-foreground">{formatTecnologia(cliente.tecnologia)}</TableCell>
+            <TableCell className="text-muted-foreground">
               {new Date(cliente.created_at).toLocaleDateString('es-AR')}
             </TableCell>
           </TableRow>

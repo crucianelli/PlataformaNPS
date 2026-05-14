@@ -1,16 +1,19 @@
 import { HTMLAttributes } from 'react'
 import { cn } from '@/lib/utils/cn'
 
+type BadgeVariant = 'default' | 'success' | 'warning' | 'danger' | 'info' | 'outline'
+
 interface BadgeProps extends HTMLAttributes<HTMLSpanElement> {
-  variant?: 'default' | 'success' | 'warning' | 'danger' | 'info'
+  variant?: BadgeVariant
 }
 
-const variants = {
-  default: 'bg-gray-100 text-gray-800',
-  success: 'bg-green-100 text-green-800',
-  warning: 'bg-yellow-100 text-yellow-800',
-  danger: 'bg-red-100 text-red-800',
-  info: 'bg-blue-100 text-blue-800',
+const variants: Record<BadgeVariant, string> = {
+  default:  'bg-muted text-muted-foreground',
+  success:  'bg-[color-mix(in_srgb,var(--success)_12%,transparent)] text-[var(--success)]',
+  warning:  'bg-[color-mix(in_srgb,var(--warning)_12%,transparent)] text-[var(--warning)]',
+  danger:   'bg-[color-mix(in_srgb,var(--destructive)_12%,transparent)] text-destructive',
+  info:     'bg-[color-mix(in_srgb,var(--primary)_10%,transparent)] text-primary',
+  outline:  'border border-border bg-transparent text-foreground',
 }
 
 export default function Badge({
@@ -22,7 +25,7 @@ export default function Badge({
   return (
     <span
       className={cn(
-        'inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium',
+        'inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium leading-none',
         variants[variant],
         className
       )}

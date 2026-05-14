@@ -17,7 +17,7 @@ interface CampanasTableProps {
 export default function CampanasTable({ campanas }: CampanasTableProps) {
   if (campanas.length === 0) {
     return (
-      <div className="text-center py-12 text-sm text-gray-500">
+      <div className="text-center py-12 text-sm text-muted-foreground">
         No hay campanas creadas todavia.
       </div>
     )
@@ -43,7 +43,7 @@ export default function CampanasTable({ campanas }: CampanasTableProps) {
           return (
             <TableRow key={c.id}>
               <TableCell className="font-medium">{c.nombre}</TableCell>
-              <TableCell className="text-gray-500">
+              <TableCell className="text-muted-foreground">
                 {new Date(c.fecha + 'T00:00:00').toLocaleDateString('es-AR')}
               </TableCell>
               <TableCell>

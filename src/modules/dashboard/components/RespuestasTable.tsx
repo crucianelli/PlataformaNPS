@@ -28,7 +28,7 @@ function DetailItem({
 }) {
   return (
     <p>
-      <span className="font-medium text-gray-900">{label}:</span> {valueOrDash(value)}
+      <span className="font-medium text-foreground">{label}:</span> {valueOrDash(value)}
     </p>
   )
 }
@@ -43,10 +43,10 @@ function ScoreLine({
   nps?: boolean
 }) {
   return (
-    <div className="flex items-center justify-between gap-3 rounded-md border border-gray-200 bg-white px-3 py-2">
-      <span className="text-sm text-gray-700">{label}</span>
+    <div className="flex items-center justify-between gap-3 rounded-md border border-border bg-card px-3 py-2">
+      <span className="text-sm text-foreground">{label}</span>
       {value === null ? (
-        <span className="text-sm text-gray-400">—</span>
+        <span className="text-sm text-muted-foreground">—</span>
       ) : nps ? (
         <NpsBadge value={value} />
       ) : (
@@ -60,7 +60,7 @@ export default function RespuestasTable({ respuestas }: RespuestasTableProps) {
   const [expandedId, setExpandedId] = useState<string | null>(null)
 
   if (respuestas.length === 0) {
-    return <div className="py-12 text-center text-sm text-gray-500">No hay respuestas para mostrar.</div>
+    return <div className="py-12 text-center text-sm text-muted-foreground">No hay respuestas para mostrar.</div>
   }
 
   return (
@@ -86,19 +86,19 @@ export default function RespuestasTable({ respuestas }: RespuestasTableProps) {
 
           return [
             <TableRow key={respuesta.encuestaId}>
-              <TableCell className="text-gray-500">
+              <TableCell className="text-muted-foreground">
                 {new Date(respuesta.fechaRespuesta).toLocaleDateString('es-AR')}
               </TableCell>
               <TableCell>
                 <div>
                   <p className="font-medium">{respuesta.nombreApellido ?? respuesta.clienteNombre}</p>
-                  <p className="text-xs text-gray-500">{respuesta.email ?? respuesta.clienteTelefono}</p>
+                  <p className="text-xs text-muted-foreground">{respuesta.email ?? respuesta.clienteTelefono}</p>
                 </div>
               </TableCell>
               <TableCell>{respuesta.campanaNombre}</TableCell>
               <TableCell>{respuesta.concesionario}</TableCell>
               <TableCell>{respuesta.maquinaModelo ?? '—'}</TableCell>
-              <TableCell className="text-gray-500">{formatTecnologia(respuesta.tecnologia)}</TableCell>
+              <TableCell className="text-muted-foreground">{formatTecnologia(respuesta.tecnologia)}</TableCell>
               <TableCell>
                 <Badge variant={respuesta.canalRespuesta === 'llamado' ? 'warning' : 'info'}>
                   {respuesta.canalRespuesta === 'llamado' ? 'Llamado' : 'Mensaje'}
@@ -125,12 +125,12 @@ export default function RespuestasTable({ respuestas }: RespuestasTableProps) {
             </TableRow>,
             ...(expanded
               ? [
-                  <TableRow key={`${respuesta.encuestaId}-detail`} className="bg-gray-50 hover:bg-gray-50">
+                  <TableRow key={`${respuesta.encuestaId}-detail`} className="bg-muted/30 hover:bg-muted/30">
                     <TableCell colSpan={11}>
                       <div className="grid grid-cols-1 gap-6 p-3 xl:grid-cols-4">
                         <div className="space-y-2">
-                          <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">Contacto</p>
-                          <div className="space-y-1 text-sm text-gray-700">
+                          <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Contacto</p>
+                          <div className="space-y-1 text-sm text-foreground">
                             <DetailItem label="Nombre" value={respuesta.nombreApellido ?? respuesta.clienteNombre} />
                             <DetailItem label="Email" value={respuesta.email} />
                             <DetailItem label="Teléfono" value={respuesta.telefono ?? respuesta.clienteTelefono} />
@@ -142,8 +142,8 @@ export default function RespuestasTable({ respuestas }: RespuestasTableProps) {
                           </div>
                         </div>
                         <div className="space-y-2">
-                          <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">Encuesta</p>
-                          <div className="space-y-1 text-sm text-gray-700">
+                          <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Encuesta</p>
+                          <div className="space-y-1 text-sm text-foreground">
                             <DetailItem label="Campaña" value={respuesta.campanaNombre} />
                             <DetailItem label="Concesionario importado" value={respuesta.concesionario} />
                             <DetailItem label="Concesionario sede" value={respuesta.concesionarioSede} />
@@ -158,7 +158,7 @@ export default function RespuestasTable({ respuestas }: RespuestasTableProps) {
                           </div>
                         </div>
                         <div className="space-y-3">
-                          <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">Calificaciones</p>
+                          <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Calificaciones</p>
                           <div className="space-y-2">
                             <ScoreLine label="Entrega y presentación" value={respuesta.calificacionEntregaPresentacion} />
                             <ScoreLine label="Puesta en marcha" value={respuesta.calificacionPuestaMarcha} />
@@ -171,18 +171,18 @@ export default function RespuestasTable({ respuestas }: RespuestasTableProps) {
                           </div>
                         </div>
                         <div className="space-y-3">
-                          <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">Comentarios</p>
-                          <div className="space-y-3 text-sm text-gray-700">
+                          <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Comentarios</p>
+                          <div className="space-y-3 text-sm text-foreground">
                             <div>
-                              <p className="font-medium text-gray-900">Producto</p>
+                              <p className="font-medium text-foreground">Producto</p>
                               <p>{respuesta.comentarioProducto || 'Sin comentario.'}</p>
                             </div>
                             <div>
-                              <p className="font-medium text-gray-900">Empresa</p>
+                              <p className="font-medium text-foreground">Empresa</p>
                               <p>{respuesta.comentarioEmpresa || 'Sin comentario.'}</p>
                             </div>
                             <div>
-                              <p className="font-medium text-gray-900">General</p>
+                              <p className="font-medium text-foreground">General</p>
                               <p>{respuesta.comentarioGeneral || 'Sin comentario.'}</p>
                             </div>
                           </div>

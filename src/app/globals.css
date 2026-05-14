@@ -1,14 +1,222 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ─── Base CSS custom properties (cambiar aquí para dark mode) ──── */
+
+:root {
+  /* Surfaces */
+  --background:             #FAFAF8;
+  --foreground:             #0F172A;
+  --card:                   #ffffff;
+  --card-foreground:        #0F172A;
+  --popover:                #ffffff;
+  --popover-foreground:     #0F172A;
+
+  /* Neutral scale */
+  --muted:                  #E2E8F4;
+  --muted-foreground:       #64748B;
+  --border:                 #E2E8F4;
+  --input:                  #E2E8F4;
+  --ring:                   #1B3FBC;
+
+  /* Interactive */
+  --primary:                #1B3FBC;
+  --primary-hover:          #162F94;
+  --primary-foreground:     #ffffff;
+  --secondary:              #3B82F6;
+  --secondary-foreground:   #ffffff;
+  --accent:                 #B45309;
+  --accent-foreground:      #ffffff;
+
+  /* Semantic */
+  --destructive:            #DC1F1F;
+  --destructive-foreground: #ffffff;
+  --success:                #15803D;
+  --success-foreground:     #ffffff;
+  --warning:                #B45309;
+  --warning-foreground:     #ffffff;
+
+  /* NPS tokens */
+  --nps-promotor:           #15803D;
+  --nps-promotor-bg:        #DCFCE7;
+  --nps-neutro:             #B45309;
+  --nps-neutro-bg:          #FEF9C3;
+  --nps-detractor:          #DC1F1F;
+  --nps-detractor-bg:       #FEE2E2;
+
+  /* Sidebar (always dark regardless of page theme) */
+  --sidebar:                #111111;
+  --sidebar-foreground:     #C8D3E0;
+  --sidebar-accent:         #1E1E1E;
+  --sidebar-border:         rgba(255, 255, 255, 0.06);
+
+  /* Shadows */
+  --shadow-sm:   0 1px 3px 0 rgb(15 23 42 / 0.06), 0 1px 2px -1px rgb(15 23 42 / 0.04);
+  --shadow-md:   0 4px 6px -1px rgb(15 23 42 / 0.08), 0 2px 4px -2px rgb(15 23 42 / 0.06);
+  --shadow-lg:   0 10px 15px -3px rgb(15 23 42 / 0.08), 0 4px 6px -4px rgb(15 23 42 / 0.05);
+}
+
+.dark {
+  --background:             #0A0F1E;
+  --foreground:             #E8EDF4;
+  --card:                   #0F172A;
+  --card-foreground:        #E8EDF4;
+  --popover:                #0F172A;
+  --popover-foreground:     #E8EDF4;
+  --muted:                  #1E293B;
+  --muted-foreground:       #94A3B8;
+  --border:                 #1E293B;
+  --input:                  #1E293B;
+  --ring:                   #6B7FE3;
+  --primary:                #6B7FE3;
+  --primary-hover:          #7D8FEA;
+  --primary-foreground:     #ffffff;
+  --accent:                 #D97706;
+  --accent-foreground:      #0A0F1E;
+  --sidebar:                #070D18;
+  --sidebar-accent:         #0F1729;
+  --shadow-sm:              0 1px 3px 0 rgb(0 0 0 / 0.24), 0 1px 2px -1px rgb(0 0 0 / 0.16);
+  --shadow-md:              0 4px 6px -1px rgb(0 0 0 / 0.28), 0 2px 4px -2px rgb(0 0 0 / 0.20);
+  --shadow-lg:              0 10px 15px -3px rgb(0 0 0 / 0.28), 0 4px 6px -4px rgb(0 0 0 / 0.20);
+}
+
+/* ─── Tailwind v4 theme tokens ──────────────────────────────────── */
+
 @theme inline {
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-  --color-brand: #C0272D;
+  /* Tipografía */
+  --font-sans: var(--font-jakarta), system-ui, sans-serif;
+  --font-mono: var(--font-mono-nps), ui-monospace, "Cascadia Code", monospace;
+
+  /* Brand Crucianelli (fijo, no cambia con dark mode) */
+  --color-brand:      #C0272D;
   --color-brand-dark: #9B1E23;
+
+  /* Surfaces — referencian variables root para reactivity dark mode */
+  --color-background:         var(--background);
+  --color-foreground:         var(--foreground);
+  --color-card:               var(--card);
+  --color-card-foreground:    var(--card-foreground);
+  --color-popover:            var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+
+  /* Neutral */
+  --color-muted:              var(--muted);
+  --color-muted-foreground:   var(--muted-foreground);
+  --color-border:             var(--border);
+  --color-input:              var(--input);
+  --color-ring:               var(--ring);
+
+  /* Interactive */
+  --color-primary:             var(--primary);
+  --color-primary-foreground:  var(--primary-foreground);
+  --color-secondary:           var(--secondary);
+  --color-secondary-foreground:var(--secondary-foreground);
+  --color-accent:              var(--accent);
+  --color-accent-foreground:   var(--accent-foreground);
+
+  /* Semantic */
+  --color-destructive:             var(--destructive);
+  --color-destructive-foreground:  var(--destructive-foreground);
+  --color-success:                 var(--success);
+  --color-success-foreground:      var(--success-foreground);
+  --color-warning:                 var(--warning);
+  --color-warning-foreground:      var(--warning-foreground);
+
+  /* NPS */
+  --color-nps-promotor:     var(--nps-promotor);
+  --color-nps-promotor-bg:  var(--nps-promotor-bg);
+  --color-nps-neutro:       var(--nps-neutro);
+  --color-nps-neutro-bg:    var(--nps-neutro-bg);
+  --color-nps-detractor:    var(--nps-detractor);
+  --color-nps-detractor-bg: var(--nps-detractor-bg);
+
+  /* Sidebar */
+  --color-sidebar:            var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-accent:     var(--sidebar-accent);
+
+  /* Shadows (para usar con shadow-sm / shadow-md en Tailwind v4) */
+  --shadow-sm: var(--shadow-sm);
+  --shadow-md: var(--shadow-md);
+  --shadow-lg: var(--shadow-lg);
+}
+
+/* ─── Global base ───────────────────────────────────────────────── */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  height: 100%;
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 
 body {
-  background-color: #f8f9fa;
-  color: #111827;
+  min-height: 100%;
+  background-color: var(--background);
+  color: var(--foreground);
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-feature-settings: "rlig" 1, "calt" 1;
+}
+
+/* ─── Skip to content (accesibilidad) ──────────────────────────── */
+
+.skip-link {
+  position: absolute;
+  top: -100%;
+  left: 1rem;
+  z-index: 9999;
+  padding: 0.5rem 1rem;
+  background: var(--primary);
+  color: var(--primary-foreground);
+  border-radius: 0 0 0.5rem 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: top 0.15s ease-out;
+}
+.skip-link:focus {
+  top: 0;
+}
+
+/* ─── Focus ring global ─────────────────────────────────────────── */
+
+:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+
+/* ─── Scrollbar personalizado ───────────────────────────────────── */
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--muted);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--muted-foreground);
 }

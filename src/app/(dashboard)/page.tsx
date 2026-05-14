@@ -26,7 +26,7 @@ export default async function DashboardPage() {
 
         <Card>
           <CardHeader>
-            <h2 className="text-sm font-semibold text-gray-900">Últimas respuestas</h2>
+            <h2 className="text-sm font-semibold text-foreground">Últimas respuestas</h2>
           </CardHeader>
           <CardContent className="p-0">
             <RespuestasTable respuestas={respuestas.slice(0, 10)} />

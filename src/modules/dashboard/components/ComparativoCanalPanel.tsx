@@ -29,34 +29,34 @@ export default function ComparativoCanalPanel({ comparativo }: ComparativoCanalP
   return (
     <Card>
       <CardHeader>
-        <h2 className="text-sm font-semibold text-gray-900">Respuestas por canal</h2>
+        <h2 className="text-sm font-semibold text-foreground">Respuestas por canal</h2>
       </CardHeader>
       <CardContent>
         {totalGlobal === 0 ? (
-          <p className="text-sm text-gray-500">Sin datos</p>
+          <p className="text-sm text-muted-foreground">Sin datos</p>
         ) : (
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             {comparativo.map((item) => (
               <div
                 key={item.canal}
-                className="rounded-lg border border-gray-200 bg-gray-50 p-4 space-y-4"
+                className="rounded-lg border border-border bg-muted/30 p-4 space-y-4"
               >
                 <div className="flex items-center justify-between gap-2">
-                  <span className="text-sm font-semibold text-gray-900">
+                  <span className="text-sm font-semibold text-foreground">
                     {CANAL_LABELS[item.canal]}
                   </span>
                   <div className="flex items-center gap-2">
-                    <span className="text-xs text-gray-500">{formatPct(item.porcentaje)}</span>
-                    <span className="text-sm font-bold text-gray-900 tabular-nums">
+                    <span className="text-xs text-muted-foreground">{formatPct(item.porcentaje)}</span>
+                    <span className="text-sm font-bold text-foreground tabular-nums">
                       {item.total}
                     </span>
-                    <span className="text-xs text-gray-500">
+                    <span className="text-xs text-muted-foreground">
                       {item.total === 1 ? 'respuesta' : 'respuestas'}
                     </span>
                   </div>
                 </div>
 
-                <div className="h-1.5 overflow-hidden rounded-full bg-gray-200">
+                <div className="h-1.5 overflow-hidden rounded-full bg-muted">
                   <div
                     className="h-full rounded-full bg-brand transition-all"
                     style={{
@@ -71,11 +71,11 @@ export default function ComparativoCanalPanel({ comparativo }: ComparativoCanalP
                     { label: 'Producto', value: item.npsProducto },
                     { label: 'Empresa', value: item.npsEmpresa },
                   ].map(({ label, value }) => (
-                    <div key={label} className="rounded-md border border-gray-200 bg-white px-2 py-2">
-                      <p className="text-[10px] uppercase tracking-wide text-gray-500 truncate">{label}</p>
+                    <div key={label} className="rounded-md border border-border bg-card px-2 py-2">
+                      <p className="text-[10px] uppercase tracking-wide text-muted-foreground truncate">{label}</p>
                       <div className="mt-1 flex justify-center">
                         {item.total === 0 ? (
-                          <span className="text-sm text-gray-400">—</span>
+                          <span className="text-sm text-muted-foreground">—</span>
                         ) : (
                           <Badge variant={getNpsScoreVariant(value)}>
                             {formatNps(value)}

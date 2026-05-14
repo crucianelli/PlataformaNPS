@@ -124,9 +124,7 @@ export default function Sidebar() {
 
       {/* Marca */}
       <div className="flex items-center gap-3 px-4 py-5">
-        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-brand">
-          <span className="text-sm font-bold text-white">C</span>
-        </div>
+        <img src="/Logo.jpg" alt="Crucianelli" width={36} height={36} className="shrink-0 rounded-lg" />
         <div className="min-w-0">
           <p className="text-sm font-semibold leading-none text-white">Crucianelli</p>
           <p className="mt-1 text-[10px] font-medium uppercase tracking-widest text-white/35">NPS</p>

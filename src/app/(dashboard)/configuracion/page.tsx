@@ -11,10 +11,10 @@ export default async function ConfiguracionPage() {
       {!config ? (
         <Card>
           <CardHeader>
-            <h2 className="text-sm font-semibold text-gray-900">Configuración no inicializada</h2>
+            <h2 className="text-sm font-semibold text-foreground">Configuración no inicializada</h2>
           </CardHeader>
           <CardContent>
-            <p className="text-sm text-gray-600">
+            <p className="text-sm text-muted-foreground">
               No existe una fila en <code>system_config</code>. Ejecuta el seed inicial de Supabase
               antes de continuar.
             </p>

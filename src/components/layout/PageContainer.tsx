@@ -1,23 +1,19 @@
 import { ReactNode } from 'react'
+import PageHeader from '@/components/layout/PageHeader'
 
 interface PageContainerProps {
   children: ReactNode
   title?: string
+  description?: string
   actions?: ReactNode
 }
 
-export default function PageContainer({ children, title, actions }: PageContainerProps) {
+export default function PageContainer({ children, title, description, actions }: PageContainerProps) {
   return (
-    <div className="mx-auto w-full max-w-7xl px-6 py-8">
+    <div className="mx-auto w-full max-w-screen-2xl px-4 py-4 md:px-6 md:py-6">
       {(title || actions) && (
-        <div className="mb-7 flex items-center justify-between">
-          {title && (
-            <div>
-              <h1 className="text-lg font-semibold text-gray-900">{title}</h1>
-              <div className="mt-1.5 h-0.5 w-8 rounded-full bg-brand" />
-            </div>
-          )}
-          {actions && <div className="flex items-center gap-3">{actions}</div>}
+        <div className="mb-6">
+          <PageHeader title={title!} description={description} actions={actions} />
         </div>
       )}
       {children}

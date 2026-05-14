@@ -24,16 +24,16 @@ export default function MarcarSinRespuestaForm({ encuestaId }: MarcarSinRespuest
           role="dialog"
           aria-modal="true"
         >
-          <div className="w-full max-w-lg rounded-xl bg-white p-6 shadow-xl">
-            <h3 className="text-base font-semibold text-gray-900">Marcar OF como sin respuesta</h3>
-            <p className="mt-1 text-sm text-gray-500">
+          <div className="w-full max-w-lg rounded-xl bg-card p-6 shadow-xl">
+            <h3 className="text-base font-semibold text-foreground">Marcar OF como sin respuesta</h3>
+            <p className="mt-1 text-sm text-muted-foreground">
               Dejá un comentario explicando por qué la dejamos como sin respuesta. Quedará guardado para auditoría.
             </p>
 
             <form action={formAction} className="mt-4 space-y-3">
               <input type="hidden" name="encuestaId" value={encuestaId} />
               <div>
-                <label htmlFor="comentario" className="mb-1 block text-sm font-medium text-gray-700">
+                <label htmlFor="comentario" className="mb-1 block text-sm font-medium text-foreground">
                   Comentario *
                 </label>
                 <textarea
@@ -45,7 +45,7 @@ export default function MarcarSinRespuestaForm({ encuestaId }: MarcarSinRespuest
                   maxLength={2000}
                   disabled={isPending}
                   placeholder="Ej: no atiende ninguno de los teléfonos, número equivocado, etc."
-                  className="block w-full resize-none rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand"
+                  className="block w-full resize-none rounded-lg border border-border bg-card px-3 py-2 text-sm text-foreground placeholder-gray-400 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
                 />
               </div>
 

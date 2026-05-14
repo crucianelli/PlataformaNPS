@@ -18,7 +18,7 @@ export default function CambiarEstadoForm({ campanaId, estadoActual }: CambiarEs
   return (
     <Card>
       <CardContent className="py-3 flex items-center gap-4">
-        <span className="text-sm text-gray-600 font-medium shrink-0">Cambiar estado:</span>
+        <span className="text-sm text-muted-foreground font-medium shrink-0">Cambiar estado:</span>
         <form action={formAction} className="flex items-center gap-2 flex-wrap">
           <input type="hidden" name="campana_id" value={campanaId} />
           {ESTADOS.filter((e) => e !== estadoActual).map((estado) => (
@@ -28,7 +28,7 @@ export default function CambiarEstadoForm({ campanaId, estadoActual }: CambiarEs
               value={estado}
               type="submit"
               disabled={isPending}
-              className="rounded-md bg-gray-100 px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-200 transition-colors disabled:opacity-50"
+              className="rounded-md bg-muted px-3 py-1.5 text-sm font-medium text-foreground hover:bg-muted transition-colors disabled:opacity-50"
             >
               Marcar como {estado}
             </button>
