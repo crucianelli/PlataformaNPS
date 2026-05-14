@@ -9,6 +9,7 @@ type RespuestaCriticaData = {
   npsConcesionario: number
   comentarioProducto: string | null
   comentarioEmpresa: string | null
+  comentarioConcesionario: string | null
   comentarioGeneral: string | null
 }
 
@@ -19,6 +20,7 @@ export async function enviarAlertaNpsCritico({
   npsConcesionario,
   comentarioProducto,
   comentarioEmpresa,
+  comentarioConcesionario,
   comentarioGeneral,
 }: RespuestaCriticaData) {
   const supabase = createSupabaseAdmin()
@@ -58,13 +60,13 @@ export async function enviarAlertaNpsCritico({
     npsConcesionario,
     comentarioProducto,
     comentarioEmpresa,
+    comentarioConcesionario,
     comentarioGeneral,
     detalleUrl,
   })
 
-  // BCC: cada destinatario recibe el mail sin ver a los demás
   await sendEmail({
-    bcc: recipients,
+    to: recipients,
     subject: email.subject,
     html: email.html,
     text: email.text,

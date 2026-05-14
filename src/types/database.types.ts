@@ -236,6 +236,7 @@ export type Database = {
           calle_numero: string | null
           canal_respuesta: string
           codigo_postal: string | null
+          comentario_concesionario: string | null
           comentario_empresa: string | null
           comentario_general: string | null
           comentario_producto: string | null
@@ -265,6 +266,7 @@ export type Database = {
           calle_numero?: string | null
           canal_respuesta?: string
           codigo_postal?: string | null
+          comentario_concesionario?: string | null
           comentario_empresa?: string | null
           comentario_general?: string | null
           comentario_producto?: string | null
@@ -294,6 +296,7 @@ export type Database = {
           calle_numero?: string | null
           canal_respuesta?: string
           codigo_postal?: string | null
+          comentario_concesionario?: string | null
           comentario_empresa?: string | null
           comentario_general?: string | null
           comentario_producto?: string | null

@@ -7,6 +7,7 @@ type AlertaNpsTemplateParams = {
   npsConcesionario: number
   comentarioProducto: string | null
   comentarioEmpresa: string | null
+  comentarioConcesionario: string | null
   comentarioGeneral: string | null
   detalleUrl: string
 }
@@ -21,8 +22,8 @@ function escapeHtml(value: string) {
 }
 
 function renderScore(label: string, value: number) {
-  const bg = value < 6 ? '#fee2e2' : '#f3f4f6'
-  const color = value < 6 ? '#b91c1c' : '#111827'
+  const bg = value <= 6 ? '#fee2e2' : '#f3f4f6'
+  const color = value <= 6 ? '#b91c1c' : '#111827'
 
   return `
     <tr>
@@ -54,13 +55,14 @@ export function buildAlertaNpsTemplate({
   npsConcesionario,
   comentarioProducto,
   comentarioEmpresa,
+  comentarioConcesionario,
   comentarioGeneral,
   detalleUrl,
 }: AlertaNpsTemplateParams) {
   const criticalFields = [
-    npsProducto < 6 ? `Producto (${npsProducto})` : null,
-    npsEmpresa < 6 ? `Empresa (${npsEmpresa})` : null,
-    npsConcesionario < 6 ? `Concesionario (${npsConcesionario})` : null,
+    npsProducto <= 6 ? `Producto (${npsProducto})` : null,
+    npsEmpresa <= 6 ? `Empresa (${npsEmpresa})` : null,
+    npsConcesionario <= 6 ? `Concesionario (${npsConcesionario})` : null,
   ].filter(Boolean)
 
   const subject = `Alerta NPS critica - ${clienteNombre} - ${concesionario}`
@@ -92,6 +94,7 @@ export function buildAlertaNpsTemplate({
 
           ${comentarioBlock('Comentario sobre el producto', comentarioProducto)}
           ${comentarioBlock('Comentario sobre la empresa', comentarioEmpresa)}
+          ${comentarioBlock('Comentario sobre el concesionario', comentarioConcesionario)}
           ${comentarioBlock('Comentario general', comentarioGeneral)}
 
           <div style="margin-top:24px;">
@@ -115,6 +118,7 @@ export function buildAlertaNpsTemplate({
     `NPS Concesionario: ${npsConcesionario}`,
     comentarioProducto ? `Comentario producto: ${comentarioProducto}` : null,
     comentarioEmpresa ? `Comentario empresa: ${comentarioEmpresa}` : null,
+    comentarioConcesionario ? `Comentario concesionario: ${comentarioConcesionario}` : null,
     comentarioGeneral ? `Comentario general: ${comentarioGeneral}` : null,
     '',
     `Detalle: ${detalleUrl}`,

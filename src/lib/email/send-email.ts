@@ -1,15 +1,5 @@
 import nodemailer from 'nodemailer'
 
-const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST,
-  port: Number(process.env.SMTP_PORT ?? 465),
-  secure: process.env.SMTP_SECURE !== 'false',
-  auth: {
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASS,
-  },
-})
-
 type SendEmailParams = {
   to?: string | string[]
   bcc?: string | string[]
@@ -19,17 +9,27 @@ type SendEmailParams = {
 }
 
 export async function sendEmail({ to, bcc, subject, html, text }: SendEmailParams) {
+  const transporter = nodemailer.createTransport({
+    host: process.env.SMTP_HOST,
+    port: Number(process.env.SMTP_PORT ?? 465),
+    secure: process.env.SMTP_SECURE !== 'false',
+    auth: {
+      user: process.env.SMTP_USER,
+      pass: process.env.SMTP_PASS,
+    },
+  })
+
   const from = process.env.EMAIL_FROM ?? process.env.SMTP_USER
 
-  // Si no se indica 'to', el campo se autoasigna al remitente.
-  // Esto permite envíos BCC puros donde ningún destinatario ve a los demás.
   const toField = to
     ? Array.isArray(to) ? to : [to]
-    : [from!]
+    : undefined
 
   const bccField = bcc
     ? Array.isArray(bcc) ? bcc : [bcc]
     : undefined
+
+  if (!toField && !bccField) throw new Error('sendEmail: se requiere al menos "to" o "bcc"')
 
   await transporter.sendMail({
     from,

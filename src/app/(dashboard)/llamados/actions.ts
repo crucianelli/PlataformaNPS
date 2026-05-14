@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
 import { createSupabaseServer } from '@/lib/supabase/server'
 import { marcarEncuestaSinRespuesta } from '@/modules/recordatorios/services/recordatorios.service'
+import { autoCompletarCampanaIfDone } from '@/modules/campanas/services/campanas.service'
 
 type ActionState = { error?: string; success?: boolean }
 
@@ -33,10 +34,24 @@ export async function marcarSinRespuestaAction(
   const { data: userData } = await supabase.auth.getUser()
   const marcadoPor = userData.user?.id ?? null
 
+  const { data: encuesta } = await supabase
+    .from('encuestas')
+    .select('campana_id')
+    .eq('id', parsed.data.encuestaId)
+    .single()
+
   try {
     await marcarEncuestaSinRespuesta(parsed.data.encuestaId, parsed.data.comentario, marcadoPor)
   } catch {
     return { error: 'No se pudo marcar la OF como sin respuesta.' }
+  }
+
+  if (encuesta?.campana_id) {
+    try {
+      await autoCompletarCampanaIfDone(encuesta.campana_id)
+    } catch (error) {
+      console.error('[AUTO COMPLETAR CAMPAÑA] Error:', error instanceof Error ? error.message : error)
+    }
   }
 
   revalidatePath('/llamados')

@@ -1,4 +1,5 @@
 import { createSupabaseServer } from '@/lib/supabase/server'
+import { createSupabaseAdmin } from '@/lib/supabase/server'
 import type { CampanaEstado } from '../types/campana.types'
 
 export async function getCampanas() {
@@ -57,4 +58,26 @@ export async function updateCampanaEstado(id: string, estado: CampanaEstado) {
   const supabase = await createSupabaseServer()
   const { error } = await supabase.from('campanas').update({ estado }).eq('id', id)
   if (error) throw error
+}
+
+export async function autoCompletarCampanaIfDone(campanaId: string) {
+  const supabase = createSupabaseAdmin()
+
+  const { data: encuestas, error } = await supabase
+    .from('encuestas')
+    .select('estado')
+    .eq('campana_id', campanaId)
+
+  if (error || !encuestas || encuestas.length === 0) return
+
+  const allClosed = encuestas.every(
+    (e) => e.estado === 'respondida' || e.estado === 'sin_respuesta'
+  )
+  if (!allClosed) return
+
+  await supabase
+    .from('campanas')
+    .update({ estado: 'completada' })
+    .eq('id', campanaId)
+    .eq('estado', 'activa')
 }

@@ -4,6 +4,7 @@ import { z } from 'zod'
 import { createSupabaseAdmin } from '@/lib/supabase/server'
 import { enviarAlertaNpsCritico } from '@/modules/alertas/services/alertas.service'
 import { CONCESIONARIOS, MAQUINAS, getTipoMaquina } from './form-options'
+import { autoCompletarCampanaIfDone } from '@/modules/campanas/services/campanas.service'
 
 const RespuestaSchema = z.object({
   token: z.string().uuid(),
@@ -26,6 +27,7 @@ const RespuestaSchema = z.object({
   nps_empresa: z.coerce.number().int().min(1).max(10),
   comentario_producto: z.string().max(1000).optional(),
   comentario_empresa: z.string().max(1000).optional(),
+  comentario_concesionario: z.string().max(1000).optional(),
 })
 
 type State = { error?: string; success?: boolean }
@@ -55,6 +57,7 @@ export async function guardarRespuestaAction(
     nps_empresa: formData.get('nps_empresa'),
     comentario_producto: formData.get('comentario_producto'),
     comentario_empresa: formData.get('comentario_empresa'),
+    comentario_concesionario: formData.get('comentario_concesionario'),
   }
 
   const result = RespuestaSchema.safeParse(raw)
@@ -67,7 +70,7 @@ export async function guardarRespuestaAction(
   // 1. Re-validar token en servidor
   const { data: encuesta } = await supabase
     .from('encuestas')
-    .select('id, estado')
+    .select('id, estado, campana_id')
     .eq('token', result.data.token)
     .single()
 
@@ -116,15 +119,20 @@ export async function guardarRespuestaAction(
     nps_concesionario: result.data.nps_concesionario,
     comentario_producto: result.data.comentario_producto || null,
     comentario_empresa: result.data.comentario_empresa || null,
+    comentario_concesionario: result.data.comentario_concesionario || null,
     comentario_general: null,
   })
 
-  if (errInsert) return { error: 'Error al guardar la respuesta. Por favor intentá nuevamente.' }
+  if (errInsert) {
+    console.error('[GUARDAR RESPUESTA] Error INSERT:', errInsert)
+    return { error: 'Error al guardar la respuesta. Por favor intentá nuevamente.' }
+  }
 
   // FASE 7: disparar alerta si cualquier NPS < 6
   const { nps_producto, nps_empresa, nps_concesionario } = result.data
-  const esNPSCritico = nps_producto < 6 || nps_empresa < 6 || nps_concesionario < 6
+  const esNPSCritico = nps_producto <= 6 || nps_empresa <= 6 || nps_concesionario <= 6
   if (esNPSCritico) {
+    console.log('[ALERTA NPS] Disparando alerta — producto:', nps_producto, 'empresa:', nps_empresa, 'concesionario:', nps_concesionario)
     try {
       await enviarAlertaNpsCritico({
         encuestaId: encuesta.id,
@@ -133,11 +141,18 @@ export async function guardarRespuestaAction(
         npsConcesionario: nps_concesionario,
         comentarioProducto: result.data.comentario_producto || null,
         comentarioEmpresa: result.data.comentario_empresa || null,
+        comentarioConcesionario: result.data.comentario_concesionario || null,
         comentarioGeneral: null,
       })
     } catch (error) {
-      console.error('No se pudo enviar la alerta NPS crítica', error)
+      console.error('[ALERTA NPS] Error al enviar email — encuesta:', encuesta.id, '| motivo:', error instanceof Error ? error.message : error)
     }
+  }
+
+  try {
+    await autoCompletarCampanaIfDone(encuesta.campana_id)
+  } catch (error) {
+    console.error('[AUTO COMPLETAR CAMPAÑA] Error:', error instanceof Error ? error.message : error)
   }
 
   return { success: true }
