@@ -1,7 +1,6 @@
 import { LogOut, Bell } from 'lucide-react'
 import { logoutAction } from '@/lib/supabase/actions'
 import { cn } from '@/lib/utils/cn'
-import ThemeToggle from '@/components/ui-custom/ThemeToggle'
 import MobileMenuButton from '@/components/layout/MobileMenuButton'
 
 interface TopbarProps {
@@ -32,8 +31,6 @@ export default function Topbar({ title, className }: TopbarProps) {
 
       {/* Acciones del header */}
       <div className="flex items-center gap-1">
-        <ThemeToggle />
-
         <div className="mx-1 h-4 w-px bg-border" aria-hidden />
 
         <button
