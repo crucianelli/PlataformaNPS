@@ -124,6 +124,7 @@ export default function Sidebar() {
 
       {/* Marca */}
       <div className="flex items-center gap-3 px-4 py-5">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src="/Logo.jpg" alt="Crucianelli" width={36} height={36} className="shrink-0 rounded-lg" />
         <div className="min-w-0">
           <p className="text-sm font-semibold leading-none text-white">Crucianelli</p>

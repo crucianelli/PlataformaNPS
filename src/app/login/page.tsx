@@ -61,6 +61,7 @@ export default function LoginPage() {
         <div className="relative z-10 flex flex-col items-center text-center">
 
           {/* Logo */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/Logo.jpg" alt="Crucianelli" width={100} className="mb-8 rounded-2xl shadow-2xl shadow-brand/40" />
 
           <h1 className="text-4xl font-bold tracking-tight text-white">
@@ -93,6 +94,7 @@ export default function LoginPage() {
 
         {/* Logo visible solo en mobile */}
         <div className="mb-10 flex flex-col items-center lg:hidden">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/Logo.jpg" alt="Crucianelli" width={56} className="mb-4 rounded-xl shadow-lg" />
           <p className="text-xs font-semibold uppercase tracking-widest text-brand">Plataforma NPS</p>
         </div>

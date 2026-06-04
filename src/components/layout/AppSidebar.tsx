@@ -161,6 +161,7 @@ export default function AppSidebar({
       >
         {/* Logo + close btn */}
         <div className="flex items-center gap-3 px-4 py-5">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/Logo.jpg" alt="Crucianelli" width={32} height={32} className="shrink-0 rounded-lg" />
           <div className="min-w-0 flex-1">
             <p className="truncate text-sm font-semibold leading-none text-white">Crucianelli</p>

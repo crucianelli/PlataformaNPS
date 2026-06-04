@@ -37,6 +37,7 @@ function PageShell({ children }: { children: React.ReactNode }) {
 
       {/* Logo debajo de la ola */}
       <div className="flex justify-center pt-8 pb-2">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src="/CrucianelliLogo.png" alt="Crucianelli" width={240} />
       </div>
 

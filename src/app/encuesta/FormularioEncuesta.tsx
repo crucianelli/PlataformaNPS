@@ -200,6 +200,7 @@ export default function FormularioEncuesta({ token, concesionario }: FormularioE
   if (state.success) {
     return (
       <Card className="text-center py-14">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src="/CrucianelliLogo.png" alt="Crucianelli" width={180} className="mx-auto mb-8" />
         <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-green-100 mb-5">
           <svg className="h-8 w-8 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
