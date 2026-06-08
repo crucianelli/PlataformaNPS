@@ -1,6 +1,10 @@
-node_modules
-npm-debug.log
-.next
 .git
-.env
-docker-compose.yml
+.gitignore
+.env*
+node_modules
+.next
+README.md
+docs
+design-system
+*.sql
+*.md
