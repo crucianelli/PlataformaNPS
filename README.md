@@ -135,4 +135,21 @@ npm run build
 npm run start
 npm run lint
 ```
+
+## Despliegue con Docker
+
+Empaquetado optimizado mediante Docker multi-stage y modo standalone de Next.js para su publicación en el repositorio crucianelli/npsplatform
+
+### 1. Compilación y Etiquetado
+
+```bash
+docker build \
+  --build-arg NEXT_PUBLIC_SUPABASE_URL="[https://tu-supabase-url.com](https://tu-supabase-url.com)" \
+  --build-arg NEXT_PUBLIC_SUPABASE_ANON_KEY="tu-anon-key-de-supabase" \
+  --build-arg NEXT_PUBLIC_APP_URL="[https://tu-app-produccion.com](https://tu-app-produccion.com)" \
+  -t crucianelli/npsplatform:latest .
+```
+
+Nota: Produccion es la etiqueta "latest"
+
 # PlataformaNPS
