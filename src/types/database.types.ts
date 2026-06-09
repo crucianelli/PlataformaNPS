@@ -236,6 +236,7 @@ export type Database = {
           calle_numero: string | null
           canal_respuesta: string
           codigo_postal: string | null
+          comentario_concesionario: string | null
           comentario_empresa: string | null
           comentario_general: string | null
           comentario_producto: string | null
@@ -253,6 +254,7 @@ export type Database = {
           nps_producto: number
           piso_departamento: string | null
           provincia: string | null
+          regalo_estado: Database["public"]["Enums"]["regalo_estado"]
           telefono: string | null
           tipo_maquina: Database["public"]["Enums"]["tipo_maquina_enum"]
         }
@@ -265,6 +267,7 @@ export type Database = {
           calle_numero?: string | null
           canal_respuesta?: string
           codigo_postal?: string | null
+          comentario_concesionario?: string | null
           comentario_empresa?: string | null
           comentario_general?: string | null
           comentario_producto?: string | null
@@ -282,6 +285,7 @@ export type Database = {
           nps_producto: number
           piso_departamento?: string | null
           provincia?: string | null
+          regalo_estado?: Database["public"]["Enums"]["regalo_estado"]
           telefono?: string | null
           tipo_maquina?: Database["public"]["Enums"]["tipo_maquina_enum"]
         }
@@ -294,6 +298,7 @@ export type Database = {
           calle_numero?: string | null
           canal_respuesta?: string
           codigo_postal?: string | null
+          comentario_concesionario?: string | null
           comentario_empresa?: string | null
           comentario_general?: string | null
           comentario_producto?: string | null
@@ -311,6 +316,7 @@ export type Database = {
           nps_producto?: number
           piso_departamento?: string | null
           provincia?: string | null
+          regalo_estado?: Database["public"]["Enums"]["regalo_estado"]
           telefono?: string | null
           tipo_maquina?: Database["public"]["Enums"]["tipo_maquina_enum"]
         }
@@ -330,6 +336,39 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      notificaciones: {
+        Row: {
+          id: string
+          tipo: Database["public"]["Enums"]["notificacion_tipo"]
+          titulo: string
+          mensaje: string
+          leida: boolean
+          para_rol: string
+          metadata: Record<string, string> | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          tipo: Database["public"]["Enums"]["notificacion_tipo"]
+          titulo: string
+          mensaje: string
+          leida?: boolean
+          para_rol: string
+          metadata?: Record<string, string> | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          tipo?: Database["public"]["Enums"]["notificacion_tipo"]
+          titulo?: string
+          mensaje?: string
+          leida?: boolean
+          para_rol?: string
+          metadata?: Record<string, string> | null
+          created_at?: string
+        }
+        Relationships: []
       }
       system_config: {
         Row: {
@@ -396,6 +435,7 @@ export type Database = {
     }
     Enums: {
       campana_estado: "activa" | "completada" | "archivada"
+      notificacion_tipo: "nps_critico" | "nueva_respuesta" | "regalo_pendiente" | "campana_sin_actividad"
       encuesta_estado:
         | "pendiente"
         | "respondida"
@@ -403,6 +443,7 @@ export type Database = {
         | "necesidad_de_llamado"
         | "sin_respuesta"
       envio_estado: "pendiente_envio" | "enviado"
+      regalo_estado: "pendiente_envio" | "enviado"
       tipo_maquina_enum: "sembradora" | "fertilizadora"
     }
     CompositeTypes: {

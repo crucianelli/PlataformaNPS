@@ -8,6 +8,7 @@ type RespuestaCriticaData = {
   npsEmpresa: number
   npsConcesionario: number
   comentarioProducto: string | null
+  comentarioConcesionario: string | null
   comentarioEmpresa: string | null
   comentarioGeneral: string | null
 }
@@ -18,6 +19,7 @@ export async function enviarAlertaNpsCritico({
   npsEmpresa,
   npsConcesionario,
   comentarioProducto,
+  comentarioConcesionario,
   comentarioEmpresa,
   comentarioGeneral,
 }: RespuestaCriticaData) {
@@ -57,6 +59,7 @@ export async function enviarAlertaNpsCritico({
     npsEmpresa,
     npsConcesionario,
     comentarioProducto,
+    comentarioConcesionario,
     comentarioEmpresa,
     comentarioGeneral,
     detalleUrl,

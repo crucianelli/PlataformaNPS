@@ -24,6 +24,7 @@ const RespuestaSchema = z.object({
   nps_concesionario: z.coerce.number().int().min(1).max(10),
   nps_producto: z.coerce.number().int().min(1).max(10),
   nps_empresa: z.coerce.number().int().min(1).max(10),
+  comentario_concesionario: z.string().max(1000).optional(),
   comentario_producto: z.string().max(1000).optional(),
   comentario_empresa: z.string().max(1000).optional(),
 })
@@ -53,6 +54,7 @@ export async function guardarRespuestaAction(
     nps_concesionario: formData.get('nps_concesionario'),
     nps_producto: formData.get('nps_producto'),
     nps_empresa: formData.get('nps_empresa'),
+    comentario_concesionario: formData.get('comentario_concesionario'),
     comentario_producto: formData.get('comentario_producto'),
     comentario_empresa: formData.get('comentario_empresa'),
   }
@@ -114,6 +116,7 @@ export async function guardarRespuestaAction(
     nps_producto: result.data.nps_producto,
     nps_empresa: result.data.nps_empresa,
     nps_concesionario: result.data.nps_concesionario,
+    comentario_concesionario: result.data.comentario_concesionario || null,
     comentario_producto: result.data.comentario_producto || null,
     comentario_empresa: result.data.comentario_empresa || null,
     comentario_general: null,
@@ -121,23 +124,63 @@ export async function guardarRespuestaAction(
 
   if (errInsert) return { error: 'Error al guardar la respuesta. Por favor intentá nuevamente.' }
 
-  // FASE 7: disparar alerta si cualquier NPS < 6
+  // Disparar alerta email + notificaciones en paralelo (errores no bloquean la respuesta)
   const { nps_producto, nps_empresa, nps_concesionario } = result.data
   const esNPSCritico = nps_producto < 6 || nps_empresa < 6 || nps_concesionario < 6
-  if (esNPSCritico) {
-    try {
-      await enviarAlertaNpsCritico({
-        encuestaId: encuesta.id,
-        npsProducto: nps_producto,
-        npsEmpresa: nps_empresa,
-        npsConcesionario: nps_concesionario,
-        comentarioProducto: result.data.comentario_producto || null,
-        comentarioEmpresa: result.data.comentario_empresa || null,
-        comentarioGeneral: null,
-      })
-    } catch (error) {
-      console.error('No se pudo enviar la alerta NPS crítica', error)
+  const nombre = result.data.nombre_apellido
+  const concesionario = result.data.concesionario_sede
+
+  try {
+    const inserts: Promise<unknown>[] = [
+      Promise.resolve(supabase.from('notificaciones').insert({
+        tipo: 'nueva_respuesta',
+        titulo: 'Nueva respuesta recibida',
+        mensaje: `${nombre} (${concesionario}) completó la encuesta.`,
+        para_rol: 'admin',
+        metadata: { nombre, concesionario },
+      })),
+      Promise.resolve(supabase.from('notificaciones').insert({
+        tipo: 'regalo_pendiente',
+        titulo: 'Nuevo regalo pendiente',
+        mensaje: `${nombre} completó la encuesta. Hay un nuevo regalo pendiente de envío.`,
+        para_rol: 'rambla',
+        metadata: { nombre, concesionario },
+      })),
+    ]
+
+    if (esNPSCritico) {
+      const npsList: string[] = []
+      if (nps_producto < 6)      npsList.push(`Producto: ${nps_producto}`)
+      if (nps_empresa < 6)       npsList.push(`Empresa: ${nps_empresa}`)
+      if (nps_concesionario < 6) npsList.push(`Concesionario: ${nps_concesionario}`)
+
+      inserts.push(
+        Promise.resolve(supabase.from('notificaciones').insert({
+          tipo: 'nps_critico',
+          titulo: 'NPS Crítico detectado',
+          mensaje: `${nombre} — ${npsList.join(' · ')}`,
+          para_rol: 'admin',
+          metadata: { nombre, concesionario },
+        }))
+      )
+
+      inserts.push(
+        enviarAlertaNpsCritico({
+          encuestaId: encuesta.id,
+          npsProducto: nps_producto,
+          npsEmpresa: nps_empresa,
+          npsConcesionario: nps_concesionario,
+          comentarioProducto: result.data.comentario_producto || null,
+          comentarioConcesionario: result.data.comentario_concesionario || null,
+          comentarioEmpresa: result.data.comentario_empresa || null,
+          comentarioGeneral: null,
+        }).catch(err => console.error('Alerta NPS email fallida', err))
+      )
     }
+
+    await Promise.allSettled(inserts)
+  } catch (error) {
+    console.error('Error al crear notificaciones', error)
   }
 
   return { success: true }

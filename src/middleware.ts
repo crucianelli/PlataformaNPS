@@ -24,6 +24,7 @@ export async function middleware(request: NextRequest) {
   )
 
   const { data: { user } } = await supabase.auth.getUser()
+  const role = user?.app_metadata?.role as string | undefined
 
   const { pathname } = request.nextUrl
   const isPublic =
@@ -33,8 +34,15 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL('/login', request.url))
   }
 
+  // Usuarios Rambla: solo pueden acceder a /rambla
+  if (user && role === 'rambla' && !pathname.startsWith('/rambla')) {
+    return NextResponse.redirect(new URL('/rambla', request.url))
+  }
+
   if (pathname === '/login' && user) {
-    return NextResponse.redirect(new URL('/', request.url))
+    return NextResponse.redirect(
+      new URL(role === 'rambla' ? '/rambla' : '/', request.url)
+    )
   }
 
   return supabaseResponse

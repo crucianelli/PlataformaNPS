@@ -1,15 +1,22 @@
-import { LogOut, Bell } from 'lucide-react'
+import { LogOut } from 'lucide-react'
 import { logoutAction } from '@/lib/supabase/actions'
 import { cn } from '@/lib/utils/cn'
-import ThemeToggle from '@/components/ui-custom/ThemeToggle'
 import MobileMenuButton from '@/components/layout/MobileMenuButton'
+import NotificacionesBell from '@/modules/notificaciones/components/NotificacionesBell'
+import { getNotificaciones, getUnreadCount } from '@/modules/notificaciones/services/notificaciones.service'
 
 interface TopbarProps {
   title?: string
   className?: string
+  role?: string
 }
 
-export default function Topbar({ title, className }: TopbarProps) {
+export default async function Topbar({ title, className, role = 'admin' }: TopbarProps) {
+  const [notificaciones, unreadCount] = await Promise.all([
+    getNotificaciones(role),
+    getUnreadCount(role),
+  ])
+
   return (
     <header
       className={cn(
@@ -18,10 +25,8 @@ export default function Topbar({ title, className }: TopbarProps) {
       )}
     >
       <div className="flex items-center gap-3">
-        {/* Hamburger — solo visible en mobile */}
         <MobileMenuButton />
 
-        {/* Indicador de sección activa */}
         <div className="flex items-center gap-2.5">
           <span className="h-1.5 w-1.5 rounded-full bg-brand" aria-hidden />
           <span className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
@@ -30,21 +35,12 @@ export default function Topbar({ title, className }: TopbarProps) {
         </div>
       </div>
 
-      {/* Acciones del header */}
       <div className="flex items-center gap-1">
-        <ThemeToggle />
-
-        <div className="mx-1 h-4 w-px bg-border" aria-hidden />
-
-        <button
-          type="button"
-          aria-label="Notificaciones"
-          className="flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground
-                     transition-colors duration-150 hover:bg-muted hover:text-foreground
-                     focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-        >
-          <Bell size={16} aria-hidden />
-        </button>
+        <NotificacionesBell
+          notificaciones={notificaciones}
+          unreadCount={unreadCount}
+          rol={role}
+        />
 
         <div className="mx-1 h-4 w-px bg-border" aria-hidden />
 

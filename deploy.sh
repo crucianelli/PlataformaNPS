@@ -1,16 +1,18 @@
 #!/bin/bash
 set -e
 
-# ⚠️ Verificar con Franco el nombre exacto de la imagen en Docker Hub
 IMAGE_NAME="crucianelli/npsplatform"
 TAG="latest"
 
-# Cargar variables de entorno desde .env.local
+
 if [ ! -f .env.local ]; then
   echo "Error: no se encontró .env.local"
   exit 1
 fi
-source .env.local
+
+NEXT_PUBLIC_SUPABASE_URL=$(grep '^NEXT_PUBLIC_SUPABASE_URL=' .env.local | cut -d '=' -f2-)
+NEXT_PUBLIC_SUPABASE_ANON_KEY=$(grep '^NEXT_PUBLIC_SUPABASE_ANON_KEY=' .env.local | cut -d '=' -f2-)
+NEXT_PUBLIC_APP_URL="https://posventa.portalcrucianelli.site"
 
 echo "→ Buildeando imagen $IMAGE_NAME:$TAG..."
 docker build \

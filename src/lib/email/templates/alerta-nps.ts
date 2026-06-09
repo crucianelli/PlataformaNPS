@@ -6,6 +6,7 @@ type AlertaNpsTemplateParams = {
   npsEmpresa: number
   npsConcesionario: number
   comentarioProducto: string | null
+  comentarioConcesionario: string | null
   comentarioEmpresa: string | null
   comentarioGeneral: string | null
   detalleUrl: string
@@ -53,6 +54,7 @@ export function buildAlertaNpsTemplate({
   npsEmpresa,
   npsConcesionario,
   comentarioProducto,
+  comentarioConcesionario,
   comentarioEmpresa,
   comentarioGeneral,
   detalleUrl,
@@ -91,6 +93,7 @@ export function buildAlertaNpsTemplate({
           </table>
 
           ${comentarioBlock('Comentario sobre el producto', comentarioProducto)}
+          ${comentarioBlock('Comentario sobre el concesionario', comentarioConcesionario)}
           ${comentarioBlock('Comentario sobre la empresa', comentarioEmpresa)}
           ${comentarioBlock('Comentario general', comentarioGeneral)}
 
@@ -114,6 +117,7 @@ export function buildAlertaNpsTemplate({
     `NPS Empresa: ${npsEmpresa}`,
     `NPS Concesionario: ${npsConcesionario}`,
     comentarioProducto ? `Comentario producto: ${comentarioProducto}` : null,
+    comentarioConcesionario ? `Comentario concesionario: ${comentarioConcesionario}` : null,
     comentarioEmpresa ? `Comentario empresa: ${comentarioEmpresa}` : null,
     comentarioGeneral ? `Comentario general: ${comentarioGeneral}` : null,
     '',
