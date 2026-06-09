@@ -336,6 +336,19 @@ export default function FormularioEncuesta({ token, concesionario }: FormularioE
           label="En una escala del 1 al 10, donde 1 es muy improbable y 10 muy probable."
           required
         />
+        <div className="mt-5">
+          <label className="block text-sm font-medium text-gray-700 mb-1.5">
+            Comentario sobre el concesionario <span className="text-gray-400 font-normal">(opcional)</span>
+          </label>
+          <textarea
+            name="comentario_concesionario"
+            rows={3}
+            maxLength={1000}
+            disabled={isPending}
+            placeholder="¿Algo que podamos mejorar?"
+            className="block w-full resize-none rounded-lg border border-gray-300 bg-white px-3.5 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:border-[#C0272D] focus:outline-none focus:ring-2 focus:ring-[#C0272D]/20"
+          />
+        </div>
       </Card>
 
       <Card>

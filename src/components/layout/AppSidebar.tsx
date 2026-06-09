@@ -12,6 +12,7 @@ import {
   MessageSquare,
   BarChart3,
   Settings,
+  Gift,
   X,
 } from 'lucide-react'
 import { cn } from '@/lib/utils/cn'
@@ -43,6 +44,10 @@ const NAV_OPS: NavItem[] = [
 
 const NAV_SYSTEM: NavItem[] = [
   { href: '/configuracion', label: 'Configuración', icon: Settings },
+]
+
+const NAV_RAMBLA_ONLY: NavItem[] = [
+  { href: '/rambla', label: 'Rambla', icon: Gift },
 ]
 
 // ─── Sub-components ───────────────────────────────────────────────
@@ -110,11 +115,13 @@ function NavLink({ item, onNavigate }: { item: NavItem; onNavigate: () => void }
 interface AppSidebarProps {
   llamadosPendientes?: number
   sinRespuestaPendientes?: number
+  role?: string
 }
 
 export default function AppSidebar({
   llamadosPendientes = 0,
   sinRespuestaPendientes = 0,
+  role = 'admin',
 }: AppSidebarProps) {
   const { isOpen, close } = useSidebar()
   const pathname = usePathname()
@@ -185,29 +192,45 @@ export default function AppSidebar({
 
         {/* Navegación */}
         <nav className="flex-1 overflow-y-auto px-3 py-4">
-          <div className="space-y-4">
-            <NavGroup label="Principal">
-              {NAV_MAIN.map((item) => (
+          {role === 'rambla' ? (
+            <NavGroup label="Gestión">
+              {NAV_RAMBLA_ONLY.map((item) => (
                 <NavLink key={item.href} item={item} onNavigate={close} />
               ))}
             </NavGroup>
+          ) : (
+            <div className="space-y-4">
+              <NavGroup label="Principal">
+                {NAV_MAIN.map((item) => (
+                  <NavLink key={item.href} item={item} onNavigate={close} />
+                ))}
+              </NavGroup>
 
-            <div className="mx-0 h-px bg-sidebar-border" />
+              <div className="mx-0 h-px bg-sidebar-border" />
 
-            <NavGroup label="Operaciones">
-              {navOpsWithBadges.map((item) => (
-                <NavLink key={item.href} item={item} onNavigate={close} />
-              ))}
-            </NavGroup>
+              <NavGroup label="Operaciones">
+                {navOpsWithBadges.map((item) => (
+                  <NavLink key={item.href} item={item} onNavigate={close} />
+                ))}
+              </NavGroup>
 
-            <div className="mx-0 h-px bg-sidebar-border" />
+              <div className="mx-0 h-px bg-sidebar-border" />
 
-            <NavGroup label="Sistema">
-              {NAV_SYSTEM.map((item) => (
-                <NavLink key={item.href} item={item} onNavigate={close} />
-              ))}
-            </NavGroup>
-          </div>
+              <NavGroup label="Alianzas">
+                {NAV_RAMBLA_ONLY.map((item) => (
+                  <NavLink key={item.href} item={item} onNavigate={close} />
+                ))}
+              </NavGroup>
+
+              <div className="mx-0 h-px bg-sidebar-border" />
+
+              <NavGroup label="Sistema">
+                {NAV_SYSTEM.map((item) => (
+                  <NavLink key={item.href} item={item} onNavigate={close} />
+                ))}
+              </NavGroup>
+            </div>
+          )}
         </nav>
       </aside>
     </>
