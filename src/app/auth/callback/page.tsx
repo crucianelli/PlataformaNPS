@@ -16,7 +16,7 @@ function CallbackHandler() {
     const type = params.get('type')
 
     if (!accessToken || !refreshToken || type !== 'recovery') {
-      setError('Enlace inválido.')
+      Promise.resolve().then(() => setError('Enlace inválido.'))
       return
     }
 
