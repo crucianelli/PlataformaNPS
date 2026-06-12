@@ -37,7 +37,7 @@ export default function AuthCallbackPage() {
           else router.push('/nueva-password')
         })
     } else {
-      setError('Enlace inválido.')
+      Promise.resolve().then(() => setError('Enlace inválido.'))
     }
   }, [router, searchParams])
 
