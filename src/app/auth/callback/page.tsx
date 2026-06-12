@@ -1,10 +1,10 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { Suspense, useEffect, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { createSupabaseClient } from '@/lib/supabase/client'
 
-export default function AuthCallbackPage() {
+function CallbackHandler() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const [error, setError] = useState<string | null>(null)
@@ -15,7 +15,6 @@ export default function AuthCallbackPage() {
     const next = searchParams.get('next') ?? '/nueva-password'
 
     if (code) {
-      // Flujo PKCE: intercambia el code por sesión
       supabase.auth.exchangeCodeForSession(code).then(({ error }) => {
         if (error) setError('El enlace expiró o no es válido.')
         else router.push(next)
@@ -23,7 +22,7 @@ export default function AuthCallbackPage() {
       return
     }
 
-    // Flujo implícito: los tokens vienen en el hash (#access_token=...)
+    // Flujo implícito: tokens en el hash (#access_token=...)
     const hash = typeof window !== 'undefined' ? window.location.hash.substring(1) : ''
     const params = new URLSearchParams(hash)
     const accessToken = params.get('access_token')
@@ -64,5 +63,13 @@ export default function AuthCallbackPage() {
         Verificando enlace...
       </div>
     </div>
+  )
+}
+
+export default function AuthCallbackPage() {
+  return (
+    <Suspense>
+      <CallbackHandler />
+    </Suspense>
   )
 }
