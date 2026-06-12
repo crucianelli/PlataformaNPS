@@ -1,44 +1,38 @@
 'use client'
 
 import { Suspense, useEffect, useState } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useSearchParams } from 'next/navigation'
 import { createSupabaseClient } from '@/lib/supabase/client'
 
 function CallbackHandler() {
-  const router = useRouter()
   const searchParams = useSearchParams()
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     const supabase = createSupabaseClient()
-    const code = searchParams.get('code')
     const next = searchParams.get('next') ?? '/nueva-password'
 
-    if (code) {
-      supabase.auth.exchangeCodeForSession(code).then(({ error }) => {
-        if (error) setError('El enlace expiró o no es válido.')
-        else router.push(next)
-      })
-      return
-    }
+    // onAuthStateChange detecta automáticamente el token del hash (flujo implícito)
+    // y dispara PASSWORD_RECOVERY cuando el token es válido
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'PASSWORD_RECOVERY' && session) {
+        // Reload completo para que el middleware lea las cookies de sesión correctamente
+        window.location.href = next
+      } else if (event === 'SIGNED_IN' && session) {
+        window.location.href = next
+      }
+    })
 
-    // Flujo implícito: tokens en el hash (#access_token=...)
-    const hash = typeof window !== 'undefined' ? window.location.hash.substring(1) : ''
-    const params = new URLSearchParams(hash)
-    const accessToken = params.get('access_token')
-    const refreshToken = params.get('refresh_token')
-    const type = params.get('type')
+    // Timeout de seguridad: si en 8 segundos no se detectó nada, el enlace expiró
+    const timeout = setTimeout(() => {
+      Promise.resolve().then(() => setError('El enlace expiró o no es válido.'))
+    }, 8000)
 
-    if (accessToken && refreshToken && type === 'recovery') {
-      supabase.auth.setSession({ access_token: accessToken, refresh_token: refreshToken })
-        .then(({ error }) => {
-          if (error) setError('El enlace expiró o no es válido.')
-          else router.push('/nueva-password')
-        })
-    } else {
-      Promise.resolve().then(() => setError('Enlace inválido.'))
+    return () => {
+      subscription.unsubscribe()
+      clearTimeout(timeout)
     }
-  }, [router, searchParams])
+  }, [searchParams])
 
   if (error) {
     return (
