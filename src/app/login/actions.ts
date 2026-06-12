@@ -37,7 +37,7 @@ export async function solicitarRecuperacionAction(
 
   const headersList = await headers()
   const host = headersList.get('host') ?? 'localhost:3000'
-  const proto = headersList.get('x-forwarded-proto') ?? (host.startsWith('localhost') ? 'http' : 'https')
+  const proto = host.startsWith('localhost') ? 'http' : 'https'
   const redirectTo = `${proto}://${host}/auth/callback?next=/nueva-password`
 
   const admin = createSupabaseAdmin()

@@ -1,38 +1,35 @@
 'use client'
 
 import { Suspense, useEffect, useState } from 'react'
-import { useSearchParams } from 'next/navigation'
 import { createSupabaseClient } from '@/lib/supabase/client'
 
 function CallbackHandler() {
-  const searchParams = useSearchParams()
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     const supabase = createSupabaseClient()
-    const next = searchParams.get('next') ?? '/nueva-password'
 
-    // onAuthStateChange detecta automáticamente el token del hash (flujo implícito)
-    // y dispara PASSWORD_RECOVERY cuando el token es válido
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === 'PASSWORD_RECOVERY' && session) {
-        // Reload completo para que el middleware lea las cookies de sesión correctamente
-        window.location.href = next
-      } else if (event === 'SIGNED_IN' && session) {
-        window.location.href = next
-      }
-    })
+    const hash = window.location.hash.substring(1)
+    const params = new URLSearchParams(hash)
+    const accessToken = params.get('access_token')
+    const refreshToken = params.get('refresh_token')
+    const type = params.get('type')
 
-    // Timeout de seguridad: si en 8 segundos no se detectó nada, el enlace expiró
-    const timeout = setTimeout(() => {
-      Promise.resolve().then(() => setError('El enlace expiró o no es válido.'))
-    }, 8000)
-
-    return () => {
-      subscription.unsubscribe()
-      clearTimeout(timeout)
+    if (!accessToken || !refreshToken || type !== 'recovery') {
+      setError('Enlace inválido.')
+      return
     }
-  }, [searchParams])
+
+    supabase.auth.setSession({ access_token: accessToken, refresh_token: refreshToken })
+      .then(({ data, error }) => {
+        if (error || !data.session) {
+          setError('El enlace expiró o no es válido.')
+        } else {
+          // Reload completo para que el middleware lea las cookies de sesión
+          window.location.href = '/nueva-password'
+        }
+      })
+  }, [])
 
   if (error) {
     return (
