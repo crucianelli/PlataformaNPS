@@ -45,8 +45,13 @@ export async function solicitarRecuperacionAction(
     options: { redirectTo },
   })
 
-  // Siempre responder con éxito para no revelar si el email existe
-  if (error || !data?.properties?.action_link) {
+  if (error) {
+    console.error('[recuperar-password] generateLink error:', error.message)
+    return { success: true }
+  }
+
+  if (!data?.properties?.action_link) {
+    console.error('[recuperar-password] generateLink: no action_link en la respuesta', data)
     return { success: true }
   }
 
@@ -54,8 +59,9 @@ export async function solicitarRecuperacionAction(
 
   try {
     await sendEmail({ to: email, ...template })
-  } catch {
-    // No bloquear al usuario si el email falla
+    console.log('[recuperar-password] email enviado a', email)
+  } catch (err) {
+    console.error('[recuperar-password] sendEmail error:', err)
   }
 
   return { success: true }
