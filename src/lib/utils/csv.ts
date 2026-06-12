@@ -15,6 +15,32 @@ export type ClienteCSVRow = {
   tecnologia: Tecnologia | null
 }
 
+function parseCSVLine(line: string, sep: string): string[] {
+  const fields: string[] = []
+  let current = ''
+  let inQuotes = false
+
+  for (let i = 0; i < line.length; i++) {
+    const char = line[i]
+    if (char === '"') {
+      if (inQuotes && line[i + 1] === '"') {
+        current += '"'
+        i++
+      } else {
+        inQuotes = !inQuotes
+      }
+    } else if (char === sep && !inQuotes) {
+      fields.push(current.trim())
+      current = ''
+    } else {
+      current += char
+    }
+  }
+
+  fields.push(current.trim())
+  return fields
+}
+
 function normalizeHeader(h: string): string {
   return h
     .toLowerCase()
@@ -67,7 +93,7 @@ export function parseClientesCSV(text: string): ClienteCSVRow[] {
   if (lines.length < 2) throw new Error('El archivo no tiene datos.')
 
   const sep = lines[0].includes(';') ? ';' : ','
-  const rawHeaders = lines[0].split(sep).map((h) => h.trim().replace(/^"|"$/g, ''))
+  const rawHeaders = parseCSVLine(lines[0], sep)
   const headers = rawHeaders.map(normalizeHeader)
 
   const dealerIdx = headers.findIndex((h) => h.startsWith('concesionario'))
@@ -89,7 +115,7 @@ export function parseClientesCSV(text: string): ClienteCSVRow[] {
     .slice(1)
     .filter((line) => line.trim())
     .map((line, index) => {
-      const values = line.split(sep).map((v) => v.trim().replace(/^"|"$/g, ''))
+      const values = parseCSVLine(line, sep)
       const phones = [phone1Idx, phone2Idx, phone3Idx]
         .filter((idx) => idx !== -1)
         .map((idx) => values[idx] ?? '')
