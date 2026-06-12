@@ -1,8 +1,8 @@
 'use server'
 
-import { createSupabaseServer } from '@/lib/supabase/server'
-import { createSupabaseAdmin } from '@/lib/supabase/server'
+import { createSupabaseServer, createSupabaseAdmin } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
+import { headers } from 'next/headers'
 import { sendEmail } from '@/lib/email/send-email'
 import { buildRecuperarPasswordTemplate } from '@/lib/email/templates/recuperar-password'
 
@@ -35,8 +35,10 @@ export async function solicitarRecuperacionAction(
 
   if (!email) return { error: 'Ingresá tu email.' }
 
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'
-  const redirectTo = `${appUrl}/auth/callback?next=/nueva-password`
+  const headersList = await headers()
+  const host = headersList.get('host') ?? 'localhost:3000'
+  const proto = headersList.get('x-forwarded-proto') ?? (host.startsWith('localhost') ? 'http' : 'https')
+  const redirectTo = `${proto}://${host}/auth/callback?next=/nueva-password`
 
   const admin = createSupabaseAdmin()
   const { data, error } = await admin.auth.admin.generateLink({
