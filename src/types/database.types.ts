@@ -254,6 +254,8 @@ export type Database = {
           nps_producto: number
           piso_departamento: string | null
           provincia: string | null
+          fecha_seguimiento: string | null
+          numero_seguimiento: string | null
           regalo_estado: Database["public"]["Enums"]["regalo_estado"]
           telefono: string | null
           tipo_maquina: Database["public"]["Enums"]["tipo_maquina_enum"]
@@ -285,6 +287,8 @@ export type Database = {
           nps_producto: number
           piso_departamento?: string | null
           provincia?: string | null
+          fecha_seguimiento?: string | null
+          numero_seguimiento?: string | null
           regalo_estado?: Database["public"]["Enums"]["regalo_estado"]
           telefono?: string | null
           tipo_maquina?: Database["public"]["Enums"]["tipo_maquina_enum"]
@@ -316,6 +320,8 @@ export type Database = {
           nps_producto?: number
           piso_departamento?: string | null
           provincia?: string | null
+          fecha_seguimiento?: string | null
+          numero_seguimiento?: string | null
           regalo_estado?: Database["public"]["Enums"]["regalo_estado"]
           telefono?: string | null
           tipo_maquina?: Database["public"]["Enums"]["tipo_maquina_enum"]

@@ -6,7 +6,7 @@ export async function getRespuestasRambla(): Promise<RespuestaRambla[]> {
   const { data, error } = await supabase
     .from('respuestas')
     .select(
-      'id, fecha_respuesta, nombre_apellido, calle_numero, piso_departamento, localidad, codigo_postal, provincia, email, telefono, regalo_estado'
+      'id, fecha_respuesta, nombre_apellido, calle_numero, piso_departamento, localidad, codigo_postal, provincia, email, telefono, maquina_modelo, regalo_estado, numero_seguimiento, fecha_seguimiento'
     )
     .order('fecha_respuesta', { ascending: false })
 

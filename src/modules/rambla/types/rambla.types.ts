@@ -11,7 +11,10 @@ export type RespuestaRambla = {
   provincia: string | null
   email: string | null
   telefono: string | null
+  maquina_modelo: string | null
   regalo_estado: RegaloEstado
+  numero_seguimiento: string | null
+  fecha_seguimiento: string | null
 }
 
 export type RegaloStats = {
