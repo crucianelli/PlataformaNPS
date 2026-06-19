@@ -90,8 +90,8 @@ export async function checkAvisosRecordatorio() {
         },
       })
 
-      // Email a los destinatarios configurados
-      const recipients = config.emails_notificacion ?? []
+      // Email solo al administrador
+      const recipients = ['rasef@crucianelli.com']
       if (recipients.length > 0) {
         const email = buildAvisoRecordatorioTemplate({
           campanaNombre: campana.nombre,
