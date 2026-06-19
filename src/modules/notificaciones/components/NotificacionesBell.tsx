@@ -7,6 +7,7 @@ import {
   MessageSquare,
   Gift,
   Activity,
+  CalendarClock,
   Check,
   X,
 } from 'lucide-react'
@@ -44,6 +45,11 @@ const TIPO_CONFIG: Record<NotificacionTipo, {
     icon: Activity,
     iconColor: 'text-orange-500',
     iconBg: 'bg-orange-100',
+  },
+  aviso_recordatorio: {
+    icon: CalendarClock,
+    iconColor: 'text-amber-600',
+    iconBg: 'bg-amber-100',
   },
 }
 

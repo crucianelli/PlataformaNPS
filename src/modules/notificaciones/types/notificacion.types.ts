@@ -3,6 +3,7 @@ export type NotificacionTipo =
   | 'nueva_respuesta'
   | 'regalo_pendiente'
   | 'campana_sin_actividad'
+  | 'aviso_recordatorio'
 
 export type Notificacion = {
   id: string

@@ -1,6 +1,7 @@
 import PageContainer from '@/components/layout/PageContainer'
 import { Card, CardContent, CardHeader } from '@/components/ui/Card'
 import RespuestasTable from '@/modules/dashboard/components/RespuestasTable'
+import Pagination from '@/components/ui/Pagination'
 import {
   getDashboardFilterOptions,
   getRespuestas,
@@ -12,6 +13,8 @@ import {
   NPS_ANSWER_STATUS_OPTIONS,
   NPS_DIMENSION_OPTIONS,
 } from '@/modules/dashboard/utils/nps'
+
+const PAGE_SIZE = 50
 
 export default async function RespuestasPage({
   searchParams,
@@ -26,6 +29,7 @@ export default async function RespuestasPage({
     estadoNps?: string
     npsDimension?: string
     canal?: string
+    page?: string
   }>
 }) {
   const {
@@ -38,7 +42,10 @@ export default async function RespuestasPage({
     estadoNps,
     npsDimension,
     canal,
+    page: pageParam,
   } = await searchParams
+
+  const page = Math.max(1, parseInt(pageParam ?? '1', 10) || 1)
   const tecnologiaFilter = normalizeTecnologiaInput(tecnologia) ?? undefined
   const estadoNpsFilter = normalizeNpsAnswerStatus(estadoNps)
   const npsDimensionFilter = normalizeNpsDimension(npsDimension)
@@ -58,20 +65,31 @@ export default async function RespuestasPage({
     }),
   ])
 
-  const exportParams = new URLSearchParams()
-  if (q) exportParams.set('q', q)
-  if (concesionario) exportParams.set('concesionario', concesionario)
-  if (campanaId) exportParams.set('campanaId', campanaId)
-  if (fechaDesde) exportParams.set('fechaDesde', fechaDesde)
-  if (fechaHasta) exportParams.set('fechaHasta', fechaHasta)
-  if (tecnologiaFilter) exportParams.set('tecnologia', tecnologiaFilter)
-  if (estadoNpsFilter) exportParams.set('estadoNps', estadoNpsFilter)
-  if (npsDimensionFilter) exportParams.set('npsDimension', npsDimensionFilter)
-  if (canalFilter) exportParams.set('canal', canalFilter)
-  const exportHref = `/api/respuestas/exportar${exportParams.toString() ? `?${exportParams.toString()}` : ''}`
+  const total = respuestas.length
+  const totalPages = Math.ceil(total / PAGE_SIZE)
+  const pagedRespuestas = respuestas.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)
+
+  const filterParams = new URLSearchParams()
+  if (q) filterParams.set('q', q)
+  if (concesionario) filterParams.set('concesionario', concesionario)
+  if (campanaId) filterParams.set('campanaId', campanaId)
+  if (fechaDesde) filterParams.set('fechaDesde', fechaDesde)
+  if (fechaHasta) filterParams.set('fechaHasta', fechaHasta)
+  if (tecnologiaFilter) filterParams.set('tecnologia', tecnologiaFilter)
+  if (estadoNpsFilter) filterParams.set('estadoNps', estadoNpsFilter)
+  if (npsDimensionFilter) filterParams.set('npsDimension', npsDimensionFilter)
+  if (canalFilter) filterParams.set('canal', canalFilter)
+
+  const exportHref = `/api/respuestas/exportar${filterParams.toString() ? `?${filterParams.toString()}` : ''}`
+
+  const getPageUrl = (p: number) => {
+    const params = new URLSearchParams(filterParams)
+    params.set('page', p.toString())
+    return `/respuestas?${params.toString()}`
+  }
 
   return (
-    <PageContainer title={`Respuestas (${respuestas.length})`}>
+    <PageContainer title={`Respuestas (${total})`}>
       <div className="space-y-6">
         <Card>
           <CardContent className="pt-4">
@@ -220,7 +238,7 @@ export default async function RespuestasPage({
                 </div>
               </div>
               <div className="flex flex-col gap-3 border-t border-border pt-4 sm:flex-row sm:items-center sm:justify-between">
-                <p className="text-xs text-muted-foreground">{respuestas.length} respuesta{respuestas.length !== 1 ? 's' : ''} encontrada{respuestas.length !== 1 ? 's' : ''}</p>
+                <p className="text-xs text-muted-foreground">{total} respuesta{total !== 1 ? 's' : ''} encontrada{total !== 1 ? 's' : ''}</p>
                 <div className="flex flex-wrap items-center gap-3">
                   <button
                     type="submit"
@@ -254,7 +272,15 @@ export default async function RespuestasPage({
             </a>
           </CardHeader>
           <CardContent className="p-0">
-            <RespuestasTable respuestas={respuestas} />
+            <RespuestasTable respuestas={pagedRespuestas} />
+            <Pagination
+              currentPage={page}
+              totalPages={totalPages}
+              totalItems={total}
+              pageSize={PAGE_SIZE}
+              getPageUrl={getPageUrl}
+              itemLabel="respuestas"
+            />
           </CardContent>
         </Card>
       </div>

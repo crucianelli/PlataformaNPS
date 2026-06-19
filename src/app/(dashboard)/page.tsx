@@ -7,12 +7,16 @@ import {
   getNpsResumenExtendido,
   getRespuestas,
 } from '@/modules/dashboard/services/dashboard.service'
+import { checkAvisosRecordatorio } from '@/modules/recordatorios/services/avisos.service'
 
 export default async function DashboardPage() {
   const [resumen, efectividad, respuestas] = await Promise.all([
     getNpsResumenExtendido(),
     getEfectividadEnvios(),
     getRespuestas(),
+    checkAvisosRecordatorio().catch((err) =>
+      console.error('[dashboard] checkAvisosRecordatorio falló:', err)
+    ),
   ])
 
   return (

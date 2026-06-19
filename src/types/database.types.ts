@@ -444,7 +444,7 @@ export type Database = {
     }
     Enums: {
       campana_estado: "activa" | "completada" | "archivada"
-      notificacion_tipo: "nps_critico" | "nueva_respuesta" | "regalo_pendiente" | "campana_sin_actividad"
+      notificacion_tipo: "nps_critico" | "nueva_respuesta" | "regalo_pendiente" | "campana_sin_actividad" | "aviso_recordatorio"
       encuesta_estado:
         | "pendiente"
         | "respondida"
