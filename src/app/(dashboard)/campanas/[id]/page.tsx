@@ -9,6 +9,7 @@ import EliminarCampanaForm from '@/modules/campanas/components/EliminarCampanaFo
 import RecordatoriosTimeline from '@/modules/recordatorios/components/RecordatoriosTimeline'
 import { getRecordatoriosByCampana, puedeCrearRecordatorio } from '@/modules/recordatorios/services/recordatorios.service'
 import { formatTecnologia } from '@/lib/utils/tecnologia'
+import CopyButton from '@/components/ui/CopyButton'
 
 const estadoBadge: Record<string, 'success' | 'info' | 'default'> = {
   activa:     'success',
@@ -23,6 +24,8 @@ const encuestaBadge: Record<string, 'success' | 'warning' | 'info' | 'default'> 
   respondida: 'success',
   sin_respuesta: 'default',
 }
+
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'
 
 export default async function CampanaDetallePage({
   params,
@@ -126,6 +129,7 @@ export default async function CampanaDetallePage({
                   <TableHead>OF</TableHead>
                   <TableHead>Tecnología</TableHead>
                   <TableHead>Estado</TableHead>
+                  <TableHead>Link</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -142,6 +146,12 @@ export default async function CampanaDetallePage({
                       <Badge variant={encuestaBadge[e.estado] ?? 'default'}>
                         {e.estado}
                       </Badge>
+                    </TableCell>
+                    <TableCell>
+                      <CopyButton
+                        text={`${APP_URL}/encuesta?token=${e.token}`}
+                        title={`${APP_URL}/encuesta?token=${e.token}`}
+                      />
                     </TableCell>
                   </TableRow>
                 ))}
