@@ -2,7 +2,7 @@
 
 import { z } from 'zod'
 import { createSupabaseAdmin } from '@/lib/supabase/server'
-import { enviarAlertaNpsCritico } from '@/modules/alertas/services/alertas.service'
+import { enviarAlertaNpsCritico, enviarNotificacionRambla } from '@/modules/alertas/services/alertas.service'
 import { CONCESIONARIOS, MAQUINAS, getTipoMaquina } from './form-options'
 
 const RespuestaSchema = z.object({
@@ -146,6 +146,17 @@ export async function guardarRespuestaAction(
         para_rol: 'rambla',
         metadata: { nombre, concesionario },
       })),
+      enviarNotificacionRambla({
+        nombreApellido: result.data.nombre_apellido,
+        calleNumero: result.data.calle_numero,
+        pisoDepartamento: result.data.piso_departamento || null,
+        localidad: result.data.localidad,
+        codigoPostal: result.data.codigo_postal,
+        provincia: result.data.provincia,
+        email: result.data.email,
+        telefono: result.data.telefono,
+        concesionario: result.data.concesionario_sede,
+      }).catch(err => console.error('Notificación Rambla email fallida', err)),
     ]
 
     if (esNPSCritico) {

@@ -4,6 +4,7 @@ import { z } from 'zod'
 import { revalidatePath } from 'next/cache'
 import { sendEmail } from '@/lib/email/send-email'
 import { buildTestEmailTemplate } from '@/lib/email/templates/test-email'
+import { buildRamblaRegaloTemplate } from '@/lib/email/templates/rambla-regalo'
 import { getSystemConfig, updateSystemConfig } from '@/modules/configuracion/services/configuracion.service'
 
 const ConfigSchema = z.object({
@@ -17,6 +18,7 @@ const ConfigSchema = z.object({
     .int('Debe ser un número entero.')
     .min(1, 'Debe ser mayor a 0.'),
   emails_notificacion: z.string().optional(),
+  emails_rambla: z.string().optional(),
 })
 
 type ActionState = { error?: string; success?: boolean }
@@ -40,6 +42,7 @@ export async function actualizarConfiguracionAction(
     dias_notificacion_inicial: formData.get('dias_notificacion_inicial'),
     dias_hasta_llamado: formData.get('dias_hasta_llamado'),
     emails_notificacion: formData.get('emails_notificacion'),
+    emails_rambla: formData.get('emails_rambla'),
   }
 
   const result = ConfigSchema.safeParse(raw)
@@ -49,9 +52,14 @@ export async function actualizarConfiguracionAction(
 
   const emails = parseEmails(result.data.emails_notificacion)
   const invalidEmail = emails.find((email) => !z.email().safeParse(email).success)
-
   if (invalidEmail) {
     return { error: `El email "${invalidEmail}" no es válido.` }
+  }
+
+  const emailsRambla = parseEmails(result.data.emails_rambla)
+  const invalidRambla = emailsRambla.find((email) => !z.email().safeParse(email).success)
+  if (invalidRambla) {
+    return { error: `El email de Rambla "${invalidRambla}" no es válido.` }
   }
 
   try {
@@ -59,6 +67,7 @@ export async function actualizarConfiguracionAction(
       dias_notificacion_inicial: result.data.dias_notificacion_inicial,
       dias_hasta_llamado: result.data.dias_hasta_llamado,
       emails_notificacion: emails,
+      emails_rambla: emailsRambla,
     })
   } catch {
     return { error: 'No se pudo guardar la configuración.' }
@@ -105,6 +114,54 @@ export async function enviarEmailPruebaAction(
     const message =
       error instanceof Error ? error.message : 'No se pudo enviar el email de prueba.'
 
+    return { error: message }
+  }
+
+  return { success: true, sentTo: recipient }
+}
+
+export async function enviarEmailPruebaRamblaAction(
+  _prevState: TestActionState,
+  formData: FormData
+): Promise<TestActionState> {
+  const emailSchema = z.object({
+    to: z.string().email('Ingresa un email válido para la prueba.').optional().or(z.literal('')),
+  })
+
+  const result = emailSchema.safeParse({ to: formData.get('to') })
+  if (!result.success) {
+    return { error: result.error.issues[0]?.message ?? 'Email inválido.' }
+  }
+
+  const config = await getSystemConfig()
+  const fallbackRecipient = config?.emails_rambla?.[0] ?? config?.emails_notificacion[0]
+  const recipient = result.data.to || fallbackRecipient
+
+  if (!recipient) {
+    return { error: 'Configura al menos un email de Rambla o indicá un destinatario manual.' }
+  }
+
+  const email = buildRamblaRegaloTemplate({
+    nombreApellido: 'Daniel Lualdi',
+    calleNumero: 'Cuartel 4',
+    pisoDepartamento: null,
+    localidad: 'Roque Pérez',
+    codigoPostal: '7245',
+    provincia: 'Buenos Aires',
+    email: 'ejemplo@email.com',
+    telefono: '2345416567',
+    concesionario: 'Crucianelli (DEMO)',
+  })
+
+  try {
+    await sendEmail({
+      to: recipient,
+      subject: `[PRUEBA] ${email.subject}`,
+      html: email.html,
+      text: email.text,
+    })
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'No se pudo enviar el email de prueba.'
     return { error: message }
   }
 

@@ -1,6 +1,7 @@
 import { createSupabaseAdmin } from '@/lib/supabase/server'
 import { sendEmail } from '@/lib/email/send-email'
 import { buildAlertaNpsTemplate } from '@/lib/email/templates/alerta-nps'
+import { buildRamblaRegaloTemplate } from '@/lib/email/templates/rambla-regalo'
 
 type RespuestaCriticaData = {
   encuestaId: string
@@ -71,5 +72,41 @@ export async function enviarAlertaNpsCritico({
     subject: email.subject,
     html: email.html,
     text: email.text,
+  })
+}
+
+type DatosEnvioRambla = {
+  nombreApellido: string
+  calleNumero: string
+  pisoDepartamento: string | null
+  localidad: string
+  codigoPostal: string
+  provincia: string
+  email: string
+  telefono: string
+  concesionario: string
+}
+
+export async function enviarNotificacionRambla(datos: DatosEnvioRambla) {
+  const supabase = createSupabaseAdmin()
+
+  const { data: config, error } = await supabase
+    .from('system_config')
+    .select('emails_rambla')
+    .limit(1)
+    .maybeSingle()
+
+  if (error) throw error
+
+  const recipients: string[] = config?.emails_rambla ?? []
+  if (recipients.length === 0) return
+
+  const emailContent = buildRamblaRegaloTemplate(datos)
+
+  await sendEmail({
+    bcc: recipients,
+    subject: emailContent.subject,
+    html: emailContent.html,
+    text: emailContent.text,
   })
 }

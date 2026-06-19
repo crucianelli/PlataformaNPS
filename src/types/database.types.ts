@@ -382,6 +382,7 @@ export type Database = {
           dias_notificacion_inicial: number
           dias_notificacion_recordatorio: number
           emails_notificacion: string[]
+          emails_rambla: string[]
           id: string
           updated_at: string
         }
@@ -390,6 +391,7 @@ export type Database = {
           dias_notificacion_inicial?: number
           dias_notificacion_recordatorio?: number
           emails_notificacion?: string[]
+          emails_rambla?: string[]
           id?: string
           updated_at?: string
         }
@@ -398,6 +400,7 @@ export type Database = {
           dias_notificacion_inicial?: number
           dias_notificacion_recordatorio?: number
           emails_notificacion?: string[]
+          emails_rambla?: string[]
           id?: string
           updated_at?: string
         }

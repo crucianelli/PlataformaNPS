@@ -4,6 +4,7 @@ import { useActionState } from 'react'
 import {
   actualizarConfiguracionAction,
   enviarEmailPruebaAction,
+  enviarEmailPruebaRamblaAction,
 } from '@/app/(dashboard)/configuracion/actions'
 import Input from '@/components/ui/Input'
 import Button from '@/components/ui/Button'
@@ -17,6 +18,7 @@ interface ConfigFormProps {
 export default function ConfigForm({ config }: ConfigFormProps) {
   const [state, formAction, isPending] = useActionState(actualizarConfiguracionAction, {})
   const [testState, testFormAction, isSendingTest] = useActionState(enviarEmailPruebaAction, {})
+  const [testRamblaState, testRamblaFormAction, isSendingRamblaTest] = useActionState(enviarEmailPruebaRamblaAction, {})
 
   return (
     <div className="space-y-6">
@@ -57,12 +59,12 @@ export default function ConfigForm({ config }: ConfigFormProps) {
                 htmlFor="emails_notificacion"
                 className="block text-sm font-medium text-foreground"
               >
-                Emails de notificación
+                Emails de notificación (NPS crítico)
               </label>
               <textarea
                 id="emails_notificacion"
                 name="emails_notificacion"
-                rows={6}
+                rows={4}
                 disabled={isPending}
                 defaultValue={config.emails_notificacion.join('\n')}
                 placeholder={'responsable@empresa.com\nsupervision@empresa.com'}
@@ -70,6 +72,27 @@ export default function ConfigForm({ config }: ConfigFormProps) {
               />
               <p className="text-xs text-muted-foreground">
                 Ingresa un email por línea o separados por coma.
+              </p>
+            </div>
+
+            <div className="space-y-1">
+              <label
+                htmlFor="emails_rambla"
+                className="block text-sm font-medium text-foreground"
+              >
+                Emails de Rambla (despacho de regalos)
+              </label>
+              <textarea
+                id="emails_rambla"
+                name="emails_rambla"
+                rows={4}
+                disabled={isPending}
+                defaultValue={(config.emails_rambla ?? []).join('\n')}
+                placeholder={'pedidos@rambla.com\necommerce-almacen@rambla.com'}
+                className="block w-full rounded-md border border-border bg-card px-3 py-2 text-sm text-foreground shadow-sm placeholder-gray-400 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary disabled:cursor-not-allowed disabled:bg-muted/30 disabled:text-muted-foreground"
+              />
+              <p className="text-xs text-muted-foreground">
+                Reciben un email con los datos de envío cada vez que alguien completa una encuesta. Ingresa un email por línea o separados por coma.
               </p>
             </div>
 
@@ -120,6 +143,43 @@ export default function ConfigForm({ config }: ConfigFormProps) {
             <div className="flex justify-end">
               <Button type="submit" variant="secondary" disabled={isSendingTest}>
                 {isSendingTest ? 'Enviando prueba...' : 'Enviar email de prueba'}
+              </Button>
+            </div>
+          </form>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <h2 className="text-sm font-semibold text-foreground">Prueba de email Rambla</h2>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Envía un email de ejemplo con el formato de despacho de regalos para verificar que se vea correctamente.
+          </p>
+        </CardHeader>
+        <CardContent>
+          <form action={testRamblaFormAction} className="space-y-4">
+            <Input
+              label="Destinatario de prueba"
+              name="to"
+              type="email"
+              placeholder={(config.emails_rambla ?? [])[0] ?? config.emails_notificacion[0] ?? 'destinatario@empresa.com'}
+              disabled={isSendingRamblaTest}
+            />
+
+            <p className="text-xs text-muted-foreground">
+              Si dejas este campo vacío, se usará el primer email de Rambla configurado. El email se envía con datos ficticios y el asunto indica que es una prueba.
+            </p>
+
+            {testRamblaState?.error && <p className="text-sm text-red-600">{testRamblaState.error}</p>}
+            {testRamblaState?.success && (
+              <p className="text-sm font-medium text-green-700">
+                Email de prueba Rambla enviado a {testRamblaState.sentTo}.
+              </p>
+            )}
+
+            <div className="flex justify-end">
+              <Button type="submit" variant="secondary" disabled={isSendingRamblaTest}>
+                {isSendingRamblaTest ? 'Enviando prueba...' : 'Enviar email de prueba Rambla'}
               </Button>
             </div>
           </form>
