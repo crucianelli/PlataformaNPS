@@ -47,9 +47,7 @@ type RawEncuestaConRespuesta = {
         tipo_maquina: 'sembradora' | 'fertilizadora'
         nombre_firma_factura: string | null
         calificacion_entrega_presentacion: number | null
-        calificacion_puesta_marcha: number | null
         calificacion_capacitacion: number | null
-        calificacion_funcionamiento_general: number | null
         calificacion_tecnico: number | null
         nps_producto: number
         nps_empresa: number
@@ -74,9 +72,7 @@ type RawEncuestaConRespuesta = {
         tipo_maquina: 'sembradora' | 'fertilizadora'
         nombre_firma_factura: string | null
         calificacion_entrega_presentacion: number | null
-        calificacion_puesta_marcha: number | null
         calificacion_capacitacion: number | null
-        calificacion_funcionamiento_general: number | null
         calificacion_tecnico: number | null
         nps_producto: number
         nps_empresa: number
@@ -114,9 +110,7 @@ export type RespuestaDetalle = {
   tipoMaquina: 'sembradora' | 'fertilizadora'
   nombreFirmaFactura: string | null
   calificacionEntregaPresentacion: number | null
-  calificacionPuestaMarcha: number | null
   calificacionCapacitacion: number | null
-  calificacionFuncionamientoGeneral: number | null
   calificacionTecnico: number | null
   npsProducto: number
   npsEmpresa: number
@@ -248,9 +242,7 @@ function mapRespuesta(row: RawEncuestaConRespuesta): RespuestaDetalle | null {
     tipoMaquina: respuesta.tipo_maquina,
     nombreFirmaFactura: respuesta.nombre_firma_factura,
     calificacionEntregaPresentacion: respuesta.calificacion_entrega_presentacion,
-    calificacionPuestaMarcha: respuesta.calificacion_puesta_marcha,
     calificacionCapacitacion: respuesta.calificacion_capacitacion,
-    calificacionFuncionamientoGeneral: respuesta.calificacion_funcionamiento_general,
     calificacionTecnico: respuesta.calificacion_tecnico,
     npsProducto: respuesta.nps_producto,
     npsEmpresa: respuesta.nps_empresa,
@@ -287,9 +279,7 @@ export async function getRespuestas(filters: DashboardFilters = {}) {
         tipo_maquina,
         nombre_firma_factura,
         calificacion_entrega_presentacion,
-        calificacion_puesta_marcha,
         calificacion_capacitacion,
-        calificacion_funcionamiento_general,
         calificacion_tecnico,
         nps_producto,
         nps_empresa,
@@ -524,9 +514,7 @@ const CALIFICACIONES_CONFIG: Array<{
   labelCorto: string
 }> = [
   { key: 'calificacionEntregaPresentacion', label: 'Entrega y presentación', labelCorto: 'Entrega' },
-  { key: 'calificacionPuestaMarcha', label: 'Puesta en marcha', labelCorto: 'Puesta en marcha' },
   { key: 'calificacionCapacitacion', label: 'Capacitación', labelCorto: 'Capacitación' },
-  { key: 'calificacionFuncionamientoGeneral', label: 'Funcionamiento general', labelCorto: 'Funcionamiento' },
   { key: 'calificacionTecnico', label: 'Técnico', labelCorto: 'Técnico' },
   { key: 'npsConcesionario', label: 'NPS concesionario', labelCorto: 'NPS Concesion.' },
   { key: 'npsProducto', label: 'NPS producto', labelCorto: 'NPS Producto' },

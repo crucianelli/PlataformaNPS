@@ -161,9 +161,7 @@ export default function RespuestasTable({ respuestas }: RespuestasTableProps) {
                           <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Calificaciones</p>
                           <div className="space-y-2">
                             <ScoreLine label="Entrega y presentación" value={respuesta.calificacionEntregaPresentacion} />
-                            <ScoreLine label="Puesta en marcha" value={respuesta.calificacionPuestaMarcha} />
                             <ScoreLine label="Capacitación" value={respuesta.calificacionCapacitacion} />
-                            <ScoreLine label="Funcionamiento general" value={respuesta.calificacionFuncionamientoGeneral} />
                             <ScoreLine label="Técnico" value={respuesta.calificacionTecnico} />
                             <ScoreLine label="NPS concesionario" value={respuesta.npsConcesionario} nps />
                             <ScoreLine label="NPS producto" value={respuesta.npsProducto} nps />
