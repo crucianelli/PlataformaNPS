@@ -12,8 +12,6 @@ import {
 
 type ActionState = { error?: string; success?: boolean }
 
-const ROLES: UserRole[] = ['admin', 'rambla', 'fabrica']
-
 async function requireAdmin() {
   const supabase = await createSupabaseServer()
   const { data: { user } } = await supabase.auth.getUser()
