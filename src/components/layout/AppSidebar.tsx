@@ -198,6 +198,12 @@ export default function AppSidebar({
                 <NavLink key={item.href} item={item} onNavigate={close} />
               ))}
             </NavGroup>
+          ) : role === 'fabrica' ? (
+            <NavGroup label="Principal">
+              {NAV_MAIN.map((item) => (
+                <NavLink key={item.href} item={item} onNavigate={close} />
+              ))}
+            </NavGroup>
           ) : (
             <div className="space-y-4">
               <NavGroup label="Principal">

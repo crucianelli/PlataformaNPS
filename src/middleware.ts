@@ -64,10 +64,20 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL('/rambla', request.url))
   }
 
-  if (pathname === '/login' && user) {
-    return NextResponse.redirect(
-      new URL(role === 'rambla' ? '/rambla' : '/', request.url)
+  // Usuarios Fábrica: solo pueden acceder a las rutas de visualización (Principal)
+  const FABRICA_ALLOWED = ['/', '/nps', '/respuestas']
+  if (user && role === 'fabrica') {
+    const allowed = FABRICA_ALLOWED.some((r) =>
+      r === '/' ? pathname === '/' : pathname.startsWith(r)
     )
+    if (!allowed) {
+      return NextResponse.redirect(new URL('/', request.url))
+    }
+  }
+
+  if (pathname === '/login' && user) {
+    const dest = role === 'rambla' ? '/rambla' : '/'
+    return NextResponse.redirect(new URL(dest, request.url))
   }
 
   return supabaseResponse
