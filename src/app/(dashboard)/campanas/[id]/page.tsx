@@ -10,6 +10,8 @@ import RecordatoriosTimeline from '@/modules/recordatorios/components/Recordator
 import { getRecordatoriosByCampana, puedeCrearRecordatorio } from '@/modules/recordatorios/services/recordatorios.service'
 import { formatTecnologia } from '@/lib/utils/tecnologia'
 import CopyButton from '@/components/ui/CopyButton'
+import WhatsappCampanaSection from '@/modules/whatsapp/components/WhatsappCampanaSection'
+import { getJobsByCampana, getPlantillas } from '@/modules/whatsapp/services/whatsapp.service'
 
 const estadoBadge: Record<string, 'success' | 'info' | 'default'> = {
   activa:     'success',
@@ -33,11 +35,13 @@ export default async function CampanaDetallePage({
   params: Promise<{ id: string }>
 }) {
   const { id } = await params
-  const [campana, encuestas, recordatorios, permisoRecordatorio] = await Promise.all([
+  const [campana, encuestas, recordatorios, permisoRecordatorio, jobsWA, plantillasWA] = await Promise.all([
     getCampanaById(id).catch(() => null),
     getCampanaConEncuestas(id),
     getRecordatoriosByCampana(id),
     puedeCrearRecordatorio(id),
+    getJobsByCampana(id),
+    getPlantillas(),
   ])
 
   if (!campana) notFound()
@@ -108,6 +112,14 @@ export default async function CampanaDetallePage({
           campanaId={id}
           recordatorios={recordatorios}
           permiso={permisoRecordatorio}
+        />
+
+        <WhatsappCampanaSection
+          campanaId={id}
+          campanaNombre={campana.nombre}
+          plantillas={plantillasWA}
+          jobs={jobsWA}
+          totalPendientes={pendientes}
         />
 
         {/* Tabla de encuestas */}

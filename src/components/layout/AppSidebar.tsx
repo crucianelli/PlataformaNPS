@@ -13,6 +13,7 @@ import {
   BarChart3,
   Settings,
   Gift,
+  MessageCircle,
   X,
 } from 'lucide-react'
 import { cn } from '@/lib/utils/cn'
@@ -40,6 +41,7 @@ const NAV_OPS: NavItem[] = [
   { href: '/clientes',      label: 'Clientes',      icon: Users },
   { href: '/llamados',      label: 'Llamados',      icon: Phone, urgent: true },
   { href: '/sin-respuesta', label: 'Sin respuesta', icon: Clock },
+  { href: '/whatsapp',      label: 'WhatsApp',      icon: MessageCircle },
 ]
 
 const NAV_SYSTEM: NavItem[] = [

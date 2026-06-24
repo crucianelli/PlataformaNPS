@@ -1,0 +1,12 @@
+Windows Registry Editor Version 5.00
+
+[HKEY_CLASSES_ROOT\whatsapp-sender]
+@="URL:WhatsApp Sender Protocol"
+"URL Protocol"=""
+
+[HKEY_CLASSES_ROOT\whatsapp-sender\shell]
+
+[HKEY_CLASSES_ROOT\whatsapp-sender\shell\open]
+
+[HKEY_CLASSES_ROOT\whatsapp-sender\shell\open\command]
+@="\"C:\\Windows\\System32\\cmd.exe\" /c \"\\\\wsl.localhost\\Debian\\home\\renzoasef\\Proyectos\\plataformaNPS\\launcher.bat\" \"%1\""

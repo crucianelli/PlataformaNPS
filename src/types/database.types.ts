@@ -406,6 +406,144 @@ export type Database = {
         }
         Relationships: []
       }
+      plantillas_whatsapp: {
+        Row: {
+          id: string
+          nombre: string
+          tipo: 'inicial' | 'recordatorio' | 'personalizado'
+          lineas: string[]
+          ruta_imagen: string | null
+          activa: boolean
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          nombre: string
+          tipo: 'inicial' | 'recordatorio' | 'personalizado'
+          lineas?: string[]
+          ruta_imagen?: string | null
+          activa?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          nombre?: string
+          tipo?: 'inicial' | 'recordatorio' | 'personalizado'
+          lineas?: string[]
+          ruta_imagen?: string | null
+          activa?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      envios_whatsapp_jobs: {
+        Row: {
+          id: string
+          campana_id: string
+          plantilla_id: string
+          estado: 'pendiente' | 'en_progreso' | 'completado' | 'error' | 'interrumpido'
+          total_contactos: number
+          enviados: number
+          errores: number
+          created_at: string
+          started_at: string | null
+          completed_at: string | null
+        }
+        Insert: {
+          id?: string
+          campana_id: string
+          plantilla_id: string
+          estado?: 'pendiente' | 'en_progreso' | 'completado' | 'error' | 'interrumpido'
+          total_contactos?: number
+          enviados?: number
+          errores?: number
+          created_at?: string
+          started_at?: string | null
+          completed_at?: string | null
+        }
+        Update: {
+          id?: string
+          campana_id?: string
+          plantilla_id?: string
+          estado?: 'pendiente' | 'en_progreso' | 'completado' | 'error' | 'interrumpido'
+          total_contactos?: number
+          enviados?: number
+          errores?: number
+          created_at?: string
+          started_at?: string | null
+          completed_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "envios_whatsapp_jobs_campana_id_fkey"
+            columns: ["campana_id"]
+            isOneToOne: false
+            referencedRelation: "campanas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "envios_whatsapp_jobs_plantilla_id_fkey"
+            columns: ["plantilla_id"]
+            isOneToOne: false
+            referencedRelation: "plantillas_whatsapp"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      envios_whatsapp_detalle: {
+        Row: {
+          id: string
+          job_id: string
+          encuesta_id: string
+          celular: string
+          nombre: string
+          url_encuesta: string
+          estado: 'pendiente' | 'enviado' | 'error'
+          enviado_at: string | null
+          error_mensaje: string | null
+        }
+        Insert: {
+          id?: string
+          job_id: string
+          encuesta_id: string
+          celular: string
+          nombre: string
+          url_encuesta: string
+          estado?: 'pendiente' | 'enviado' | 'error'
+          enviado_at?: string | null
+          error_mensaje?: string | null
+        }
+        Update: {
+          id?: string
+          job_id?: string
+          encuesta_id?: string
+          celular?: string
+          nombre?: string
+          url_encuesta?: string
+          estado?: 'pendiente' | 'enviado' | 'error'
+          enviado_at?: string | null
+          error_mensaje?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "envios_whatsapp_detalle_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "envios_whatsapp_jobs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "envios_whatsapp_detalle_encuesta_id_fkey"
+            columns: ["encuesta_id"]
+            isOneToOne: false
+            referencedRelation: "encuestas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       v_encuestas_completas: {
