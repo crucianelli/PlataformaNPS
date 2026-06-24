@@ -182,6 +182,10 @@ export async function eliminarCampanaAction(
     if (error) return { error: 'No se pudieron eliminar las respuestas asociadas.' }
   }
 
+  // Eliminar jobs de WhatsApp (cascade borra envios_whatsapp_detalle automáticamente)
+  const { error: waJobsError } = await supabase.from('envios_whatsapp_jobs').delete().eq('campana_id', campanaId)
+  if (waJobsError) return { error: 'No se pudieron eliminar los envíos de WhatsApp asociados.' }
+
   const { error: enviosError } = await supabase.from('envios').delete().eq('campana_id', campanaId)
   if (enviosError) return { error: 'No se pudieron eliminar los envíos asociados.' }
 
