@@ -176,4 +176,14 @@ export async function crearJob(
   return job
 }
 
+export async function detenerJob(jobId: string): Promise<void> {
+  const supabase = await createSupabaseServer()
+  const { error } = await supabase
+    .from('envios_whatsapp_jobs')
+    .update({ estado: 'interrumpido' })
+    .eq('id', jobId)
+    .in('estado', ['en_progreso', 'pendiente'])
+  if (error) throw error
+}
+
 export { renderizarMensaje } from '../utils/renderizar'

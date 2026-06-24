@@ -8,6 +8,7 @@ import {
   archivarPlantilla,
   duplicarPlantilla,
   crearJob,
+  detenerJob,
 } from '@/modules/whatsapp/services/whatsapp.service'
 
 type ActionState = { error?: string; success?: boolean; id?: string }
@@ -135,5 +136,16 @@ export async function crearJobAction(
     return { success: true, id: job.id }
   } catch (e) {
     return { error: e instanceof Error ? e.message : 'Error al crear el job' }
+  }
+}
+
+export async function detenerJobAction(jobId: string): Promise<ActionState> {
+  try {
+    await detenerJob(jobId)
+    revalidatePath(`/whatsapp/jobs/${jobId}`)
+    revalidatePath('/whatsapp')
+    return { success: true }
+  } catch (e) {
+    return { error: e instanceof Error ? e.message : 'Error al detener el job' }
   }
 }

@@ -1,7 +1,8 @@
 'use client'
 
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState, useCallback, useTransition } from 'react'
 import Badge from '@/components/ui/Badge'
+import { detenerJobAction } from '@/app/(dashboard)/whatsapp/actions'
 import type { JobConDetalle, JobEstado, DetalleEstado } from '../types/whatsapp.types'
 
 interface JobProgressProps {
@@ -38,8 +39,17 @@ function formatFecha(iso: string | null) {
 
 export default function JobProgress({ jobId, initialData }: JobProgressProps) {
   const [data, setData] = useState<JobConDetalle>(initialData)
+  const [isDetening, startDetener] = useTransition()
 
   const isActive = data.estado === 'en_progreso' || data.estado === 'pendiente'
+
+  const handleDetener = () => {
+    if (!confirm('¿Detener el envío? El script va a parar después del mensaje actual.')) return
+    startDetener(async () => {
+      await detenerJobAction(jobId)
+      setData((prev) => ({ ...prev, estado: 'interrumpido' }))
+    })
+  }
 
   const refresh = useCallback(async () => {
     try {
@@ -88,7 +98,20 @@ export default function JobProgress({ jobId, initialData }: JobProgressProps) {
             <Badge variant={ESTADO_BADGE[data.estado]}>{ESTADO_LABEL[data.estado]}</Badge>
             <span className="text-sm text-muted-foreground">{data.plantilla.nombre}</span>
           </div>
-          <span className="text-sm font-semibold text-foreground">{pct}%</span>
+          <div className="flex items-center gap-3">
+            {data.estado === 'en_progreso' && (
+              <button
+                type="button"
+                onClick={handleDetener}
+                disabled={isDetening}
+                className="rounded-md border border-destructive/40 px-3 py-1 text-xs font-medium
+                           text-destructive hover:bg-destructive/10 transition-colors disabled:opacity-50"
+              >
+                {isDetening ? 'Deteniendo...' : '⏹ Detener'}
+              </button>
+            )}
+            <span className="text-sm font-semibold text-foreground">{pct}%</span>
+          </div>
         </div>
         <div className="h-3 w-full overflow-hidden rounded-full bg-muted">
           <div

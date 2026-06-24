@@ -55,7 +55,8 @@ def supabase_patch(path, data):
     body = json.dumps(data).encode()
     req = urllib.request.Request(url, data=body, headers=HEADERS, method='PATCH')
     with urllib.request.urlopen(req) as res:
-        return json.loads(res.read()) if res.read() else {}
+        content = res.read()
+        return json.loads(content) if content else {}
 
 # ─── Parsear job ID del argumento de URL ────────────────────────────────────
 
@@ -147,6 +148,12 @@ def main():
     print(f"📋 Contactos pendientes: {total}")
 
     for i, detalle in enumerate(detalles):
+        # Chequear si el job fue detenido desde la plataforma
+        job_estado = supabase_get(f"envios_whatsapp_jobs?id=eq.{job_id}&select=estado")[0]['estado']
+        if job_estado == 'interrumpido':
+            print(f"⏹ Job detenido desde la plataforma. Saliendo...")
+            break
+
         # Pausa larga cada 4 envíos
         if i > 0 and i % 4 == 0:
             espera_larga = random.randint(120, 240)
@@ -167,7 +174,8 @@ def main():
         chat_url = f"https://web.whatsapp.com/send?phone={celular}"
         subprocess.Popen([chrome_path, chat_url])
 
-        espera_inicial = random.randint(25, 35)
+        # El primer chat tarda más en cargar
+        espera_inicial = random.randint(35, 45) if i == 0 else random.randint(25, 35)
         print(f"⏳ [{i+1}/{total}] Cargando chat de {nombre}...")
         time.sleep(espera_inicial)
 
