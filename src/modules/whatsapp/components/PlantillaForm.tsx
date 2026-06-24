@@ -1,6 +1,6 @@
 'use client'
 
-import { useActionState, useState, useCallback } from 'react'
+import { useActionState, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Input from '@/components/ui/Input'
 import Button from '@/components/ui/Button'
@@ -41,15 +41,6 @@ export default function PlantillaForm({ plantilla }: PlantillaFormProps) {
   const removeLinea = (i: number) => setLineas((prev) => prev.filter((_, idx) => idx !== i))
   const updateLinea = (i: number, val: string) =>
     setLineas((prev) => prev.map((l, idx) => (idx === i ? val : l)))
-
-  const insertVariable = useCallback(
-    (variable: string, lineaIdx: number) => {
-      setLineas((prev) =>
-        prev.map((l, idx) => (idx === lineaIdx ? l + variable : l))
-      )
-    },
-    []
-  )
 
   const previewMensaje = lineas
     .map((l) => l.replace(/\{nombre\}/g, 'Juan García').replace(/\{url\}/g, 'https://ejemplo.com/encuesta?token=abc123'))

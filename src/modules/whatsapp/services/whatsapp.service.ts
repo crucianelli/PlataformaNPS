@@ -4,7 +4,6 @@ import type {
   PlantillaInsert,
   PlantillaUpdate,
   WhatsappJob,
-  WhatsappDetalle,
   JobConPlantilla,
   JobConDetalle,
 } from '../types/whatsapp.types'

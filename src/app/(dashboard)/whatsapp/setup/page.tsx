@@ -28,7 +28,7 @@ pause`
       <div className="max-w-2xl space-y-6">
         <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
           Este setup se hace <strong>una sola vez</strong> en la PC Windows donde corre el script.
-          Después, los botones "Ejecutar" de la plataforma funcionan con un solo clic.
+          Después, los botones &quot;Ejecutar&quot; de la plataforma funcionan con un solo clic.
         </div>
 
         <Card>
