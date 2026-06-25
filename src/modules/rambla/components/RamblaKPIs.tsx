@@ -1,8 +1,9 @@
 import { Gift, CheckCircle2, Package } from 'lucide-react'
-import type { RegaloStats } from '../types/rambla.types'
+import type { RegaloStats, FiltroTipo } from '../types/rambla.types'
 
 interface Props {
   stats: RegaloStats
+  tipo?: FiltroTipo
 }
 
 interface KPICardProps {
@@ -49,7 +50,21 @@ function KPICard({ label, value, icon: Icon, color }: KPICardProps) {
   )
 }
 
-export default function RamblaKPIs({ stats }: Props) {
+export default function RamblaKPIs({ stats, tipo = 'respuesta' }: Props) {
+  if (tipo === 'envio') {
+    // En modo facturación solo tiene sentido mostrar los enviados en ese período
+    return (
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-1 max-w-xs">
+        <KPICard
+          label="Enviados en el período"
+          value={stats.enviados}
+          icon={CheckCircle2}
+          color="green"
+        />
+      </div>
+    )
+  }
+
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
       <KPICard

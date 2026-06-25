@@ -1,13 +1,47 @@
 import { Gift } from 'lucide-react'
-import { getRespuestasRambla, getRegaloStats } from '@/modules/rambla/services/rambla.service'
+import { getRespuestasRambla, getRegaloStats, RAMBLA_PAGE_SIZE } from '@/modules/rambla/services/rambla.service'
 import RamblaKPIs from '@/modules/rambla/components/RamblaKPIs'
 import RamblaTable from '@/modules/rambla/components/RamblaTable'
+import RamblaFiltros from '@/modules/rambla/components/RamblaFiltros'
+import Pagination from '@/components/ui/Pagination'
+import type { RamblaFiltros as Filtros, FiltroTipo } from '@/modules/rambla/types/rambla.types'
 
-export default async function RamblaPage() {
-  const [respuestas, stats] = await Promise.all([
-    getRespuestasRambla(),
-    getRegaloStats(),
+interface SearchParams {
+  desde?: string
+  hasta?: string
+  tipo?: string
+  page?: string
+}
+
+export default async function RamblaPage({
+  searchParams,
+}: {
+  searchParams: Promise<SearchParams>
+}) {
+  const params = await searchParams
+  const desde = params.desde
+  const hasta = params.hasta
+  const tipo: FiltroTipo = params.tipo === 'envio' ? 'envio' : 'respuesta'
+  const page = Math.max(1, Number(params.page ?? 1))
+
+  const filtros: Filtros = { desde, hasta, tipo }
+
+  const [result, stats] = await Promise.all([
+    getRespuestasRambla(filtros, page),
+    getRegaloStats(filtros),
   ])
+
+  const totalPages = Math.ceil(result.total / RAMBLA_PAGE_SIZE)
+
+  function getPageUrl(p: number) {
+    const sp = new URLSearchParams()
+    if (tipo !== 'respuesta') sp.set('tipo', tipo)
+    if (desde) sp.set('desde', desde)
+    if (hasta) sp.set('hasta', hasta)
+    if (p > 1) sp.set('page', String(p))
+    const qs = sp.toString()
+    return `/rambla${qs ? '?' + qs : ''}`
+  }
 
   return (
     <div className="mx-auto max-w-screen-2xl space-y-6 p-6">
@@ -22,15 +56,26 @@ export default async function RamblaPage() {
         </div>
       </div>
 
-      {/* KPIs */}
-      <RamblaKPIs stats={stats} />
+      {/* Filtros */}
+      <RamblaFiltros desde={desde} hasta={hasta} tipo={tipo} />
+
+      {/* KPIs — reflejan el período y tipo de filtro activo */}
+      <RamblaKPIs stats={stats} tipo={tipo} />
 
       {/* Tabla */}
       <div className="space-y-3">
         <h2 className="text-sm font-semibold text-foreground">
-          Registros ({respuestas.length})
+          Registros ({result.total})
         </h2>
-        <RamblaTable respuestas={respuestas} />
+        <RamblaTable respuestas={result.data} filtros={filtros} />
+        <Pagination
+          currentPage={page}
+          totalPages={totalPages}
+          totalItems={result.total}
+          pageSize={RAMBLA_PAGE_SIZE}
+          getPageUrl={getPageUrl}
+          itemLabel="registros"
+        />
       </div>
     </div>
   )

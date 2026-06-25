@@ -2,7 +2,8 @@
 
 import { revalidatePath } from 'next/cache'
 import { createSupabaseAdmin, createSupabaseServer } from '@/lib/supabase/server'
-import type { RegaloEstado } from '@/modules/rambla/types/rambla.types'
+import type { RegaloEstado, RamblaFiltros, RespuestaRambla } from '@/modules/rambla/types/rambla.types'
+import { exportarRespuestasRambla } from '@/modules/rambla/services/rambla.service'
 
 async function getRoleOrThrow() {
   const supabase = await createSupabaseServer()
@@ -48,4 +49,9 @@ export async function guardarSeguimientoAction(
 
   if (error) throw error
   revalidatePath('/rambla')
+}
+
+export async function exportarRamblaAction(filtros?: RamblaFiltros): Promise<RespuestaRambla[]> {
+  await getRoleOrThrow()
+  return exportarRespuestasRambla(filtros)
 }
