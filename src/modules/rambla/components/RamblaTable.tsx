@@ -2,11 +2,12 @@
 
 import { useState, useTransition } from 'react'
 import { CheckCircle2, Clock, RotateCcw, Save, FileDown } from 'lucide-react'
-import { actualizarRegaloEstadoAction, guardarSeguimientoAction } from '@/app/(dashboard)/rambla/actions'
-import type { RespuestaRambla } from '../types/rambla.types'
+import { actualizarRegaloEstadoAction, guardarSeguimientoAction, exportarRamblaAction } from '@/app/(dashboard)/rambla/actions'
+import type { RespuestaRambla, RamblaFiltros } from '../types/rambla.types'
 
 interface Props {
   respuestas: RespuestaRambla[]
+  filtros?: RamblaFiltros
 }
 
 function EstadoBadge({ estado }: { estado: RespuestaRambla['regalo_estado'] }) {
@@ -128,13 +129,14 @@ function buildDireccion(r: RespuestaRambla) {
   return partes.join(', ') || '—'
 }
 
-function exportarPDF(respuestas: RespuestaRambla[]) {
+function generarPDF(respuestas: RespuestaRambla[]) {
   const win = window.open('', '_blank')
   if (!win) return
 
   const filas = respuestas.map(r => `
     <tr>
       <td>${formatFecha(r.fecha_respuesta)}</td>
+      <td>${r.fecha_envio ? formatFecha(r.fecha_envio) : '—'}</td>
       <td>${r.nombre_apellido ?? '—'}</td>
       <td>${r.maquina_modelo ?? '—'}</td>
       <td>${buildDireccion(r)}</td>
@@ -143,7 +145,6 @@ function exportarPDF(respuestas: RespuestaRambla[]) {
       <td>${r.email ?? '—'}</td>
       <td>${r.telefono ?? '—'}</td>
       <td>${r.numero_seguimiento ?? '—'}</td>
-      <td>${r.fecha_seguimiento ? new Date(r.fecha_seguimiento).toLocaleDateString('es-AR', { day: '2-digit', month: '2-digit', year: 'numeric' }) : '—'}</td>
       <td>${r.regalo_estado === 'enviado' ? 'Enviado' : 'Pendiente'}</td>
     </tr>
   `).join('')
@@ -176,6 +177,7 @@ function exportarPDF(respuestas: RespuestaRambla[]) {
         <thead>
           <tr>
             <th>Fecha encuesta</th>
+            <th>Fecha envío</th>
             <th>Nombre</th>
             <th>Producto</th>
             <th>Dirección</th>
@@ -184,7 +186,6 @@ function exportarPDF(respuestas: RespuestaRambla[]) {
             <th>Email</th>
             <th>Teléfono</th>
             <th>N° Seguimiento</th>
-            <th>Fecha seguimiento</th>
             <th>Estado</th>
           </tr>
         </thead>
@@ -197,11 +198,39 @@ function exportarPDF(respuestas: RespuestaRambla[]) {
   win.document.close()
 }
 
-export default function RamblaTable({ respuestas }: Props) {
+function ExportarBtn({ filtros }: { filtros?: RamblaFiltros }) {
+  const [loading, setLoading] = useState(false)
+
+  async function handleExportar() {
+    setLoading(true)
+    try {
+      const todos = await exportarRamblaAction(filtros)
+      generarPDF(todos)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  return (
+    <button
+      type="button"
+      onClick={handleExportar}
+      disabled={loading}
+      className="inline-flex items-center gap-2 rounded-lg border border-border bg-card px-3 py-1.5 text-xs font-semibold text-foreground shadow-sm transition-colors hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed"
+    >
+      {loading
+        ? <><RotateCcw size={13} className="animate-spin" aria-hidden />Exportando…</>
+        : <><FileDown size={13} aria-hidden />Exportar PDF</>
+      }
+    </button>
+  )
+}
+
+export default function RamblaTable({ respuestas, filtros }: Props) {
   if (respuestas.length === 0) {
     return (
       <div className="rounded-xl border border-border bg-card py-16 text-center">
-        <p className="text-sm text-muted-foreground">No hay respuestas registradas todavía.</p>
+        <p className="text-sm text-muted-foreground">No hay respuestas en el período seleccionado.</p>
       </div>
     )
   }
@@ -209,14 +238,7 @@ export default function RamblaTable({ respuestas }: Props) {
   return (
     <div className="space-y-3">
       <div className="flex justify-end">
-        <button
-          type="button"
-          onClick={() => exportarPDF(respuestas)}
-          className="inline-flex items-center gap-2 rounded-lg border border-border bg-card px-3 py-1.5 text-xs font-semibold text-foreground shadow-sm transition-colors hover:bg-muted"
-        >
-          <FileDown size={13} aria-hidden />
-          Exportar PDF
-        </button>
+        <ExportarBtn filtros={filtros} />
       </div>
 
       <div className="overflow-x-auto rounded-xl border border-border bg-card">
@@ -224,7 +246,10 @@ export default function RamblaTable({ respuestas }: Props) {
           <thead>
             <tr className="border-b border-border bg-muted/40">
               <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                Fecha
+                Fecha encuesta
+              </th>
+              <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                Fecha envío
               </th>
               <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                 Nombre
@@ -266,6 +291,9 @@ export default function RamblaTable({ respuestas }: Props) {
               <tr key={r.id} className="transition-colors hover:bg-muted/30">
                 <td className="whitespace-nowrap px-4 py-3 text-muted-foreground">
                   {formatFecha(r.fecha_respuesta)}
+                </td>
+                <td className="whitespace-nowrap px-4 py-3 text-muted-foreground">
+                  {r.fecha_envio ? formatFecha(r.fecha_envio) : <span className="text-muted-foreground/40">—</span>}
                 </td>
                 <td className="px-4 py-3 font-medium text-foreground">
                   {r.nombre_apellido ?? '—'}

@@ -171,10 +171,17 @@ export async function marcarRecordatorioEnviado(
   if (encuestasError) throw encuestasError
 }
 
-export async function getEncuestasNecesidadLlamado(): Promise<EncuestaNecesidadLlamado[]> {
+export const LLAMADOS_PAGE_SIZE = 25
+
+export async function getEncuestasNecesidadLlamado(
+  page = 1
+): Promise<{ data: EncuestaNecesidadLlamado[]; total: number }> {
   await syncWorkflowEstados()
   const supabase = await createSupabaseServer()
-  const { data, error } = await supabase
+  const from = (page - 1) * LLAMADOS_PAGE_SIZE
+  const to = from + LLAMADOS_PAGE_SIZE - 1
+
+  const { data, error, count } = await supabase
     .from('encuestas')
     .select(`
       id,
@@ -182,19 +189,23 @@ export async function getEncuestasNecesidadLlamado(): Promise<EncuestaNecesidadL
       estado,
       campanas(id, nombre, fecha),
       clientes(id, nombre, telefono, telefono_2, telefono_3, concesionario, orden_fabricacion)
-    `)
+    `, { count: 'exact' })
     .eq('estado', 'necesidad_de_llamado')
     .order('created_at', { ascending: true })
+    .range(from, to)
 
   if (error) throw error
 
-  return (data ?? []).map((item) => ({
-    id: item.id,
-    token: item.token,
-    estado: 'necesidad_de_llamado',
-    campana: Array.isArray(item.campanas) ? item.campanas[0] ?? null : item.campanas,
-    cliente: Array.isArray(item.clientes) ? item.clientes[0] ?? null : item.clientes,
-  }))
+  return {
+    data: (data ?? []).map((item) => ({
+      id: item.id,
+      token: item.token,
+      estado: 'necesidad_de_llamado',
+      campana: Array.isArray(item.campanas) ? item.campanas[0] ?? null : item.campanas,
+      cliente: Array.isArray(item.clientes) ? item.clientes[0] ?? null : item.clientes,
+    })),
+    total: count ?? 0,
+  }
 }
 
 export async function getEncuestasSinRespuesta(): Promise<EncuestaSinRespuesta[]> {

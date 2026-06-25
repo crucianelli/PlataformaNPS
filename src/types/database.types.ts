@@ -226,6 +226,198 @@ export type Database = {
           },
         ]
       }
+      envios_whatsapp_detalle: {
+        Row: {
+          celular: string
+          encuesta_id: string
+          enviado_at: string | null
+          error_mensaje: string | null
+          estado: string
+          id: string
+          job_id: string
+          nombre: string
+          url_encuesta: string
+        }
+        Insert: {
+          celular: string
+          encuesta_id: string
+          enviado_at?: string | null
+          error_mensaje?: string | null
+          estado?: string
+          id?: string
+          job_id: string
+          nombre: string
+          url_encuesta: string
+        }
+        Update: {
+          celular?: string
+          encuesta_id?: string
+          enviado_at?: string | null
+          error_mensaje?: string | null
+          estado?: string
+          id?: string
+          job_id?: string
+          nombre?: string
+          url_encuesta?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "envios_whatsapp_detalle_encuesta_id_fkey"
+            columns: ["encuesta_id"]
+            isOneToOne: false
+            referencedRelation: "encuestas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "envios_whatsapp_detalle_encuesta_id_fkey"
+            columns: ["encuesta_id"]
+            isOneToOne: false
+            referencedRelation: "v_encuestas_completas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "envios_whatsapp_detalle_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "envios_whatsapp_jobs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      envios_whatsapp_jobs: {
+        Row: {
+          campana_id: string
+          completed_at: string | null
+          created_at: string
+          enviados: number
+          errores: number
+          estado: string
+          id: string
+          plantilla_id: string
+          started_at: string | null
+          total_contactos: number
+        }
+        Insert: {
+          campana_id: string
+          completed_at?: string | null
+          created_at?: string
+          enviados?: number
+          errores?: number
+          estado?: string
+          id?: string
+          plantilla_id: string
+          started_at?: string | null
+          total_contactos?: number
+        }
+        Update: {
+          campana_id?: string
+          completed_at?: string | null
+          created_at?: string
+          enviados?: number
+          errores?: number
+          estado?: string
+          id?: string
+          plantilla_id?: string
+          started_at?: string | null
+          total_contactos?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "envios_whatsapp_jobs_campana_id_fkey"
+            columns: ["campana_id"]
+            isOneToOne: false
+            referencedRelation: "campanas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "envios_whatsapp_jobs_campana_id_fkey"
+            columns: ["campana_id"]
+            isOneToOne: false
+            referencedRelation: "v_encuestas_completas"
+            referencedColumns: ["campana_id"]
+          },
+          {
+            foreignKeyName: "envios_whatsapp_jobs_campana_id_fkey"
+            columns: ["campana_id"]
+            isOneToOne: false
+            referencedRelation: "v_nps_por_campana"
+            referencedColumns: ["campana_id"]
+          },
+          {
+            foreignKeyName: "envios_whatsapp_jobs_plantilla_id_fkey"
+            columns: ["plantilla_id"]
+            isOneToOne: false
+            referencedRelation: "plantillas_whatsapp"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      notificaciones: {
+        Row: {
+          created_at: string
+          id: string
+          leida: boolean
+          mensaje: string
+          metadata: Json | null
+          para_rol: string
+          tipo: Database["public"]["Enums"]["notificacion_tipo"]
+          titulo: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          leida?: boolean
+          mensaje: string
+          metadata?: Json | null
+          para_rol: string
+          tipo: Database["public"]["Enums"]["notificacion_tipo"]
+          titulo: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          leida?: boolean
+          mensaje?: string
+          metadata?: Json | null
+          para_rol?: string
+          tipo?: Database["public"]["Enums"]["notificacion_tipo"]
+          titulo?: string
+        }
+        Relationships: []
+      }
+      plantillas_whatsapp: {
+        Row: {
+          activa: boolean
+          created_at: string
+          id: string
+          lineas: string[]
+          nombre: string
+          ruta_imagen: string | null
+          tipo: string
+          updated_at: string
+        }
+        Insert: {
+          activa?: boolean
+          created_at?: string
+          id?: string
+          lineas?: string[]
+          nombre: string
+          ruta_imagen?: string | null
+          tipo: string
+          updated_at?: string
+        }
+        Update: {
+          activa?: boolean
+          created_at?: string
+          id?: string
+          lineas?: string[]
+          nombre?: string
+          ruta_imagen?: string | null
+          tipo?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       respuestas: {
         Row: {
           calificacion_capacitacion: number | null
@@ -243,7 +435,9 @@ export type Database = {
           concesionario_sede: string | null
           email: string | null
           encuesta_id: string
+          fecha_envio: string | null
           fecha_respuesta: string
+          fecha_seguimiento: string | null
           id: string
           localidad: string | null
           maquina_modelo: string | null
@@ -252,10 +446,9 @@ export type Database = {
           nps_concesionario: number
           nps_empresa: number
           nps_producto: number
+          numero_seguimiento: string | null
           piso_departamento: string | null
           provincia: string | null
-          fecha_seguimiento: string | null
-          numero_seguimiento: string | null
           regalo_estado: Database["public"]["Enums"]["regalo_estado"]
           telefono: string | null
           tipo_maquina: Database["public"]["Enums"]["tipo_maquina_enum"]
@@ -276,7 +469,9 @@ export type Database = {
           concesionario_sede?: string | null
           email?: string | null
           encuesta_id: string
+          fecha_envio?: string | null
           fecha_respuesta?: string
+          fecha_seguimiento?: string | null
           id?: string
           localidad?: string | null
           maquina_modelo?: string | null
@@ -285,10 +480,9 @@ export type Database = {
           nps_concesionario: number
           nps_empresa: number
           nps_producto: number
+          numero_seguimiento?: string | null
           piso_departamento?: string | null
           provincia?: string | null
-          fecha_seguimiento?: string | null
-          numero_seguimiento?: string | null
           regalo_estado?: Database["public"]["Enums"]["regalo_estado"]
           telefono?: string | null
           tipo_maquina?: Database["public"]["Enums"]["tipo_maquina_enum"]
@@ -309,7 +503,9 @@ export type Database = {
           concesionario_sede?: string | null
           email?: string | null
           encuesta_id?: string
+          fecha_envio?: string | null
           fecha_respuesta?: string
+          fecha_seguimiento?: string | null
           id?: string
           localidad?: string | null
           maquina_modelo?: string | null
@@ -318,10 +514,9 @@ export type Database = {
           nps_concesionario?: number
           nps_empresa?: number
           nps_producto?: number
+          numero_seguimiento?: string | null
           piso_departamento?: string | null
           provincia?: string | null
-          fecha_seguimiento?: string | null
-          numero_seguimiento?: string | null
           regalo_estado?: Database["public"]["Enums"]["regalo_estado"]
           telefono?: string | null
           tipo_maquina?: Database["public"]["Enums"]["tipo_maquina_enum"]
@@ -342,39 +537,6 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
-      }
-      notificaciones: {
-        Row: {
-          id: string
-          tipo: Database["public"]["Enums"]["notificacion_tipo"]
-          titulo: string
-          mensaje: string
-          leida: boolean
-          para_rol: string
-          metadata: Record<string, string> | null
-          created_at: string
-        }
-        Insert: {
-          id?: string
-          tipo: Database["public"]["Enums"]["notificacion_tipo"]
-          titulo: string
-          mensaje: string
-          leida?: boolean
-          para_rol: string
-          metadata?: Record<string, string> | null
-          created_at?: string
-        }
-        Update: {
-          id?: string
-          tipo?: Database["public"]["Enums"]["notificacion_tipo"]
-          titulo?: string
-          mensaje?: string
-          leida?: boolean
-          para_rol?: string
-          metadata?: Record<string, string> | null
-          created_at?: string
-        }
-        Relationships: []
       }
       system_config: {
         Row: {
@@ -405,144 +567,6 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
-      }
-      plantillas_whatsapp: {
-        Row: {
-          id: string
-          nombre: string
-          tipo: 'inicial' | 'recordatorio' | 'personalizado'
-          lineas: string[]
-          ruta_imagen: string | null
-          activa: boolean
-          created_at: string
-          updated_at: string
-        }
-        Insert: {
-          id?: string
-          nombre: string
-          tipo: 'inicial' | 'recordatorio' | 'personalizado'
-          lineas?: string[]
-          ruta_imagen?: string | null
-          activa?: boolean
-          created_at?: string
-          updated_at?: string
-        }
-        Update: {
-          id?: string
-          nombre?: string
-          tipo?: 'inicial' | 'recordatorio' | 'personalizado'
-          lineas?: string[]
-          ruta_imagen?: string | null
-          activa?: boolean
-          created_at?: string
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      envios_whatsapp_jobs: {
-        Row: {
-          id: string
-          campana_id: string
-          plantilla_id: string
-          estado: 'pendiente' | 'en_progreso' | 'completado' | 'error' | 'interrumpido'
-          total_contactos: number
-          enviados: number
-          errores: number
-          created_at: string
-          started_at: string | null
-          completed_at: string | null
-        }
-        Insert: {
-          id?: string
-          campana_id: string
-          plantilla_id: string
-          estado?: 'pendiente' | 'en_progreso' | 'completado' | 'error' | 'interrumpido'
-          total_contactos?: number
-          enviados?: number
-          errores?: number
-          created_at?: string
-          started_at?: string | null
-          completed_at?: string | null
-        }
-        Update: {
-          id?: string
-          campana_id?: string
-          plantilla_id?: string
-          estado?: 'pendiente' | 'en_progreso' | 'completado' | 'error' | 'interrumpido'
-          total_contactos?: number
-          enviados?: number
-          errores?: number
-          created_at?: string
-          started_at?: string | null
-          completed_at?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "envios_whatsapp_jobs_campana_id_fkey"
-            columns: ["campana_id"]
-            isOneToOne: false
-            referencedRelation: "campanas"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "envios_whatsapp_jobs_plantilla_id_fkey"
-            columns: ["plantilla_id"]
-            isOneToOne: false
-            referencedRelation: "plantillas_whatsapp"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      envios_whatsapp_detalle: {
-        Row: {
-          id: string
-          job_id: string
-          encuesta_id: string
-          celular: string
-          nombre: string
-          url_encuesta: string
-          estado: 'pendiente' | 'enviado' | 'error'
-          enviado_at: string | null
-          error_mensaje: string | null
-        }
-        Insert: {
-          id?: string
-          job_id: string
-          encuesta_id: string
-          celular: string
-          nombre: string
-          url_encuesta: string
-          estado?: 'pendiente' | 'enviado' | 'error'
-          enviado_at?: string | null
-          error_mensaje?: string | null
-        }
-        Update: {
-          id?: string
-          job_id?: string
-          encuesta_id?: string
-          celular?: string
-          nombre?: string
-          url_encuesta?: string
-          estado?: 'pendiente' | 'enviado' | 'error'
-          enviado_at?: string | null
-          error_mensaje?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "envios_whatsapp_detalle_job_id_fkey"
-            columns: ["job_id"]
-            isOneToOne: false
-            referencedRelation: "envios_whatsapp_jobs"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "envios_whatsapp_detalle_encuesta_id_fkey"
-            columns: ["encuesta_id"]
-            isOneToOne: false
-            referencedRelation: "encuestas"
-            referencedColumns: ["id"]
-          },
-        ]
       }
     }
     Views: {
@@ -578,11 +602,11 @@ export type Database = {
       }
     }
     Functions: {
+      check_campanas_sin_actividad: { Args: never; Returns: undefined }
       sync_encuestas_necesidad_llamado: { Args: never; Returns: number }
     }
     Enums: {
       campana_estado: "activa" | "completada" | "archivada"
-      notificacion_tipo: "nps_critico" | "nueva_respuesta" | "regalo_pendiente" | "campana_sin_actividad" | "aviso_recordatorio"
       encuesta_estado:
         | "pendiente"
         | "respondida"
@@ -590,6 +614,11 @@ export type Database = {
         | "necesidad_de_llamado"
         | "sin_respuesta"
       envio_estado: "pendiente_envio" | "enviado"
+      notificacion_tipo:
+        | "nps_critico"
+        | "nueva_respuesta"
+        | "regalo_pendiente"
+        | "campana_sin_actividad"
       regalo_estado: "pendiente_envio" | "enviado"
       tipo_maquina_enum: "sembradora" | "fertilizadora"
     }
@@ -731,6 +760,13 @@ export const Constants = {
         "sin_respuesta",
       ],
       envio_estado: ["pendiente_envio", "enviado"],
+      notificacion_tipo: [
+        "nps_critico",
+        "nueva_respuesta",
+        "regalo_pendiente",
+        "campana_sin_actividad",
+      ],
+      regalo_estado: ["pendiente_envio", "enviado"],
       tipo_maquina_enum: ["sembradora", "fertilizadora"],
     },
   },
