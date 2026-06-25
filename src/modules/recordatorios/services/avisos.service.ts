@@ -67,7 +67,7 @@ export async function checkAvisosRecordatorio() {
       const { count: notifHoy } = await supabase
         .from('notificaciones')
         .select('id', { count: 'exact', head: true })
-        .eq('tipo', 'aviso_recordatorio')
+        .eq('tipo', 'campana_sin_actividad')
         .gte('created_at', todayStart.toISOString())
         .filter('metadata->>campana_id', 'eq', campana.id)
 
@@ -78,7 +78,7 @@ export async function checkAvisosRecordatorio() {
 
       // Notificación interna
       await supabase.from('notificaciones').insert({
-        tipo: 'aviso_recordatorio',
+        tipo: 'campana_sin_actividad',
         titulo: `Recordatorio ${nextNumero} pendiente`,
         mensaje,
         para_rol: 'admin',
