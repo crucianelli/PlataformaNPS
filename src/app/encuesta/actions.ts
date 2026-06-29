@@ -124,7 +124,7 @@ export async function guardarRespuestaAction(
 
   // Disparar alerta email + notificaciones en paralelo (errores no bloquean la respuesta)
   const { nps_producto, nps_empresa, nps_concesionario } = result.data
-  const esNPSCritico = nps_producto < 6 || nps_empresa < 6 || nps_concesionario < 6
+  const esNPSCritico = nps_producto <= 6 || nps_empresa <= 6 || nps_concesionario <= 6
   const nombre = result.data.nombre_apellido
   const concesionario = result.data.concesionario_sede
 
@@ -159,9 +159,9 @@ export async function guardarRespuestaAction(
 
     if (esNPSCritico) {
       const npsList: string[] = []
-      if (nps_producto < 6)      npsList.push(`Producto: ${nps_producto}`)
-      if (nps_empresa < 6)       npsList.push(`Empresa: ${nps_empresa}`)
-      if (nps_concesionario < 6) npsList.push(`Concesionario: ${nps_concesionario}`)
+      if (nps_producto <= 6)      npsList.push(`Producto: ${nps_producto}`)
+      if (nps_empresa <= 6)       npsList.push(`Empresa: ${nps_empresa}`)
+      if (nps_concesionario <= 6) npsList.push(`Concesionario: ${nps_concesionario}`)
 
       inserts.push(
         Promise.resolve(supabase.from('notificaciones').insert({
