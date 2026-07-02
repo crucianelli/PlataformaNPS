@@ -30,7 +30,7 @@ export default async function CampanasPage({ searchParams }: Props) {
         {/* Filtro por tipo */}
         <form className="flex items-center gap-3">
           <div className="flex gap-2">
-            <a
+            <Link
               href="/campanas"
               className={`inline-flex h-8 items-center rounded-full px-3.5 text-xs font-medium transition-colors border ${
                 !tipo
@@ -39,9 +39,9 @@ export default async function CampanasPage({ searchParams }: Props) {
               }`}
             >
               Todas
-            </a>
+            </Link>
             {tipos.map((t) => (
-              <a
+              <Link
                 key={t.id}
                 href={`/campanas?tipo=${t.id}`}
                 className={`inline-flex h-8 items-center rounded-full px-3.5 text-xs font-medium transition-colors border ${
@@ -51,7 +51,7 @@ export default async function CampanasPage({ searchParams }: Props) {
                 }`}
               >
                 {t.nombre}
-              </a>
+              </Link>
             ))}
           </div>
           {tipo && (

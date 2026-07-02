@@ -1,5 +1,4 @@
 import Link from 'next/link'
-import { notFound } from 'next/navigation'
 import PageContainer from '@/components/layout/PageContainer'
 import Button from '@/components/ui/Button'
 import Badge from '@/components/ui/Badge'
