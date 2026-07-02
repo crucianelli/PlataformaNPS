@@ -14,6 +14,7 @@ import {
   Settings,
   Gift,
   MessageCircle,
+  FileText,
   X,
 } from 'lucide-react'
 import { cn } from '@/lib/utils/cn'
@@ -45,6 +46,7 @@ const NAV_OPS: NavItem[] = [
 ]
 
 const NAV_SYSTEM: NavItem[] = [
+  { href: '/plantillas',    label: 'Plantillas',    icon: FileText },
   { href: '/configuracion', label: 'Configuración', icon: Settings },
 ]
 

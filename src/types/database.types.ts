@@ -46,6 +46,7 @@ export type Database = {
           fecha: string
           id: string
           nombre: string
+          tipo_encuesta_id: string
         }
         Insert: {
           created_at?: string
@@ -53,6 +54,7 @@ export type Database = {
           fecha?: string
           id?: string
           nombre: string
+          tipo_encuesta_id: string
         }
         Update: {
           created_at?: string
@@ -60,8 +62,17 @@ export type Database = {
           fecha?: string
           id?: string
           nombre?: string
+          tipo_encuesta_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "campanas_tipo_encuesta_id_fkey"
+            columns: ["tipo_encuesta_id"]
+            isOneToOne: false
+            referencedRelation: "tipos_encuesta"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       clientes: {
         Row: {
@@ -422,8 +433,10 @@ export type Database = {
         Row: {
           calificacion_capacitacion: number | null
           calificacion_entrega_presentacion: number | null
+          calificacion_funcionamiento_anual: number | null
           calificacion_funcionamiento_general: number | null
           calificacion_puesta_marcha: number | null
+          calificacion_resolucion_problemas: number | null
           calificacion_tecnico: number | null
           calle_numero: string | null
           canal_respuesta: string
@@ -431,6 +444,7 @@ export type Database = {
           comentario_concesionario: string | null
           comentario_empresa: string | null
           comentario_general: string | null
+          comentario_problemas: string | null
           comentario_producto: string | null
           concesionario_sede: string | null
           email: string | null
@@ -450,14 +464,18 @@ export type Database = {
           piso_departamento: string | null
           provincia: string | null
           regalo_estado: Database["public"]["Enums"]["regalo_estado"]
+          respuestas_raw: Json | null
           telefono: string | null
           tipo_maquina: Database["public"]["Enums"]["tipo_maquina_enum"]
+          tuvo_problemas_tecnicos: boolean | null
         }
         Insert: {
           calificacion_capacitacion?: number | null
           calificacion_entrega_presentacion?: number | null
+          calificacion_funcionamiento_anual?: number | null
           calificacion_funcionamiento_general?: number | null
           calificacion_puesta_marcha?: number | null
+          calificacion_resolucion_problemas?: number | null
           calificacion_tecnico?: number | null
           calle_numero?: string | null
           canal_respuesta?: string
@@ -465,6 +483,7 @@ export type Database = {
           comentario_concesionario?: string | null
           comentario_empresa?: string | null
           comentario_general?: string | null
+          comentario_problemas?: string | null
           comentario_producto?: string | null
           concesionario_sede?: string | null
           email?: string | null
@@ -484,14 +503,18 @@ export type Database = {
           piso_departamento?: string | null
           provincia?: string | null
           regalo_estado?: Database["public"]["Enums"]["regalo_estado"]
+          respuestas_raw?: Json | null
           telefono?: string | null
           tipo_maquina?: Database["public"]["Enums"]["tipo_maquina_enum"]
+          tuvo_problemas_tecnicos?: boolean | null
         }
         Update: {
           calificacion_capacitacion?: number | null
           calificacion_entrega_presentacion?: number | null
+          calificacion_funcionamiento_anual?: number | null
           calificacion_funcionamiento_general?: number | null
           calificacion_puesta_marcha?: number | null
+          calificacion_resolucion_problemas?: number | null
           calificacion_tecnico?: number | null
           calle_numero?: string | null
           canal_respuesta?: string
@@ -499,6 +522,7 @@ export type Database = {
           comentario_concesionario?: string | null
           comentario_empresa?: string | null
           comentario_general?: string | null
+          comentario_problemas?: string | null
           comentario_producto?: string | null
           concesionario_sede?: string | null
           email?: string | null
@@ -518,8 +542,10 @@ export type Database = {
           piso_departamento?: string | null
           provincia?: string | null
           regalo_estado?: Database["public"]["Enums"]["regalo_estado"]
+          respuestas_raw?: Json | null
           telefono?: string | null
           tipo_maquina?: Database["public"]["Enums"]["tipo_maquina_enum"]
+          tuvo_problemas_tecnicos?: boolean | null
         }
         Relationships: [
           {
@@ -565,6 +591,39 @@ export type Database = {
           emails_rambla?: string[]
           id?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      tipos_encuesta: {
+        Row: {
+          activo: boolean
+          config: Json | null
+          created_at: string
+          id: string
+          introduccion: string | null
+          nombre: string
+          preguntas: Json | null
+          slug: string
+        }
+        Insert: {
+          activo?: boolean
+          config?: Json | null
+          created_at?: string
+          id?: string
+          introduccion?: string | null
+          nombre: string
+          preguntas?: Json | null
+          slug: string
+        }
+        Update: {
+          activo?: boolean
+          config?: Json | null
+          created_at?: string
+          id?: string
+          introduccion?: string | null
+          nombre?: string
+          preguntas?: Json | null
+          slug?: string
         }
         Relationships: []
       }

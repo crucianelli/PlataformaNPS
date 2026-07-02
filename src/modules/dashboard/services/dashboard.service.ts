@@ -133,6 +133,7 @@ export type DashboardFilters = {
   estadoNps?: NpsAnswerStatus
   npsDimension?: NpsDimension
   canal?: 'mensaje' | 'llamado'
+  tipoEncuestaId?: string
 }
 
 export type NpsResumenExtendido = {
@@ -257,6 +258,17 @@ function mapRespuesta(row: RawEncuestaConRespuesta): RespuestaDetalle | null {
 
 export async function getRespuestas(filters: DashboardFilters = {}) {
   const supabase = await createSupabaseServer()
+
+  // Si se filtra por tipo de encuesta, pre-filtramos los campana_ids
+  let campanaIdsFiltro: string[] | null = null
+  if (filters.tipoEncuestaId) {
+    const { data: campanasFiltradas } = await supabase
+      .from('campanas')
+      .select('id')
+      .eq('tipo_encuesta_id', filters.tipoEncuestaId)
+    campanaIdsFiltro = (campanasFiltradas ?? []).map((c) => c.id)
+  }
+
   let query = supabase
     .from('encuestas')
     .select(`
@@ -303,6 +315,11 @@ export async function getRespuestas(filters: DashboardFilters = {}) {
 
   if (filters.campanaId) {
     query = query.eq('campana_id', filters.campanaId)
+  }
+
+  if (campanaIdsFiltro !== null) {
+    if (campanaIdsFiltro.length === 0) return []
+    query = query.in('campana_id', campanaIdsFiltro)
   }
 
   const { data, error } = await query
@@ -367,7 +384,11 @@ export async function getRespuestas(filters: DashboardFilters = {}) {
 }
 
 export async function getDashboardFilterOptions() {
-  const respuestas = await getRespuestas()
+  const supabase = await createSupabaseServer()
+  const [respuestas, tiposResult] = await Promise.all([
+    getRespuestas(),
+    supabase.from('tipos_encuesta').select('id, nombre, slug').eq('activo', true).order('created_at'),
+  ])
 
   const concesionarios = Array.from(new Set(respuestas.map((item) => item.concesionario))).sort()
   const campanas = Array.from(
@@ -379,7 +400,9 @@ export async function getDashboardFilterOptions() {
     ).values()
   ).sort((a, b) => a.nombre.localeCompare(b.nombre))
 
-  return { concesionarios, campanas, tecnologias: TECNOLOGIAS }
+  const tiposEncuesta = tiposResult.data ?? []
+
+  return { concesionarios, campanas, tecnologias: TECNOLOGIAS, tiposEncuesta }
 }
 
 export async function getNpsPorConcesionario(filters: DashboardFilters = {}): Promise<ConcesionarioNpsRow[]> {
@@ -466,6 +489,16 @@ export async function getEfectividadEnvios(
 ): Promise<EfectividadEnvios> {
   const supabase = await createSupabaseServer()
 
+  // Pre-filtrar campanas por tipo si corresponde
+  let campanaIdsFiltro: string[] | null = null
+  if (filters.tipoEncuestaId) {
+    const { data: campanasFiltradas } = await supabase
+      .from('campanas')
+      .select('id')
+      .eq('tipo_encuesta_id', filters.tipoEncuestaId)
+    campanaIdsFiltro = (campanasFiltradas ?? []).map((c) => c.id)
+  }
+
   let enviadasQuery = supabase
     .from('encuestas')
     .select('id, clientes!inner(concesionario, tecnologia)', { count: 'exact', head: true })
@@ -475,6 +508,14 @@ export async function getEfectividadEnvios(
     .from('encuestas')
     .select('id, clientes!inner(concesionario, tecnologia)', { count: 'exact', head: true })
     .eq('estado', 'respondida')
+
+  if (campanaIdsFiltro !== null) {
+    if (campanaIdsFiltro.length === 0) {
+      return { enviadas: 0, respondidas: 0, porcentaje: null }
+    }
+    enviadasQuery = enviadasQuery.in('campana_id', campanaIdsFiltro)
+    respondidasQuery = respondidasQuery.in('campana_id', campanaIdsFiltro)
+  }
 
   if (filters.campanaId) {
     enviadasQuery = enviadasQuery.eq('campana_id', filters.campanaId)
@@ -547,6 +588,36 @@ export async function getCalificacionesResumen(
 
     return { key, label, labelCorto, promedio, total, distribucion }
   })
+}
+
+export type NpsPorTipo = {
+  tipo: { id: string; nombre: string; slug: string }
+  resumen: NpsResumenExtendido
+  efectividad: EfectividadEnvios
+}
+
+export async function getNpsPorTipoEncuesta(
+  baseFiltros: Omit<DashboardFilters, 'tipoEncuestaId'> = {},
+): Promise<NpsPorTipo[]> {
+  const supabase = await createSupabaseServer()
+  const { data: tipos } = await supabase
+    .from('tipos_encuesta')
+    .select('id, nombre, slug')
+    .eq('activo', true)
+    .order('created_at')
+
+  if (!tipos?.length) return []
+
+  return Promise.all(
+    tipos.map(async (tipo) => {
+      const filtros: DashboardFilters = { ...baseFiltros, tipoEncuestaId: tipo.id }
+      const [resumen, efectividad] = await Promise.all([
+        getNpsResumenExtendido(filtros),
+        getEfectividadEnvios(filtros),
+      ])
+      return { tipo, resumen, efectividad }
+    }),
+  )
 }
 
 export async function getComparativoPorCanal(

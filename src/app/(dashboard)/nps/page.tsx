@@ -5,6 +5,7 @@ import ConcesionariosNpsTable from '@/modules/dashboard/components/Concesionario
 import NpsInsightsPanel from '@/modules/dashboard/components/NpsInsightsPanel'
 import ComparativoCanalPanel from '@/modules/dashboard/components/ComparativoCanalPanel'
 import CalificacionesPanel from '@/modules/dashboard/components/CalificacionesPanel'
+import NpsPorTipoPanel from '@/modules/dashboard/components/NpsPorTipoPanel'
 import {
   getDashboardFilterOptions,
   getEfectividadEnvios,
@@ -13,6 +14,7 @@ import {
   getNpsResumenExtendido,
   getComparativoPorCanal,
   getCalificacionesResumen,
+  getNpsPorTipoEncuesta,
 } from '@/modules/dashboard/services/dashboard.service'
 import { formatTecnologia, normalizeTecnologiaInput } from '@/lib/utils/tecnologia'
 
@@ -31,16 +33,17 @@ export default async function NpsPage({
     fechaHasta?: string
     tipoMaquina?: string
     tecnologia?: string
+    tipoEncuestaId?: string
   }>
 }) {
-  const { concesionario, fechaDesde, fechaHasta, tipoMaquina, tecnologia } = await searchParams
+  const { concesionario, fechaDesde, fechaHasta, tipoMaquina, tecnologia, tipoEncuestaId } = await searchParams
   const tipoMaquinaFilter = parseTipoMaquina(tipoMaquina)
   const tecnologiaFilter = normalizeTecnologiaInput(tecnologia) ?? undefined
-  const filtros = { concesionario, fechaDesde, fechaHasta, tipoMaquina: tipoMaquinaFilter, tecnologia: tecnologiaFilter }
-  const comparacionFiltros = { fechaDesde, fechaHasta, tipoMaquina: tipoMaquinaFilter, tecnologia: tecnologiaFilter }
+  const filtros = { concesionario, fechaDesde, fechaHasta, tipoMaquina: tipoMaquinaFilter, tecnologia: tecnologiaFilter, tipoEncuestaId }
+  const comparacionFiltros = { fechaDesde, fechaHasta, tipoMaquina: tipoMaquinaFilter, tecnologia: tecnologiaFilter, tipoEncuestaId }
   const tecnologiaLabel = tecnologiaFilter ? formatTecnologia(tecnologiaFilter) : undefined
 
-  const [options, resumen, efectividad, rows, distribucion, comparativoCanal, calificaciones] = await Promise.all([
+  const [options, resumen, efectividad, rows, distribucion, comparativoCanal, calificaciones, npsPorTipo] = await Promise.all([
     getDashboardFilterOptions(),
     getNpsResumenExtendido(filtros),
     getEfectividadEnvios(filtros),
@@ -48,6 +51,7 @@ export default async function NpsPage({
     getNpsDistribucion(filtros),
     getComparativoPorCanal(filtros),
     getCalificacionesResumen(filtros),
+    tipoEncuestaId ? Promise.resolve([]) : getNpsPorTipoEncuesta({ concesionario, fechaDesde, fechaHasta, tipoMaquina: tipoMaquinaFilter, tecnologia: tecnologiaFilter }),
   ])
 
   return (
@@ -56,9 +60,27 @@ export default async function NpsPage({
         <Card>
           <CardContent className="pt-4">
             <form className="grid grid-cols-1 gap-4 lg:grid-cols-6">
+              <div>
+                <label htmlFor="tipoEncuestaId" className="mb-1 block text-sm font-medium text-foreground">
+                  Tipo de encuesta
+                </label>
+                <select
+                  id="tipoEncuestaId"
+                  name="tipoEncuestaId"
+                  defaultValue={tipoEncuestaId ?? ''}
+                  className="block w-full rounded-md border border-border bg-card px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+                >
+                  <option value="">Todas las encuestas</option>
+                  {options.tiposEncuesta.map((tipo) => (
+                    <option key={tipo.id} value={tipo.id}>
+                      {tipo.nombre}
+                    </option>
+                  ))}
+                </select>
+              </div>
               <div className="w-full max-w-md">
                 <label htmlFor="concesionario" className="mb-1 block text-sm font-medium text-foreground">
-                  Filtrar por concesionario
+                  Concesionario
                 </label>
                 <select
                   id="concesionario"
@@ -149,15 +171,27 @@ export default async function NpsPage({
           </CardContent>
         </Card>
 
-        <IndicadoresPanel
-          resumen={resumen}
-          efectividad={efectividad}
-          label={
-            concesionario
-              ? `Indicadores para ${concesionario}${tipoMaquinaFilter ? ` · ${tipoMaquinaFilter}` : ''}${tecnologiaLabel ? ` · ${tecnologiaLabel}` : ''}${fechaDesde || fechaHasta ? ' con el rango seleccionado.' : '.'}`
-              : `Indicadores generales${tipoMaquinaFilter ? ` filtrados por ${tipoMaquinaFilter}` : ''}${tecnologiaLabel ? ` · ${tecnologiaLabel}` : ''}${fechaDesde || fechaHasta ? ' del rango seleccionado.' : '.'}`
-          }
-        />
+        {!tipoEncuestaId && npsPorTipo.length > 0 && (
+          <NpsPorTipoPanel
+            data={npsPorTipo}
+            currentSearchParams={{ concesionario, fechaDesde, fechaHasta, tipoMaquina, tecnologia }}
+          />
+        )}
+
+        {tipoEncuestaId && (() => {
+          const tipoNombre = options.tiposEncuesta.find((t) => t.id === tipoEncuestaId)?.nombre ?? ''
+          return (
+            <IndicadoresPanel
+              resumen={resumen}
+              efectividad={efectividad}
+              label={
+                concesionario
+                  ? `Indicadores para ${concesionario} · ${tipoNombre}${tipoMaquinaFilter ? ` · ${tipoMaquinaFilter}` : ''}${tecnologiaLabel ? ` · ${tecnologiaLabel}` : ''}${fechaDesde || fechaHasta ? ' con el rango seleccionado.' : '.'}`
+                  : `Encuestas de ${tipoNombre}${tipoMaquinaFilter ? ` filtradas por ${tipoMaquinaFilter}` : ''}${tecnologiaLabel ? ` · ${tecnologiaLabel}` : ''}${fechaDesde || fechaHasta ? ' del rango seleccionado.' : '.'}`
+              }
+            />
+          )
+        })()}
 
         <CalificacionesPanel calificaciones={calificaciones} />
 

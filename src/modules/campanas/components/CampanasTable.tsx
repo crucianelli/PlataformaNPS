@@ -10,6 +10,11 @@ const estadoBadge: Record<string, 'success' | 'info' | 'default'> = {
   archivada:  'default',
 }
 
+const tipoBadge: Record<string, 'info' | 'warning'> = {
+  inicio_garantia: 'info',
+  fin_garantia:    'warning',
+}
+
 interface CampanasTableProps {
   campanas: CampanaConConteos[]
 }
@@ -28,6 +33,7 @@ export default function CampanasTable({ campanas }: CampanasTableProps) {
       <TableHeader>
         <TableRow>
           <TableHead>Nombre</TableHead>
+          <TableHead>Tipo</TableHead>
           <TableHead>Fecha</TableHead>
           <TableHead>Estado</TableHead>
           <TableHead className="text-right">Clientes</TableHead>
@@ -43,6 +49,15 @@ export default function CampanasTable({ campanas }: CampanasTableProps) {
           return (
             <TableRow key={c.id}>
               <TableCell className="font-medium">{c.nombre}</TableCell>
+              <TableCell>
+                {c.tipoSlug && c.tipoNombre ? (
+                  <Badge variant={tipoBadge[c.tipoSlug] ?? 'default'}>
+                    {c.tipoNombre}
+                  </Badge>
+                ) : (
+                  <span className="text-muted-foreground text-xs">—</span>
+                )}
+              </TableCell>
               <TableCell className="text-muted-foreground">
                 {new Date(c.fecha + 'T00:00:00').toLocaleDateString('es-AR')}
               </TableCell>

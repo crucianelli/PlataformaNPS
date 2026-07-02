@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation'
 import { createSupabaseAdmin } from '@/lib/supabase/server'
 import FormularioEncuesta from './FormularioEncuesta'
+import FormularioFinGarantia from './FormularioFinGarantia'
 
 interface Props {
   searchParams: Promise<{ token?: string }>
@@ -61,7 +62,7 @@ export default async function EncuestaPage({ searchParams }: Props) {
 
   const { data: encuesta } = await supabase
     .from('encuestas')
-    .select('id, estado, clientes(concesionario)')
+    .select('id, estado, clientes(concesionario), campanas(tipos_encuesta(slug))')
     .eq('token', token)
     .single()
 
@@ -107,9 +108,17 @@ export default async function EncuestaPage({ searchParams }: Props) {
     ? encuesta.clientes[0]?.concesionario ?? ''
     : (encuesta.clientes as { concesionario: string } | null)?.concesionario ?? ''
 
+  const campana = Array.isArray(encuesta.campanas) ? encuesta.campanas[0] : encuesta.campanas
+  const tipoSlug = Array.isArray(campana?.tipos_encuesta)
+    ? campana.tipos_encuesta[0]?.slug
+    : (campana?.tipos_encuesta as { slug: string } | null)?.slug
+
   return (
     <PageShell>
-      <FormularioEncuesta token={token} concesionario={concesionario} />
+      {tipoSlug === 'fin_garantia'
+        ? <FormularioFinGarantia token={token} concesionario={concesionario} />
+        : <FormularioEncuesta token={token} concesionario={concesionario} />
+      }
     </PageShell>
   )
 }

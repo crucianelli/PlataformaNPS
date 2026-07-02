@@ -7,8 +7,9 @@ import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 
 const CampanaSchema = z.object({
-  nombre: z.string().min(1, 'El nombre es requerido').max(200),
-  fecha: z.string().min(1, 'La fecha es requerida'),
+  nombre:           z.string().min(1, 'El nombre es requerido').max(200),
+  fecha:            z.string().min(1, 'La fecha es requerida'),
+  tipo_encuesta_id: z.string().uuid('Tipo de encuesta inválido.'),
 })
 
 const CambiarEstadoSchema = z.object({
@@ -27,30 +28,39 @@ export async function crearCampanaAction(
   formData: FormData
 ): Promise<ActionState> {
   const raw = {
-    nombre: formData.get('nombre') as string,
-    fecha:  formData.get('fecha') as string,
+    nombre:           formData.get('nombre') as string,
+    fecha:            formData.get('fecha') as string,
+    tipo_encuesta_id: formData.get('tipo_encuesta_id') as string,
   }
 
   const result = CampanaSchema.safeParse(raw)
   if (!result.success) return { error: result.error.issues[0].message }
 
+  // Para fin de garantía, el CSV es opcional (puede venir del selector de OFs)
+  const clienteIdsSeleccionados = formData.getAll('cliente_id') as string[]
   const file = formData.get('archivo') as File | null
-  if (!file || file.size === 0) return { error: 'Selecciona el archivo CSV con los clientes.' }
+  const tieneCSV = file && file.size > 0
 
-  let rows: ReturnType<typeof parseClientesCSV>
-  try {
-    rows = parseClientesCSV(await file.text())
-  } catch (e: unknown) {
-    return { error: e instanceof Error ? e.message : 'Error al leer el CSV.' }
+  if (!tieneCSV && clienteIdsSeleccionados.length === 0) {
+    return { error: 'Seleccioná clientes del listado de OFs o cargá un archivo CSV.' }
   }
-  if (rows.length === 0) return { error: 'El CSV no contiene clientes validos.' }
+
+  let rowsCSV: ReturnType<typeof parseClientesCSV> = []
+  if (tieneCSV) {
+    try {
+      rowsCSV = parseClientesCSV(await file.text())
+    } catch (e: unknown) {
+      return { error: e instanceof Error ? e.message : 'Error al leer el CSV.' }
+    }
+    if (rowsCSV.length === 0) return { error: 'El CSV no contiene clientes válidos.' }
+  }
 
   const supabase = createSupabaseAdmin()
 
   // 1. Crear campaña
   const { data: campana, error: errCampana } = await supabase
     .from('campanas')
-    .insert({ nombre: result.data.nombre, fecha: result.data.fecha })
+    .insert({ nombre: result.data.nombre, fecha: result.data.fecha, tipo_encuesta_id: result.data.tipo_encuesta_id })
     .select()
     .single()
   if (errCampana) {
@@ -58,21 +68,30 @@ export async function crearCampanaAction(
     return { error: 'Error al crear la campaña.' }
   }
 
-  // 2. Crear clientes en batch
-  const { data: clientes, error: errClientes } = await supabase
-    .from('clientes')
-    .insert(rows)
-    .select('id, orden_fabricacion')
-  if (errClientes || !clientes) {
-    console.error('Error al crear los clientes', errClientes)
-    // Rollback: eliminar campaña creada
+  // 2a. Crear clientes desde CSV
+  let clienteIdsParaEncuesta: string[] = [...clienteIdsSeleccionados]
+
+  if (rowsCSV.length > 0) {
+    const { data: clientesNuevos, error: errClientes } = await supabase
+      .from('clientes')
+      .insert(rowsCSV)
+      .select('id')
+    if (errClientes || !clientesNuevos) {
+      console.error('Error al crear los clientes', errClientes)
+      await supabase.from('campanas').delete().eq('id', campana.id)
+      return { error: 'Error al crear los clientes.' }
+    }
+    clienteIdsParaEncuesta = [...clienteIdsParaEncuesta, ...clientesNuevos.map((c) => c.id)]
+  }
+
+  if (clienteIdsParaEncuesta.length === 0) {
     await supabase.from('campanas').delete().eq('id', campana.id)
-    return { error: 'Error al crear los clientes.' }
+    return { error: 'No hay clientes para agregar a la campaña.' }
   }
 
   // 3. Crear encuestas en batch (token lo genera la DB automáticamente)
-  const encuestasInsert = clientes.map((c) => ({
-    cliente_id: c.id,
+  const encuestasInsert = clienteIdsParaEncuesta.map((id) => ({
+    cliente_id: id,
     campana_id: campana.id,
   }))
   const { error: errEncuestas } = await supabase
@@ -83,10 +102,10 @@ export async function crearCampanaAction(
     return { error: 'Error al crear las encuestas.' }
   }
 
-  // 4. Crear envíos iniciales en batch (1 por OF)
+  // 4. Crear envíos iniciales en batch (1 por cliente)
   const fechaEnvioInicial = new Date().toISOString()
-  const enviosInsert = clientes.map((c) => ({
-    cliente_id: c.id,
+  const enviosInsert = clienteIdsParaEncuesta.map((id) => ({
+    cliente_id: id,
     campana_id: campana.id,
     numero_recordatorio: 0,
     estado_envio: 'enviado' as const,

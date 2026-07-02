@@ -8,6 +8,8 @@ export type CampanaConConteos = Campana & {
   total: number
   respondidas: number
   pendientes: number
+  tipoNombre: string | null
+  tipoSlug: string | null
 }
 
 export type EncuestaDeCampana = {

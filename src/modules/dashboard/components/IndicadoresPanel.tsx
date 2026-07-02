@@ -7,6 +7,7 @@ interface IndicadoresPanelProps {
   resumen: NpsResumenExtendido
   efectividad: EfectividadEnvios
   label?: string
+  efectividadPorTipo?: Array<{ nombre: string; efectividad: EfectividadEnvios }>
 }
 
 function renderNps(value: number | null) {
@@ -28,8 +29,8 @@ function renderPorcentaje(value: number | null) {
   return `${value.toLocaleString('es-AR')}%`
 }
 
-export default function IndicadoresPanel({ resumen, efectividad, label }: IndicadoresPanelProps) {
-  const cards = [
+export default function IndicadoresPanel({ resumen, efectividad, label, efectividadPorTipo }: IndicadoresPanelProps) {
+  const npsCards = [
     {
       title: 'NPS producto sembradoras',
       value: renderNps(resumen.npsSembradora),
@@ -58,19 +59,30 @@ export default function IndicadoresPanel({ resumen, efectividad, label }: Indica
       score: resumen.npsEmpresa,
       sub: `${resumen.totalRespuestas} respuestas`,
     },
-    {
-      title: 'Efectividad encuestas',
-      value: renderPorcentaje(efectividad.porcentaje),
-      label: '',
-      score: null,
-      sub: `${efectividad.respondidas} de ${efectividad.enviadas} enviadas`,
-    },
   ]
+
+  const efectividadCards = efectividadPorTipo && efectividadPorTipo.length > 0
+    ? efectividadPorTipo.map(({ nombre, efectividad: ef }) => ({
+        title: `Efectividad · ${nombre}`,
+        value: renderPorcentaje(ef.porcentaje),
+        label: '',
+        score: null,
+        sub: `${ef.respondidas} de ${ef.enviadas} enviadas`,
+      }))
+    : [{
+        title: 'Efectividad encuestas',
+        value: renderPorcentaje(efectividad.porcentaje),
+        label: '',
+        score: null,
+        sub: `${efectividad.respondidas} de ${efectividad.enviadas} enviadas`,
+      }]
+
+  const cards = [...npsCards, ...efectividadCards]
 
   return (
     <div className="space-y-4">
       {label && <p className="text-sm text-muted-foreground">{label}</p>}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-5">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-6">
         {cards.map((card) => (
           <Card key={card.title}>
             <CardContent className="pt-4">
