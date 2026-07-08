@@ -110,6 +110,30 @@ export type Database = {
         }
         Relationships: []
       }
+      email_errores: {
+        Row: {
+          asunto: string
+          created_at: string
+          destinatarios: string[]
+          error_mensaje: string
+          id: string
+        }
+        Insert: {
+          asunto: string
+          created_at?: string
+          destinatarios?: string[]
+          error_mensaje: string
+          id?: string
+        }
+        Update: {
+          asunto?: string
+          created_at?: string
+          destinatarios?: string[]
+          error_mensaje?: string
+          id?: string
+        }
+        Relationships: []
+      }
       encuestas: {
         Row: {
           campana_id: string

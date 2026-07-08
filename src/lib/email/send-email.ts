@@ -1,4 +1,5 @@
 import nodemailer from 'nodemailer'
+import { createSupabaseAdmin } from '@/lib/supabase/server'
 
 const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST,
@@ -31,12 +32,30 @@ export async function sendEmail({ to, bcc, subject, html, text }: SendEmailParam
     ? Array.isArray(bcc) ? bcc : [bcc]
     : undefined
 
-  await transporter.sendMail({
-    from,
-    to: toField,
-    bcc: bccField,
-    subject,
-    html,
-    text,
-  })
+  try {
+    await transporter.sendMail({
+      from,
+      to: toField,
+      bcc: bccField,
+      subject,
+      html,
+      text,
+    })
+  } catch (error) {
+    const errorMensaje = error instanceof Error ? error.message : String(error)
+
+    try {
+      await createSupabaseAdmin()
+        .from('email_errores')
+        .insert({
+          destinatarios: [...toField, ...(bccField ?? [])],
+          asunto: subject,
+          error_mensaje: errorMensaje,
+        })
+    } catch {
+      // Si falla el logging no debe ocultar el error original de envío
+    }
+
+    throw error
+  }
 }
