@@ -49,9 +49,6 @@ export async function enviarAlertaNpsCritico({
   const campana = Array.isArray(encuesta.campanas) ? encuesta.campanas[0] : encuesta.campanas
   const cliente = Array.isArray(encuesta.clientes) ? encuesta.clientes[0] : encuesta.clientes
 
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'
-  const detalleUrl = campana?.id ? `${appUrl}/campanas/${campana.id}` : `${appUrl}/campanas`
-
   const email = buildAlertaNpsTemplate({
     clienteNombre: cliente?.nombre ?? 'Cliente sin nombre',
     concesionario: cliente?.concesionario ?? 'Sin concesionario',
@@ -63,7 +60,6 @@ export async function enviarAlertaNpsCritico({
     comentarioConcesionario,
     comentarioEmpresa,
     comentarioGeneral,
-    detalleUrl,
   })
 
   // BCC: cada destinatario recibe el mail sin ver a los demás

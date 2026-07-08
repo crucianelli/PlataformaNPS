@@ -9,7 +9,6 @@ type AlertaNpsTemplateParams = {
   comentarioConcesionario: string | null
   comentarioEmpresa: string | null
   comentarioGeneral: string | null
-  detalleUrl: string
 }
 
 function escapeHtml(value: string) {
@@ -57,7 +56,6 @@ export function buildAlertaNpsTemplate({
   comentarioConcesionario,
   comentarioEmpresa,
   comentarioGeneral,
-  detalleUrl,
 }: AlertaNpsTemplateParams) {
   const criticalFields = [
     npsProducto < 6 ? `Producto (${npsProducto})` : null,
@@ -96,12 +94,6 @@ export function buildAlertaNpsTemplate({
           ${comentarioBlock('Comentario sobre el concesionario', comentarioConcesionario)}
           ${comentarioBlock('Comentario sobre la empresa', comentarioEmpresa)}
           ${comentarioBlock('Comentario general', comentarioGeneral)}
-
-          <div style="margin-top:24px;">
-            <a href="${escapeHtml(detalleUrl)}" style="display:inline-block;background:#C0272D;color:#ffffff;text-decoration:none;padding:12px 16px;border-radius:8px;font-weight:700;">
-              Ver campaña
-            </a>
-          </div>
         </div>
       </div>
     </div>
@@ -120,8 +112,6 @@ export function buildAlertaNpsTemplate({
     comentarioConcesionario ? `Comentario concesionario: ${comentarioConcesionario}` : null,
     comentarioEmpresa ? `Comentario empresa: ${comentarioEmpresa}` : null,
     comentarioGeneral ? `Comentario general: ${comentarioGeneral}` : null,
-    '',
-    `Detalle: ${detalleUrl}`,
   ]
     .filter(Boolean)
     .join('\n')
