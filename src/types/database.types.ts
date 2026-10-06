@@ -174,6 +174,7 @@ export type Database = {
       }
       encuestas: {
         Row: {
+          area_llamado: Database["public"]["Enums"]["area_llamado"] | null
           campana_id: string
           cliente_id: string
           comentario_sin_respuesta: string | null
@@ -185,6 +186,7 @@ export type Database = {
           token: string
         }
         Insert: {
+          area_llamado?: Database["public"]["Enums"]["area_llamado"] | null
           campana_id: string
           cliente_id: string
           comentario_sin_respuesta?: string | null
@@ -196,6 +198,7 @@ export type Database = {
           token?: string
         }
         Update: {
+          area_llamado?: Database["public"]["Enums"]["area_llamado"] | null
           campana_id?: string
           cliente_id?: string
           comentario_sin_respuesta?: string | null
@@ -772,6 +775,7 @@ export type Database = {
       sync_encuestas_necesidad_llamado: { Args: never; Returns: number }
     }
     Enums: {
+      area_llamado: "mkt_producto" | "comercial" | "posventa"
       campana_estado: "activa" | "completada" | "archivada"
       encuesta_estado:
         | "pendiente"
@@ -917,6 +921,7 @@ export const Constants = {
   },
   public: {
     Enums: {
+      area_llamado: ["mkt_producto", "comercial", "posventa"],
       campana_estado: ["activa", "completada", "archivada"],
       encuesta_estado: [
         "pendiente",
