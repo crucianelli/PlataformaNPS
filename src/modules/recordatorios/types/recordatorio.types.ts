@@ -39,10 +39,20 @@ export type EncuestaMedida = {
   updatedAt: string
 }
 
+export type AreaLlamado = 'mkt_producto' | 'comercial' | 'posventa'
+
+export const AREAS_LLAMADO: { value: AreaLlamado; label: string }[] = [
+  { value: 'mkt_producto', label: 'MKT de Producto' },
+  { value: 'comercial', label: 'Comercial' },
+  { value: 'posventa', label: 'Posventa' },
+]
+
 export type EncuestaNecesidadLlamado = {
   id: string
   token: string
   estado: 'necesidad_de_llamado'
+  // La asigna el trigger trg_asignar_area_llamado; null no debería darse.
+  area: AreaLlamado | null
   campana: {
     id: string
     nombre: string

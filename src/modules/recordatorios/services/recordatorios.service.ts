@@ -1,6 +1,6 @@
 import { db } from '@/lib/db/client'
 import { campanas, clientes, encuestaMedidas, encuestas, envios, tiposEncuesta } from '@/lib/db/schema'
-import { and, asc, desc, eq, inArray, sql } from 'drizzle-orm'
+import { and, asc, desc, eq, inArray } from 'drizzle-orm'
 import type {
   ClientePendienteRecordatorio,
   EncuestaMedida,
@@ -188,81 +188,68 @@ export async function marcarRecordatorioEnviado(campanaId: string, numeroRecorda
   })
 }
 
-export const LLAMADOS_PAGE_SIZE = 25
-
+// Sin paginar: el tablero reparte todas las OF en tres columnas por área.
 export async function getEncuestasNecesidadLlamado(
-  page = 1,
   tipoEncuestaId?: string
-): Promise<{ data: EncuestaNecesidadLlamado[]; total: number }> {
+): Promise<EncuestaNecesidadLlamado[]> {
   await syncWorkflowEstados()
-  const from = (page - 1) * LLAMADOS_PAGE_SIZE
 
   const whereClause = tipoEncuestaId
     ? and(eq(encuestas.estado, 'necesidad_de_llamado'), eq(campanas.tipoEncuestaId, tipoEncuestaId))
     : eq(encuestas.estado, 'necesidad_de_llamado')
 
-  const [rows, totalResult] = await Promise.all([
-    db
-      .select({
-        id: encuestas.id,
-        token: encuestas.token,
-        campanaId: campanas.id,
-        campanaNombre: campanas.nombre,
-        campanaFecha: campanas.fecha,
-        tipoNombre: tiposEncuesta.nombre,
-        tipoSlug: tiposEncuesta.slug,
-        clienteId: clientes.id,
-        clienteNombre: clientes.nombre,
-        clienteTelefono: clientes.telefono,
-        clienteTelefono2: clientes.telefono2,
-        clienteTelefono3: clientes.telefono3,
-        clienteConcesionario: clientes.concesionario,
-        clienteOrdenFabricacion: clientes.ordenFabricacion,
-        clienteTipoMaquina: clientes.tipoMaquina,
-      })
-      .from(encuestas)
-      .innerJoin(campanas, eq(encuestas.campanaId, campanas.id))
-      .leftJoin(tiposEncuesta, eq(campanas.tipoEncuestaId, tiposEncuesta.id))
-      .innerJoin(clientes, eq(encuestas.clienteId, clientes.id))
-      .where(whereClause)
-      .orderBy(asc(encuestas.createdAt))
-      .limit(LLAMADOS_PAGE_SIZE)
-      .offset(from),
-    db
-      .select({ total: sql<number>`count(*)::int` })
-      .from(encuestas)
-      .innerJoin(campanas, eq(encuestas.campanaId, campanas.id))
-      .where(whereClause),
-  ])
+  const rows = await db
+    .select({
+      id: encuestas.id,
+      token: encuestas.token,
+      area: encuestas.areaLlamado,
+      campanaId: campanas.id,
+      campanaNombre: campanas.nombre,
+      campanaFecha: campanas.fecha,
+      tipoNombre: tiposEncuesta.nombre,
+      tipoSlug: tiposEncuesta.slug,
+      clienteId: clientes.id,
+      clienteNombre: clientes.nombre,
+      clienteTelefono: clientes.telefono,
+      clienteTelefono2: clientes.telefono2,
+      clienteTelefono3: clientes.telefono3,
+      clienteConcesionario: clientes.concesionario,
+      clienteOrdenFabricacion: clientes.ordenFabricacion,
+      clienteTipoMaquina: clientes.tipoMaquina,
+    })
+    .from(encuestas)
+    .innerJoin(campanas, eq(encuestas.campanaId, campanas.id))
+    .leftJoin(tiposEncuesta, eq(campanas.tipoEncuestaId, tiposEncuesta.id))
+    .innerJoin(clientes, eq(encuestas.clienteId, clientes.id))
+    .where(whereClause)
+    .orderBy(asc(encuestas.createdAt))
 
   const medidasByEncuesta = await getMedidasByEncuestaIds(rows.map((r) => r.id))
 
-  return {
-    data: rows.map((r) => ({
-      id: r.id,
-      token: r.token,
-      estado: 'necesidad_de_llamado' as const,
-      campana: {
-        id: r.campanaId,
-        nombre: r.campanaNombre,
-        fecha: r.campanaFecha,
-        tipoNombre: r.tipoNombre,
-        tipoSlug: r.tipoSlug,
-      },
-      cliente: {
-        id: r.clienteId,
-        nombre: r.clienteNombre,
-        telefono: r.clienteTelefono,
-        telefono_2: r.clienteTelefono2,
-        telefono_3: r.clienteTelefono3,
-        concesionario: r.clienteConcesionario,
-        orden_fabricacion: r.clienteOrdenFabricacion,
-        tipo_maquina: r.clienteTipoMaquina,
-      },
-      medidas: medidasByEncuesta.get(r.id) ?? [],
-    })),
-    total: totalResult[0].total,
-  }
+  return rows.map((r) => ({
+    id: r.id,
+    token: r.token,
+    estado: 'necesidad_de_llamado' as const,
+    area: r.area,
+    campana: {
+      id: r.campanaId,
+      nombre: r.campanaNombre,
+      fecha: r.campanaFecha,
+      tipoNombre: r.tipoNombre,
+      tipoSlug: r.tipoSlug,
+    },
+    cliente: {
+      id: r.clienteId,
+      nombre: r.clienteNombre,
+      telefono: r.clienteTelefono,
+      telefono_2: r.clienteTelefono2,
+      telefono_3: r.clienteTelefono3,
+      concesionario: r.clienteConcesionario,
+      orden_fabricacion: r.clienteOrdenFabricacion,
+      tipo_maquina: r.clienteTipoMaquina,
+    },
+    medidas: medidasByEncuesta.get(r.id) ?? [],
+  }))
 }
 
 export async function getEncuestasSinRespuesta(): Promise<EncuestaSinRespuesta[]> {

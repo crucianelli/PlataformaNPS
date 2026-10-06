@@ -8,6 +8,7 @@ import { authUser } from "./auth-schema"
 
 export const campanaEstado = pgEnum("campana_estado", ['activa', 'completada', 'archivada'])
 export const encuestaEstado = pgEnum("encuesta_estado", ['pendiente', 'respondida', 'recordatorio_enviado', 'necesidad_de_llamado', 'sin_respuesta'])
+export const areaLlamado = pgEnum("area_llamado", ['mkt_producto', 'comercial', 'posventa'])
 export const envioEstado = pgEnum("envio_estado", ['pendiente_envio', 'enviado'])
 export const notificacionTipo = pgEnum("notificacion_tipo", ['nps_critico', 'nueva_respuesta', 'regalo_pendiente', 'campana_sin_actividad'])
 export const regaloEstado = pgEnum("regalo_estado", ['pendiente_envio', 'enviado'])
@@ -168,7 +169,10 @@ export const encuestas = pgTable("encuestas", {
 	marcadoSinRespuestaAt: timestamp("marcado_sin_respuesta_at", { withTimezone: true, mode: 'string' }),
 	// TEXT, no UUID: referencia a auth_user(id), que es TEXT (tipo nativo de Better Auth).
 	marcadoSinRespuestaPor: text("marcado_sin_respuesta_por"),
+	// La asigna el trigger trg_asignar_area_llamado al pasar a necesidad_de_llamado.
+	areaLlamado: areaLlamado("area_llamado"),
 }, (table) => [
+	index("idx_encuestas_area_llamado").using("btree", table.areaLlamado.asc().nullsLast().op("enum_ops")).where(sql`(area_llamado IS NOT NULL)`),
 	index("idx_encuestas_campana_id").using("btree", table.campanaId.asc().nullsLast().op("uuid_ops")),
 	index("idx_encuestas_cliente_id").using("btree", table.clienteId.asc().nullsLast().op("uuid_ops")),
 	index("idx_encuestas_estado").using("btree", table.estado.asc().nullsLast().op("enum_ops")),
