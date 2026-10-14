@@ -46,6 +46,7 @@ export type RespuestaDetalle = {
   npsEmpresa: number
   npsConcesionario: number
   comentarioProducto: string | null
+  comentarioConcesionario: string | null
   comentarioEmpresa: string | null
   comentarioGeneral: string | null
   canalRespuesta: 'mensaje' | 'llamado'
@@ -189,6 +190,7 @@ export async function getRespuestas(filters: DashboardFilters = {}): Promise<Res
       npsEmpresa: respuestas.npsEmpresa,
       npsConcesionario: respuestas.npsConcesionario,
       comentarioProducto: respuestas.comentarioProducto,
+      comentarioConcesionario: respuestas.comentarioConcesionario,
       comentarioEmpresa: respuestas.comentarioEmpresa,
       comentarioGeneral: respuestas.comentarioGeneral,
       canalRespuesta: respuestas.canalRespuesta,
@@ -202,7 +204,7 @@ export async function getRespuestas(filters: DashboardFilters = {}): Promise<Res
     // que hacía el embed de Supabase — y se filtran los que no la tengan.
     .leftJoin(respuestas, eq(respuestas.encuestaId, encuestas.id))
     .where(and(...conditions))
-    .orderBy(desc(encuestas.createdAt))
+    .orderBy(desc(respuestas.fechaRespuesta))
 
   let resultado: RespuestaDetalle[] = rows
     .filter((row) => row.fechaRespuesta !== null)
@@ -243,6 +245,7 @@ export async function getRespuestas(filters: DashboardFilters = {}): Promise<Res
       npsEmpresa: row.npsEmpresa!,
       npsConcesionario: row.npsConcesionario!,
       comentarioProducto: row.comentarioProducto,
+      comentarioConcesionario: row.comentarioConcesionario,
       comentarioEmpresa: row.comentarioEmpresa,
       comentarioGeneral: row.comentarioGeneral,
       canalRespuesta: row.canalRespuesta as 'mensaje' | 'llamado',

@@ -61,6 +61,7 @@ export async function GET(request: Request) {
       nps_producto: item.npsProducto,
       nps_empresa: item.npsEmpresa,
       comentario_producto: item.comentarioProducto,
+      comentario_concesionario: item.comentarioConcesionario,
       comentario_empresa: item.comentarioEmpresa,
       comentario_general: item.comentarioGeneral,
       canal_respuesta: item.canalRespuesta,
