@@ -68,6 +68,7 @@ type RawEncuestaConRespuesta = {
         nps_empresa: number
         nps_concesionario: number
         comentario_producto: string | null
+        comentario_concesionario: string | null
         comentario_empresa: string | null
         comentario_general: string | null
         canal_respuesta: 'mensaje' | 'llamado'
@@ -97,6 +98,7 @@ type RawEncuestaConRespuesta = {
         nps_empresa: number
         nps_concesionario: number
         comentario_producto: string | null
+        comentario_concesionario: string | null
         comentario_empresa: string | null
         comentario_general: string | null
         canal_respuesta: 'mensaje' | 'llamado'
@@ -141,6 +143,7 @@ export type RespuestaDetalle = {
   npsEmpresa: number
   npsConcesionario: number
   comentarioProducto: string | null
+  comentarioConcesionario: string | null
   comentarioEmpresa: string | null
   comentarioGeneral: string | null
   canalRespuesta: 'mensaje' | 'llamado'
@@ -281,6 +284,7 @@ function mapRespuesta(row: RawEncuestaConRespuesta): RespuestaDetalle | null {
     npsEmpresa: respuesta.nps_empresa,
     npsConcesionario: respuesta.nps_concesionario,
     comentarioProducto: respuesta.comentario_producto,
+    comentarioConcesionario: respuesta.comentario_concesionario,
     comentarioEmpresa: respuesta.comentario_empresa,
     comentarioGeneral: respuesta.comentario_general,
     canalRespuesta: respuesta.canal_respuesta,
@@ -333,6 +337,7 @@ export async function getRespuestas(filters: DashboardFilters = {}) {
         nps_empresa,
         nps_concesionario,
         comentario_producto,
+        comentario_concesionario,
         comentario_empresa,
         comentario_general,
         canal_respuesta
@@ -364,6 +369,9 @@ export async function getRespuestas(filters: DashboardFilters = {}) {
   let respuestas = (data as unknown as RawEncuestaConRespuesta[])
     .map(mapRespuesta)
     .filter((item): item is RespuestaDetalle => Boolean(item))
+    // Más recientes primero por fecha de respuesta: el .order() de arriba es
+    // sobre encuestas.created_at y PostgREST no ordena el padre por un embed.
+    .sort((a, b) => b.fechaRespuestaDate.getTime() - a.fechaRespuestaDate.getTime())
 
   if (filters.q) {
     const needle = filters.q.toLowerCase()

@@ -179,6 +179,10 @@ export default function RespuestasTable({ respuestas }: RespuestasTableProps) {
                               <p>{respuesta.comentarioProducto || 'Sin comentario.'}</p>
                             </div>
                             <div>
+                              <p className="font-medium text-foreground">Concesionario</p>
+                              <p>{respuesta.comentarioConcesionario || 'Sin comentario.'}</p>
+                            </div>
+                            <div>
                               <p className="font-medium text-foreground">Empresa</p>
                               <p>{respuesta.comentarioEmpresa || 'Sin comentario.'}</p>
                             </div>
