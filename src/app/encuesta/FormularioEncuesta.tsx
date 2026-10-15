@@ -2,11 +2,12 @@
 
 import { useActionState, useState } from 'react'
 import { guardarRespuestaAction } from './actions'
-import { CONCESIONARIOS, MAQUINAS_SEMBRADORA, MAQUINAS_FERTILIZADORA } from './form-options'
+import { CONCESIONARIOS, MAQUINAS, MAQUINAS_SEMBRADORA, MAQUINAS_FERTILIZADORA } from './form-options'
 
 interface FormularioEncuestaProps {
   token: string
   concesionario: string
+  maquina?: string | null
 }
 
 const inputClass =
@@ -85,7 +86,7 @@ function CampoSelect({
   )
 }
 
-function CampoSelectMaquina({ disabled }: { disabled?: boolean }) {
+function CampoSelectMaquina({ disabled, defaultValue }: { disabled?: boolean; defaultValue?: string }) {
   return (
     <div className="space-y-1.5">
       <label htmlFor="maquina_modelo" className="block text-sm font-medium text-gray-700">
@@ -96,7 +97,7 @@ function CampoSelectMaquina({ disabled }: { disabled?: boolean }) {
         name="maquina_modelo"
         required
         disabled={disabled}
-        defaultValue=""
+        defaultValue={defaultValue ?? ""}
         className={inputClass}
       >
         <option value="" disabled>Seleccionar...</option>
@@ -194,7 +195,7 @@ function Card({ children, className = '' }: { children: React.ReactNode; classNa
   )
 }
 
-export default function FormularioEncuesta({ token, concesionario }: FormularioEncuestaProps) {
+export default function FormularioEncuesta({ token, concesionario, maquina }: FormularioEncuestaProps) {
   const [state, formAction, isPending] = useActionState(guardarRespuestaAction, {})
 
   if (state.success) {
@@ -267,7 +268,10 @@ export default function FormularioEncuesta({ token, concesionario }: FormularioE
             disabled={isPending}
             defaultValue={CONCESIONARIOS.includes(concesionario as (typeof CONCESIONARIOS)[number]) ? concesionario : undefined}
           />
-          <CampoSelectMaquina disabled={isPending} />
+          <CampoSelectMaquina
+            disabled={isPending}
+            defaultValue={MAQUINAS.includes(maquina as (typeof MAQUINAS)[number]) ? (maquina as string) : undefined}
+          />
           <div className="md:col-span-2">
             <CampoTexto
               label="Bajo qué nombre o firma salió facturada la máquina"

@@ -62,7 +62,7 @@ export default async function EncuestaPage({ searchParams }: Props) {
 
   const { data: encuesta } = await supabase
     .from('encuestas')
-    .select('id, estado, clientes(concesionario), campanas(tipos_encuesta(slug))')
+    .select('id, estado, clientes(concesionario, tipo_maquina), campanas(tipos_encuesta(slug))')
     .eq('token', token)
     .single()
 
@@ -108,6 +108,10 @@ export default async function EncuestaPage({ searchParams }: Props) {
     ? encuesta.clientes[0]?.concesionario ?? ''
     : (encuesta.clientes as { concesionario: string } | null)?.concesionario ?? ''
 
+  const maquina = Array.isArray(encuesta.clientes)
+    ? encuesta.clientes[0]?.tipo_maquina ?? null
+    : (encuesta.clientes as { tipo_maquina: string | null } | null)?.tipo_maquina ?? null
+
   const campana = Array.isArray(encuesta.campanas) ? encuesta.campanas[0] : encuesta.campanas
   const tipoSlug = Array.isArray(campana?.tipos_encuesta)
     ? campana.tipos_encuesta[0]?.slug
@@ -116,8 +120,8 @@ export default async function EncuestaPage({ searchParams }: Props) {
   return (
     <PageShell>
       {tipoSlug === 'fin_garantia'
-        ? <FormularioFinGarantia token={token} concesionario={concesionario} />
-        : <FormularioEncuesta token={token} concesionario={concesionario} />
+        ? <FormularioFinGarantia token={token} concesionario={concesionario} maquina={maquina} />
+        : <FormularioEncuesta token={token} concesionario={concesionario} maquina={maquina} />
       }
     </PageShell>
   )

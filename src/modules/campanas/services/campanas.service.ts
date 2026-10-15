@@ -57,7 +57,7 @@ export async function getCampanaConEncuestas(id: string) {
     .from('encuestas')
     .select(`
       id, estado, token, created_at,
-      clientes(id, nombre, telefono, telefono_2, telefono_3, concesionario, orden_fabricacion, tecnologia)
+      clientes(id, nombre, telefono, telefono_2, telefono_3, concesionario, orden_fabricacion, tecnologia, tipo_maquina)
     `)
     .eq('campana_id', id)
     .order('created_at')
