@@ -1,6 +1,7 @@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/Table'
 import type { Cliente } from '../types/cliente.types'
 import { formatTecnologia } from '@/lib/utils/tecnologia'
+import { formatTipoMaquina } from '@/lib/utils/tipoMaquina'
 
 interface ClientesTableProps {
   clientes: Cliente[]
@@ -26,6 +27,7 @@ export default function ClientesTable({ clientes }: ClientesTableProps) {
           <TableHead>Concesionario</TableHead>
           <TableHead>OF</TableHead>
           <TableHead>Tecnología</TableHead>
+          <TableHead>Máquina</TableHead>
           <TableHead>Fecha alta</TableHead>
         </TableRow>
       </TableHeader>
@@ -39,6 +41,7 @@ export default function ClientesTable({ clientes }: ClientesTableProps) {
             <TableCell>{cliente.concesionario}</TableCell>
             <TableCell className="text-muted-foreground">{cliente.orden_fabricacion ?? '—'}</TableCell>
             <TableCell className="text-muted-foreground">{formatTecnologia(cliente.tecnologia)}</TableCell>
+            <TableCell className="text-muted-foreground">{formatTipoMaquina(cliente.tipo_maquina)}</TableCell>
             <TableCell className="text-muted-foreground">
               {new Date(cliente.created_at).toLocaleDateString('es-AR')}
             </TableCell>

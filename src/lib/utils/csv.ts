@@ -53,6 +53,17 @@ function normalizeHeader(h: string): string {
     .trim()
 }
 
+// "TIPO_MAQUINA", "Tipo de máquina", "Máquina", "Modelo"… todas apuntan a la misma columna
+const TIPO_MAQUINA_HEADERS = [
+  'tipo maquina',
+  'tipo de maquina',
+  'maquina',
+  'modelo',
+  'maquina modelo',
+  'modelo maquina',
+  'modelo de maquina',
+]
+
 function isPhoneHeader(header: string, index: 1 | 2 | 3): boolean {
   const aliasesByIndex: Record<1 | 2 | 3, string[]> = {
     1: [
@@ -105,7 +116,7 @@ export function parseClientesCSV(text: string): ClienteCSVRow[] {
   const phone2Idx = headers.findIndex((h) => isPhoneHeader(h, 2))
   const phone3Idx = headers.findIndex((h) => isPhoneHeader(h, 3))
   const tecnologiaIdx = headers.findIndex((h) => h === 'tecnologia')
-  const tipoMaquinaIdx = headers.findIndex((h) => h === 'tipo maquina')
+  const tipoMaquinaIdx = headers.findIndex((h) => TIPO_MAQUINA_HEADERS.includes(h))
 
   if (nameIdx === -1)   throw new Error('No se encontro la columna de cliente/nombre.')
   if (dealerIdx === -1) throw new Error('No se encontro la columna de concesionario.')

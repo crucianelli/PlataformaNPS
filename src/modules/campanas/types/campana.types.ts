@@ -26,5 +26,6 @@ export type EncuestaDeCampana = {
     concesionario: string
     orden_fabricacion: string | null
     tecnologia: string | null
+    tipo_maquina: string | null
   } | null
 }

@@ -101,8 +101,8 @@ export default async function EncuestaPage({ searchParams }: Props) {
   return (
     <PageShell>
       {encuesta.tipoSlug === 'fin_garantia'
-        ? <FormularioFinGarantia token={token} concesionario={encuesta.concesionario} />
-        : <FormularioEncuesta token={token} concesionario={encuesta.concesionario} />
+        ? <FormularioFinGarantia token={token} concesionario={encuesta.concesionario} maquina={encuesta.tipoMaquina} />
+        : <FormularioEncuesta token={token} concesionario={encuesta.concesionario} maquina={encuesta.tipoMaquina} />
       }
     </PageShell>
   )

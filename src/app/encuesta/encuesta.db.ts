@@ -27,10 +27,11 @@ export type EncuestaPublica = {
   id: string
   estado: EncuestaEstado
   concesionario: string
+  tipoMaquina: string | null
   tipoSlug: string
 }
 
-/** Datos para renderizar el formulario. No expone nada del cliente más allá del concesionario. */
+/** Datos para renderizar el formulario. No expone nada del cliente más allá del concesionario y la máquina (para precargar). */
 export async function getEncuestaPorToken(token: string): Promise<EncuestaPublica | null> {
   if (!esTokenConFormatoValido(token)) return null
 
@@ -39,6 +40,7 @@ export async function getEncuestaPorToken(token: string): Promise<EncuestaPublic
       id: encuestas.id,
       estado: encuestas.estado,
       concesionario: clientes.concesionario,
+      tipoMaquina: clientes.tipoMaquina,
       tipoSlug: tiposEncuesta.slug,
     })
     .from(encuestas)

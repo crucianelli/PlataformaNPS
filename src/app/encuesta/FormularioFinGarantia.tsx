@@ -2,11 +2,12 @@
 
 import { useActionState, useState } from 'react'
 import { guardarRespuestaFinGarantiaAction } from './actions-fin-garantia'
-import { CONCESIONARIOS, MAQUINAS_SEMBRADORA, MAQUINAS_FERTILIZADORA } from './form-options'
+import { CONCESIONARIOS, MAQUINAS, MAQUINAS_SEMBRADORA, MAQUINAS_FERTILIZADORA } from './form-options'
 
 interface FormularioFinGarantiaProps {
   token: string
   concesionario: string
+  maquina?: string | null
 }
 
 const inputClass =
@@ -55,13 +56,13 @@ function CampoSelect({
   )
 }
 
-function CampoSelectMaquina({ disabled }: { disabled?: boolean }) {
+function CampoSelectMaquina({ disabled, defaultValue }: { disabled?: boolean; defaultValue?: string }) {
   return (
     <div className="space-y-1.5">
       <label htmlFor="maquina_modelo" className="block text-sm font-medium text-gray-700">
         Sobre qué máquina está realizando esta encuesta<span className="text-[#C0272D] ml-0.5">*</span>
       </label>
-      <select id="maquina_modelo" name="maquina_modelo" required disabled={disabled} defaultValue="" className={inputClass}>
+      <select id="maquina_modelo" name="maquina_modelo" required disabled={disabled} defaultValue={defaultValue ?? ""} className={inputClass}>
         <option value="" disabled>Seleccionar...</option>
         {MAQUINAS_SEMBRADORA.length > 0 && (
           <optgroup label="Sembradoras">
@@ -141,7 +142,7 @@ function Card({ children, className = '' }: { children: React.ReactNode; classNa
   )
 }
 
-export default function FormularioFinGarantia({ token, concesionario }: FormularioFinGarantiaProps) {
+export default function FormularioFinGarantia({ token, concesionario, maquina }: FormularioFinGarantiaProps) {
   const [state, formAction, isPending] = useActionState(guardarRespuestaFinGarantiaAction, {})
   const [tuvoProblemas, setTuvoProblemas] = useState<boolean | null>(null)
 
@@ -214,7 +215,10 @@ export default function FormularioFinGarantia({ token, concesionario }: Formular
             disabled={isPending}
             defaultValue={CONCESIONARIOS.includes(concesionario as (typeof CONCESIONARIOS)[number]) ? concesionario : undefined}
           />
-          <CampoSelectMaquina disabled={isPending} />
+          <CampoSelectMaquina
+            disabled={isPending}
+            defaultValue={MAQUINAS.includes(maquina as (typeof MAQUINAS)[number]) ? (maquina as string) : undefined}
+          />
           <div className="md:col-span-2">
             <CampoTexto
               label="Bajo qué nombre o firma salió facturada la máquina"

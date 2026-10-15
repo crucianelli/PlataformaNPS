@@ -64,6 +64,7 @@ export async function getCampanaConEncuestas(id: string) {
         concesionario: clientes.concesionario,
         orden_fabricacion: clientes.ordenFabricacion,
         tecnologia: clientes.tecnologia,
+        tipo_maquina: clientes.tipoMaquina,
       },
     })
     .from(encuestas)

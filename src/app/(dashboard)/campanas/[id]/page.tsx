@@ -10,6 +10,7 @@ import EliminarEncuestaForm from '@/modules/campanas/components/EliminarEncuesta
 import RecordatoriosTimeline from '@/modules/recordatorios/components/RecordatoriosTimeline'
 import { getRecordatoriosByCampana, puedeCrearRecordatorio } from '@/modules/recordatorios/services/recordatorios.service'
 import { formatTecnologia } from '@/lib/utils/tecnologia'
+import { formatTipoMaquina } from '@/lib/utils/tipoMaquina'
 import CopyButton from '@/components/ui/CopyButton'
 import WhatsappCampanaSection from '@/modules/whatsapp/components/WhatsappCampanaSection'
 import { getJobsByCampana, getPlantillas } from '@/modules/whatsapp/services/whatsapp.service'
@@ -144,6 +145,7 @@ export default async function CampanaDetallePage({
                   <TableHead>Concesionario</TableHead>
                   <TableHead>OF</TableHead>
                   <TableHead>Tecnología</TableHead>
+                  <TableHead>Máquina</TableHead>
                   <TableHead>Estado</TableHead>
                   <TableHead>Link</TableHead>
                   {esAdmin && <TableHead>Acciones</TableHead>}
@@ -159,6 +161,7 @@ export default async function CampanaDetallePage({
                     <TableCell>{e.clientes?.concesionario ?? '—'}</TableCell>
                     <TableCell className="text-muted-foreground">{e.clientes?.orden_fabricacion ?? '—'}</TableCell>
                     <TableCell className="text-muted-foreground">{formatTecnologia(e.clientes?.tecnologia)}</TableCell>
+                    <TableCell className="text-muted-foreground">{formatTipoMaquina(e.clientes?.tipo_maquina)}</TableCell>
                     <TableCell>
                       <Badge variant={encuestaBadge[e.estado] ?? 'default'}>
                         {e.estado}
