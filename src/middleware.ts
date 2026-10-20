@@ -36,7 +36,13 @@ export async function middleware(request: NextRequest) {
     }
   )
 
-  const { data: { user } } = await supabase.auth.getUser()
+  // getClaims verifica la firma del JWT acá mismo con la clave pública del
+  // proyecto (ES256, cacheada 10 min), sin ir a Supabase en cada request como
+  // hacía getUser(). Si el token venció, lo renueva con el refresh token igual
+  // que antes. Contra: un logout o un cambio de rol tarda hasta que vence el
+  // JWT (1 h) en verse acá; las actions que escriben siguen usando getUser().
+  const { data: claimsData } = await supabase.auth.getClaims()
+  const user = claimsData?.claims ?? null
 
   // Elimina chunks de auth viejos que ya no forman parte de la sesión actual.
   // Esto previene el error HTTP 431 (Request Header Fields Too Large) cuando

@@ -39,8 +39,9 @@ export default async function CampanaDetallePage({
 }) {
   const { id } = await params
   const supabase = await createSupabaseServer()
-  const [{ data: { user } }, campana, encuestas, recordatorios, permisoRecordatorio, jobsWA, plantillasWA] = await Promise.all([
-    supabase.auth.getUser(),
+  const [{ data: claimsData }, campana, encuestas, recordatorios, permisoRecordatorio, jobsWA, plantillasWA] = await Promise.all([
+    // getClaims verifica el JWT localmente, sin viaje a Supabase (ver middleware.ts).
+    supabase.auth.getClaims(),
     getCampanaById(id).catch(() => null),
     getCampanaConEncuestas(id),
     getRecordatoriosByCampana(id),
@@ -48,7 +49,7 @@ export default async function CampanaDetallePage({
     getJobsByCampana(id),
     getPlantillas(),
   ])
-  const esAdmin = ((user?.app_metadata?.role as string | undefined) ?? 'admin') === 'admin'
+  const esAdmin = ((claimsData?.claims.app_metadata?.role as string | undefined) ?? 'admin') === 'admin'
 
   if (!campana) notFound()
 

@@ -5,8 +5,9 @@ import { createSupabaseServer } from '@/lib/supabase/server'
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   const supabase = await createSupabaseServer()
-  const { data: { user } } = await supabase.auth.getUser()
-  const role = (user?.app_metadata?.role as string | undefined) ?? 'admin'
+  // getClaims verifica el JWT localmente, sin viaje a Supabase (ver middleware.ts).
+  const { data } = await supabase.auth.getClaims()
+  const role = (data?.claims.app_metadata?.role as string | undefined) ?? 'admin'
 
   return (
     <SidebarProvider>

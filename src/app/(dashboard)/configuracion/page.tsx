@@ -16,8 +16,9 @@ export default async function ConfiguracionPage() {
     createSupabaseServer(),
   ])
 
-  const { data: { user } } = await supabase.auth.getUser()
-  const currentUserId = user?.id ?? ''
+  // getClaims verifica el JWT localmente, sin viaje a Supabase (ver middleware.ts).
+  const { data } = await supabase.auth.getClaims()
+  const currentUserId = data?.claims.sub ?? ''
 
   return (
     <PageContainer title="Configuración">
