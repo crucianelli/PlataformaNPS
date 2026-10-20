@@ -1,3 +1,4 @@
+import { cache } from 'react'
 import { createSupabaseServer } from '@/lib/supabase/server'
 import { TECNOLOGIAS, type Tecnologia } from '@/lib/utils/tecnologia'
 import { getCalificacionesConfigPorSlug, type CalificacionConfigItem } from '../utils/calificaciones'
@@ -292,7 +293,20 @@ function mapRespuesta(row: RawEncuestaConRespuesta): RespuestaDetalle | null {
   }
 }
 
-export async function getRespuestas(filters: DashboardFilters = {}) {
+type FiltrosSql = Pick<DashboardFilters, 'campanaId' | 'tipoEncuestaId' | 'concesionario' | 'tecnologia'>
+
+/**
+ * Una misma página llama a `getRespuestas` muchas veces (la vista NPS, más de
+ * diez: una por panel y por tipo de encuesta), casi siempre con los mismos
+ * filtros. `cache` de React hace que dentro de un request la consulta a la base
+ * se ejecute una sola vez por combinación de filtros de SQL; los filtros que se
+ * aplican en memoria (texto, fechas, NPS, canal) se aplican después sobre una copia.
+ *
+ * La clave es un string porque `cache` compara argumentos por referencia: dos
+ * objetos de filtros iguales pero distintos no compartirían el resultado.
+ */
+const getRespuestasBase = cache(async (clave: string): Promise<RespuestaDetalle[]> => {
+  const filters = JSON.parse(clave) as FiltrosSql
   const supabase = await createSupabaseServer()
 
   // Si se filtra por tipo de encuesta, pre-filtramos los campana_ids
@@ -366,12 +380,25 @@ export async function getRespuestas(filters: DashboardFilters = {}) {
   const { data, error } = await query
   if (error) throw error
 
-  let respuestas = (data as unknown as RawEncuestaConRespuesta[])
+  return (data as unknown as RawEncuestaConRespuesta[])
     .map(mapRespuesta)
     .filter((item): item is RespuestaDetalle => Boolean(item))
     // Más recientes primero por fecha de respuesta: el .order() de arriba es
     // sobre encuestas.created_at y PostgREST no ordena el padre por un embed.
     .sort((a, b) => b.fechaRespuestaDate.getTime() - a.fechaRespuestaDate.getTime())
+})
+
+export async function getRespuestas(filters: DashboardFilters = {}): Promise<RespuestaDetalle[]> {
+  // Orden fijo de claves y sin `undefined`, para que filtros equivalentes den la misma clave.
+  const clave = JSON.stringify({
+    campanaId: filters.campanaId,
+    tipoEncuestaId: filters.tipoEncuestaId,
+    concesionario: filters.concesionario,
+    tecnologia: filters.tecnologia,
+  } satisfies FiltrosSql)
+
+  // Copia: el resultado cacheado lo comparten todas las llamadas del request.
+  let respuestas = [...(await getRespuestasBase(clave))]
 
   if (filters.q) {
     const needle = filters.q.toLowerCase()
@@ -658,7 +685,8 @@ function calcularCalificaciones(
 
 export type TipoEncuestaRef = { id: string; nombre: string; slug: string }
 
-async function getTiposEncuestaActivos(tipoEncuestaId?: string): Promise<TipoEncuestaRef[]> {
+// Cacheado por request: la vista NPS lo pide desde varios paneles a la vez.
+const getTiposEncuestaActivos = cache(async (tipoEncuestaId?: string): Promise<TipoEncuestaRef[]> => {
   const supabase = await createSupabaseServer()
 
   let query = supabase
@@ -673,7 +701,7 @@ async function getTiposEncuestaActivos(tipoEncuestaId?: string): Promise<TipoEnc
 
   const { data } = await query
   return data ?? []
-}
+})
 
 export type CalificacionesPorTipo = {
   tipo: TipoEncuestaRef
