@@ -1,3 +1,4 @@
+import { cache } from 'react'
 import { createSupabaseServer } from '@/lib/supabase/server'
 import type {
   ClientePendienteRecordatorio,
@@ -30,7 +31,8 @@ function mapMedidas(
   }))
 }
 
-export async function getRecordatoriosByCampana(campanaId: string): Promise<RecordatorioResumen[]> {
+// Cacheado por request: el detalle de campaña lo pide directo y vía puedeCrearRecordatorio.
+export const getRecordatoriosByCampana = cache(async (campanaId: string): Promise<RecordatorioResumen[]> => {
   await syncWorkflowEstados()
   const supabase = await createSupabaseServer()
   const { data, error } = await supabase
@@ -69,7 +71,7 @@ export async function getRecordatoriosByCampana(campanaId: string): Promise<Reco
   return Array.from(resumenMap.values()).sort(
     (a, b) => a.numero_recordatorio - b.numero_recordatorio
   )
-}
+})
 
 export async function getClientesPendientes(
   campanaId: string
