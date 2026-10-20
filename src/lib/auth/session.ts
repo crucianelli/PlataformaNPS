@@ -1,3 +1,4 @@
+import { cache } from 'react'
 import { headers } from 'next/headers'
 import { auth, type UserRole } from './index'
 
@@ -17,8 +18,13 @@ export type UsuarioSesion = {
   role: UserRole
 }
 
-/** Devuelve el usuario de la sesión, o `null` si no hay sesión válida. */
-export async function getUsuarioActual(): Promise<UsuarioSesion | null> {
+/**
+ * Devuelve el usuario de la sesión, o `null` si no hay sesión válida.
+ *
+ * Cacheado por request: el layout y la página lo piden en la misma carga y sin
+ * esto cada uno consultaba la base por separado.
+ */
+export const getUsuarioActual = cache(async (): Promise<UsuarioSesion | null> => {
   const sesion = await auth.api.getSession({ headers: await headers() })
   if (!sesion?.user) return null
 
@@ -30,7 +36,7 @@ export async function getUsuarioActual(): Promise<UsuarioSesion | null> {
     // Un usuario sin rol explícito es admin, igual que en el esquema anterior.
     role: (u.role ?? 'admin') as UserRole,
   }
-}
+})
 
 /** Igual que `getUsuarioActual` pero falla si no hay sesión. Para actions que ya asumen login. */
 export async function requireUsuario(): Promise<UsuarioSesion> {
