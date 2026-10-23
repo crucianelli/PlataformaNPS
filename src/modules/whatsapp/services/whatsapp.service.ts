@@ -117,7 +117,9 @@ export async function getJobConDetalle(jobId: string): Promise<JobConDetalle | n
   const supabase = await createSupabaseServer()
   const { data, error } = await supabase
     .from('envios_whatsapp_jobs')
-    .select(`*, plantilla:plantillas_whatsapp(nombre, tipo), detalles:envios_whatsapp_detalle(*)`)
+    // `script_activo` es una columna calculada (función SQL que recibe la fila):
+    // la calcula la base con su reloj, igual que cuando el script toma el job.
+    .select(`*, script_activo, plantilla:plantillas_whatsapp(nombre, tipo), detalles:envios_whatsapp_detalle(*)`)
     .eq('id', jobId)
     .single()
   if (error) return null

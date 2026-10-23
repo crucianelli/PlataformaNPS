@@ -366,36 +366,43 @@ export type Database = {
           completed_at: string | null
           created_at: string
           enviados: number
+          ejecucion_id: string | null
           errores: number
           estado: string
           id: string
           plantilla_id: string
+          script_activo: boolean | null
           started_at: string | null
           total_contactos: number
+          ultima_senal_at: string | null
         }
         Insert: {
           campana_id: string
           completed_at?: string | null
           created_at?: string
           enviados?: number
+          ejecucion_id?: string | null
           errores?: number
           estado?: string
           id?: string
           plantilla_id: string
           started_at?: string | null
           total_contactos?: number
+          ultima_senal_at?: string | null
         }
         Update: {
           campana_id?: string
           completed_at?: string | null
           created_at?: string
           enviados?: number
+          ejecucion_id?: string | null
           errores?: number
           estado?: string
           id?: string
           plantilla_id?: string
           started_at?: string | null
           total_contactos?: number
+          ultima_senal_at?: string | null
         }
         Relationships: [
           {
@@ -772,7 +779,23 @@ export type Database = {
     }
     Functions: {
       check_campanas_sin_actividad: { Args: never; Returns: undefined }
+      script_activo: {
+        Args: { "": Database["public"]["Tables"]["envios_whatsapp_jobs"]["Row"] }
+        Returns: boolean
+      }
       sync_encuestas_necesidad_llamado: { Args: never; Returns: number }
+      whatsapp_senal_job: {
+        Args: { p_ejecucion_id: string; p_job_id: string }
+        Returns: string
+      }
+      whatsapp_soltar_job: {
+        Args: { p_ejecucion_id: string; p_job_id: string }
+        Returns: string
+      }
+      whatsapp_tomar_job: {
+        Args: { p_ejecucion_id: string; p_job_id: string }
+        Returns: string
+      }
     }
     Enums: {
       area_llamado: "mkt_producto" | "comercial" | "posventa"
