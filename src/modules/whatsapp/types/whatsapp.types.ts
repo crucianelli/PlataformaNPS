@@ -18,4 +18,6 @@ export interface JobConPlantilla extends WhatsappJob {
 export interface JobConDetalle extends WhatsappJob {
   plantilla: Pick<PlantillaWhatsapp, 'nombre' | 'tipo'>
   detalles: WhatsappDetalle[]
+  /** Hay un script con el job tomado que dio señales de vida hace menos de un minuto. */
+  script_activo: boolean
 }

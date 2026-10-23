@@ -40,6 +40,8 @@ const jobSelect = {
   created_at: enviosWhatsappJobs.createdAt,
   started_at: enviosWhatsappJobs.startedAt,
   completed_at: enviosWhatsappJobs.completedAt,
+  ejecucion_id: enviosWhatsappJobs.ejecucionId,
+  ultima_senal_at: enviosWhatsappJobs.ultimaSenalAt,
 }
 
 const detalleSelect = {
@@ -139,7 +141,12 @@ export async function getAllJobs(): Promise<JobConCampana[]> {
 
 export async function getJobConDetalle(jobId: string): Promise<JobConDetalle | null> {
   const [job] = await db
-    .select({ ...jobSelect, plantilla: { nombre: plantillasWhatsapp.nombre, tipo: plantillasWhatsapp.tipo } })
+    .select({
+      ...jobSelect,
+      plantilla: { nombre: plantillasWhatsapp.nombre, tipo: plantillasWhatsapp.tipo },
+      // Se calcula en la base para medir con su reloj, igual que al tomar el job.
+      script_activo: sql<boolean>`script_activo(${enviosWhatsappJobs})`,
+    })
     .from(enviosWhatsappJobs)
     .innerJoin(plantillasWhatsapp, eq(enviosWhatsappJobs.plantillaId, plantillasWhatsapp.id))
     .where(eq(enviosWhatsappJobs.id, jobId))
@@ -287,40 +294,41 @@ export async function getJobParaAgente(jobId: string): Promise<JobParaAgente | n
   }
 }
 
+// ─── Quién tiene tomado el job ───────────────────────────────────────────────
+//
+// Cada corrida del script se presenta con un id propio y da señales de vida
+// cada pocos segundos. Mientras esté viva, nadie más puede tomar el job: eso es
+// lo que impide que "Reanudar" arranque un segundo script con el primero
+// todavía andando. La lógica vive en SQL (20261023000000_whatsapp_ejecucion_unica.sql)
+// porque la comparte con la versión de producción del script, que habla
+// directo con Supabase.
+
+export type ResultadoTomar = 'ok' | 'ocupado' | 'sin_pendientes' | 'no_existe'
+export type ResultadoSenal = 'seguir' | 'detenido' | 'reemplazado'
+
+export async function tomarJob(jobId: string, ejecucionId: string): Promise<ResultadoTomar> {
+  const [fila] = await db.execute<{ resultado: ResultadoTomar }>(
+    sql`select whatsapp_tomar_job(${jobId}::uuid, ${ejecucionId}::uuid) as resultado`,
+  )
+  return fila.resultado
+}
+
+export async function senalJob(jobId: string, ejecucionId: string): Promise<ResultadoSenal> {
+  const [fila] = await db.execute<{ resultado: ResultadoSenal }>(
+    sql`select whatsapp_senal_job(${jobId}::uuid, ${ejecucionId}::uuid) as resultado`,
+  )
+  return fila.resultado
+}
+
 /**
- * Cambia el estado del job desde el agente. Devuelve el estado que quedó, que
- * no siempre es el pedido.
- *
- * **Un job interrumpido no vuelve a `completado`.** El script corta el loop
- * cuando ve que lo detuvieron y después reporta que terminó; ese "terminé" no
- * puede pisar el hecho de que quedaron contactos sin mandar. Antes sí lo pisaba
- * y la plataforma mostraba "Completado" para campañas cortadas a la mitad.
+ * Suelta el job y devuelve el estado que quedó. Lo decide la base mirando las
+ * filas: `completado` solo si no quedó nadie pendiente.
  */
-export async function marcarJobEstado(
-  jobId: string,
-  estado: 'en_progreso' | 'completado' | 'error' | 'interrumpido',
-): Promise<JobEstado | null> {
-  const [actual] = await db
-    .select({ estado: enviosWhatsappJobs.estado })
-    .from(enviosWhatsappJobs)
-    .where(eq(enviosWhatsappJobs.id, jobId))
-    .limit(1)
-
-  if (!actual) return null
-
-  const estadoFinal = actual.estado === 'interrumpido' && estado === 'completado' ? 'interrumpido' : estado
-
-  await db
-    .update(enviosWhatsappJobs)
-    .set({
-      estado: estadoFinal,
-      // `coalesce` para no perder el arranque original si se relanza un job a medias.
-      startedAt: sql`coalesce(${enviosWhatsappJobs.startedAt}, now())`,
-      ...(estadoFinal === 'en_progreso' ? {} : { completedAt: sql`now()` }),
-    })
-    .where(eq(enviosWhatsappJobs.id, jobId))
-
-  return estadoFinal as JobEstado
+export async function soltarJob(jobId: string, ejecucionId: string): Promise<JobEstado | null> {
+  const [fila] = await db.execute<{ estado: JobEstado | null }>(
+    sql`select whatsapp_soltar_job(${jobId}::uuid, ${ejecucionId}::uuid) as estado`,
+  )
+  return fila.estado
 }
 
 /**

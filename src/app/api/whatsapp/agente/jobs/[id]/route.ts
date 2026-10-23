@@ -3,10 +3,9 @@ import { esAgenteAutorizado } from '@/lib/auth/agente'
 import { getJobParaAgente } from '@/modules/whatsapp/services/whatsapp.service'
 
 /**
- * El job y los contactos que faltan mandar, para el script del operador.
- *
- * El script vuelve a pedir esto entre contacto y contacto para enterarse de si
- * lo detuvieron desde la plataforma (`estado === 'interrumpido'`).
+ * El job y los contactos que faltan mandar, para el script del operador. Lo
+ * pide una vez, después de tomar el job (ver `/ejecucion`). Para enterarse de
+ * si lo detuvieron usa la señal de vida, que es mucho más liviana.
  */
 export async function GET(
   request: Request,

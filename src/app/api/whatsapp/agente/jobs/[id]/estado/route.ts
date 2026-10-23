@@ -1,35 +1,20 @@
 import { NextResponse } from 'next/server'
-import { z } from 'zod'
-import { esAgenteAutorizado } from '@/lib/auth/agente'
-import { marcarJobEstado } from '@/modules/whatsapp/services/whatsapp.service'
-
-const BodySchema = z.object({
-  estado: z.enum(['en_progreso', 'completado', 'error', 'interrumpido']),
-})
 
 /**
- * El script avisa que arrancó o que terminó.
+ * Lo usaba la versión anterior de `mensajes.py` para avisar que arrancaba y que
+ * terminaba. La reemplazó `/ejecucion`, que además impide que corran dos
+ * scripts a la vez sobre el mismo job.
  *
- * Ojo: el estado que queda no siempre es el que se pidió — un job detenido
- * desde la plataforma no vuelve a `completado`. Por eso la respuesta devuelve
- * `estado`, para que el script sepa con qué se quedó.
+ * Queda contestando para que un script viejo frene **antes de mandar nada**, con
+ * un mensaje que diga qué hacer — en vez de un 404 mudo. El script viejo llama
+ * acá antes del primer mensaje e imprime el `error` de la respuesta.
  */
-export async function POST(
-  request: Request,
-  { params }: { params: Promise<{ id: string }> },
-) {
-  if (!esAgenteAutorizado(request)) {
-    return NextResponse.json({ error: 'No autorizado' }, { status: 401 })
-  }
-
-  const parsed = BodySchema.safeParse(await request.json().catch(() => null))
-  if (!parsed.success) {
-    return NextResponse.json({ error: parsed.error.issues[0].message }, { status: 400 })
-  }
-
-  const { id } = await params
-  const estado = await marcarJobEstado(id, parsed.data.estado)
-  if (!estado) return NextResponse.json({ error: 'Job no encontrado' }, { status: 404 })
-
-  return NextResponse.json({ estado })
+export async function POST() {
+  return NextResponse.json(
+    {
+      error:
+        'Esta versión de mensajes.py quedó vieja. Copiá la nueva (scripts/whatsapp/mensajes.py del repo) en la carpeta del script y volvé a ejecutar.',
+    },
+    { status: 410 },
+  )
 }

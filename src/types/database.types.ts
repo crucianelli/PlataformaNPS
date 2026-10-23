@@ -363,36 +363,42 @@ export type Database = {
           completed_at: string | null
           created_at: string
           enviados: number
+          ejecucion_id: string | null
           errores: number
           estado: string
           id: string
           plantilla_id: string
           started_at: string | null
           total_contactos: number
+          ultima_senal_at: string | null
         }
         Insert: {
           campana_id: string
           completed_at?: string | null
           created_at?: string
           enviados?: number
+          ejecucion_id?: string | null
           errores?: number
           estado?: string
           id?: string
           plantilla_id: string
           started_at?: string | null
           total_contactos?: number
+          ultima_senal_at?: string | null
         }
         Update: {
           campana_id?: string
           completed_at?: string | null
           created_at?: string
           enviados?: number
+          ejecucion_id?: string | null
           errores?: number
           estado?: string
           id?: string
           plantilla_id?: string
           started_at?: string | null
           total_contactos?: number
+          ultima_senal_at?: string | null
         }
         Relationships: [
           {

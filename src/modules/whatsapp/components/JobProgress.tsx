@@ -3,27 +3,46 @@
 import { useEffect, useState, useCallback, useTransition } from 'react'
 import Badge from '@/components/ui/Badge'
 import { detenerJobAction } from '@/app/(dashboard)/whatsapp/actions'
-import type { JobConDetalle, JobEstado, DetalleEstado } from '../types/whatsapp.types'
+import type { JobConDetalle, DetalleEstado } from '../types/whatsapp.types'
 
 interface JobProgressProps {
   jobId: string
   initialData: JobConDetalle
 }
 
-const ESTADO_BADGE: Record<JobEstado, 'success' | 'warning' | 'info' | 'default' | 'danger'> = {
-  completado:   'success',
-  en_progreso:  'info',
-  pendiente:    'warning',
-  interrumpido: 'default',
-  error:        'danger',
+/**
+ * Lo que se muestra no sale solo del `estado` guardado: también importa si hay
+ * un script vivo. "Interrumpido" con el script todavía andando quiere decir que
+ * se pidió detenerlo y está terminando el mensaje en curso — ofrecer "Reanudar"
+ * ahí arrancaba un segundo script en paralelo. Y "en progreso" sin script vivo
+ * es que se cerró la ventana sin avisar.
+ */
+type Vista = 'corriendo' | 'deteniendo' | 'no_responde' | 'listo' | 'detenido' | 'terminado'
+
+function calcularVista(data: JobConDetalle, pendientes: number): Vista {
+  if (data.script_activo) return data.estado === 'en_progreso' ? 'corriendo' : 'deteniendo'
+  if (pendientes === 0) return 'terminado'
+  if (data.estado === 'pendiente') return 'listo'
+  if (data.estado === 'en_progreso') return 'no_responde'
+  return 'detenido'
 }
 
-const ESTADO_LABEL: Record<JobEstado, string> = {
-  completado:   'Completado',
-  en_progreso:  'En progreso',
-  pendiente:    'Listo para ejecutar',
-  interrumpido: 'Interrumpido',
-  error:        'Error',
+const VISTA_BADGE: Record<Vista, 'success' | 'warning' | 'info' | 'default' | 'danger'> = {
+  corriendo:   'info',
+  deteniendo:  'warning',
+  no_responde: 'danger',
+  listo:       'warning',
+  detenido:    'default',
+  terminado:   'success',
+}
+
+const VISTA_LABEL: Record<Vista, string> = {
+  corriendo:   'En progreso',
+  deteniendo:  'Deteniendo…',
+  no_responde: 'El script no responde',
+  listo:       'Listo para ejecutar',
+  detenido:    'Interrumpido',
+  terminado:   'Completado',
 }
 
 const DETALLE_BADGE: Record<DetalleEstado, 'success' | 'warning' | 'danger'> = {
@@ -41,10 +60,11 @@ export default function JobProgress({ jobId, initialData }: JobProgressProps) {
   const [data, setData] = useState<JobConDetalle>(initialData)
   const [isDetening, startDetener] = useTransition()
 
-  const isActive = data.estado === 'en_progreso' || data.estado === 'pendiente'
+  const pendientes = data.detalles.filter((d) => d.estado === 'pendiente').length
+  const vista = calcularVista(data, pendientes)
 
   const handleDetener = () => {
-    if (!confirm('¿Detener el envío? El script va a parar después del mensaje actual.')) return
+    if (!confirm('¿Detener el envío? Si está mandando un mensaje lo termina, y después para.')) return
     startDetener(async () => {
       await detenerJobAction(jobId)
       setData((prev) => ({ ...prev, estado: 'interrumpido' }))
@@ -63,12 +83,14 @@ export default function JobProgress({ jobId, initialData }: JobProgressProps) {
     }
   }, [jobId])
 
-  // Polling cada 5s mientras el job está activo
+  // Polling cada 5s mientras quede algo por pasar. También con el job detenido:
+  // si alguien aprieta "Reanudar", la pantalla tiene que enterarse sola.
+  const seguirActualizando = vista !== 'terminado'
   useEffect(() => {
-    if (!isActive) return
+    if (!seguirActualizando) return
     const id = setInterval(refresh, 5000)
     return () => clearInterval(id)
-  }, [isActive, refresh])
+  }, [seguirActualizando, refresh])
 
   const pct = data.total_contactos > 0
     ? Math.round((data.enviados / data.total_contactos) * 100)
@@ -82,7 +104,7 @@ export default function JobProgress({ jobId, initialData }: JobProgressProps) {
           { label: 'Total',    value: data.total_contactos, color: 'text-foreground' },
           { label: 'Enviados', value: data.enviados,        color: 'text-emerald-600' },
           { label: 'Errores',  value: data.errores,         color: 'text-destructive' },
-          { label: 'Pendientes', value: data.total_contactos - data.enviados - data.errores, color: 'text-amber-600' },
+          { label: 'Pendientes', value: pendientes, color: 'text-amber-600' },
         ].map((m) => (
           <div key={m.label} className="rounded-lg border border-border bg-card px-4 py-3 text-center">
             <p className={`text-2xl font-bold ${m.color}`}>{m.value}</p>
@@ -95,11 +117,11 @@ export default function JobProgress({ jobId, initialData }: JobProgressProps) {
       <div>
         <div className="mb-1 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Badge variant={ESTADO_BADGE[data.estado]}>{ESTADO_LABEL[data.estado]}</Badge>
+            <Badge variant={VISTA_BADGE[vista]}>{VISTA_LABEL[vista]}</Badge>
             <span className="text-sm text-muted-foreground">{data.plantilla.nombre}</span>
           </div>
           <div className="flex items-center gap-3">
-            {data.estado === 'en_progreso' && (
+            {vista === 'corriendo' && (
               <button
                 type="button"
                 onClick={handleDetener}
@@ -119,25 +141,37 @@ export default function JobProgress({ jobId, initialData }: JobProgressProps) {
             style={{ width: `${pct}%` }}
           />
         </div>
-        {isActive && (
+        {seguirActualizando && (
           <p className="mt-1 text-xs text-muted-foreground">Actualizando automáticamente cada 5 segundos…</p>
         )}
       </div>
 
+      {vista === 'deteniendo' && (
+        <div className="rounded-lg border border-dashed border-border bg-muted/40 px-4 py-4 text-center">
+          <p className="text-sm text-foreground">
+            El script termina lo que está haciendo y se cierra. Suele tardar unos segundos.
+          </p>
+          <p className="mt-1 text-xs text-muted-foreground">
+            Cuando se cierre vas a poder reanudar el envío desde donde quedó.
+          </p>
+        </div>
+      )}
+
       {/* Acciones */}
-      {(data.estado === 'pendiente' || data.estado === 'interrumpido') && (
+      {(vista === 'listo' || vista === 'detenido' || vista === 'no_responde') && (
         <div className="rounded-lg border border-dashed border-brand/40 bg-brand/5 px-4 py-4 text-center">
           <p className="mb-3 text-sm text-foreground">
-            {data.estado === 'pendiente'
-              ? 'El job está listo. Hacé clic para lanzar el script en tu PC.'
-              : 'El script se interrumpió. Podés retomarlo desde donde quedó.'}
+            {vista === 'listo' && 'El job está listo. Hacé clic para lanzar el script en tu PC.'}
+            {vista === 'detenido' && 'El envío quedó interrumpido. Al reanudar, solo se le manda a quien falta.'}
+            {vista === 'no_responde' &&
+              'El script dejó de dar señales hace más de un minuto: se cerró la ventana, se apagó la PC o se cortó internet. Podés retomarlo desde donde quedó.'}
           </p>
           <a
             href={`whatsapp-sender://run?job=${jobId}`}
             className="inline-flex items-center gap-2 rounded-lg bg-brand px-5 py-2.5 text-sm
                        font-semibold text-white shadow hover:bg-brand/90 transition-colors"
           >
-            {data.estado === 'pendiente' ? '▶ Ejecutar script' : '↺ Reanudar script'}
+            {vista === 'listo' ? '▶ Ejecutar script' : '↺ Reanudar script'}
           </a>
           <p className="mt-2 text-xs text-muted-foreground">
             Requiere tener el protocol handler instalado en la PC.

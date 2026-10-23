@@ -253,6 +253,10 @@ export const enviosWhatsappJobs = pgTable("envios_whatsapp_jobs", {
 	createdAt: timestamp("created_at", { withTimezone: true, mode: 'string' }).defaultNow().notNull(),
 	startedAt: timestamp("started_at", { withTimezone: true, mode: 'string' }),
 	completedAt: timestamp("completed_at", { withTimezone: true, mode: 'string' }),
+	// Qué corrida de mensajes.py tiene tomado el job, y cuándo dio señales de
+	// vida por última vez (ver 20261023000000_whatsapp_ejecucion_unica.sql).
+	ejecucionId: uuid("ejecucion_id"),
+	ultimaSenalAt: timestamp("ultima_senal_at", { withTimezone: true, mode: 'string' }),
 }, (table) => [
 	index("idx_whatsapp_jobs_campana").using("btree", table.campanaId.asc().nullsLast().op("uuid_ops")),
 	index("idx_whatsapp_jobs_estado").using("btree", table.estado.asc().nullsLast().op("text_ops")),
