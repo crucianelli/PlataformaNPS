@@ -57,7 +57,7 @@ export async function guardarRespuestaFinGarantiaAction(
     calificacion_funcionamiento_anual: formData.get('calificacion_funcionamiento_anual'),
     tuvo_problemas_tecnicos:           formData.get('tuvo_problemas_tecnicos'),
     calificacion_resolucion_problemas: formData.get('calificacion_resolucion_problemas') || undefined,
-    comentario_problemas:              formData.get('comentario_problemas'),
+    comentario_problemas:              formData.get('comentario_problemas') ?? undefined,
     nps_producto:                      formData.get('nps_producto'),
     nps_concesionario:                 formData.get('nps_concesionario'),
     nps_empresa:                       formData.get('nps_empresa'),
