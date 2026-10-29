@@ -1,6 +1,7 @@
 import { createSupabaseServer, createSupabaseAdmin } from '@/lib/supabase/server'
 import type { CampanaEstado } from '../types/campana.types'
 import type { Tecnologia } from '@/lib/utils/tecnologia'
+import { calcularEstadoRecordatorio } from '@/lib/utils/recordatorioEstado'
 
 export type OFElegible = {
   clienteId: string
@@ -17,17 +18,23 @@ export async function getCampanas(filtros?: { tipoEncuestaId?: string }) {
   const supabase = await createSupabaseServer()
   let query = supabase
     .from('campanas')
-    .select('*, encuestas(estado), tipos_encuesta(id, nombre, slug)')
+    .select('*, encuestas(estado), tipos_encuesta(id, nombre, slug), envios(numero_recordatorio, estado_envio, fecha_envio, created_at)')
     .order('created_at', { ascending: false })
 
   if (filtros?.tipoEncuestaId) {
     query = query.eq('tipo_encuesta_id', filtros.tipoEncuestaId)
   }
 
-  const { data, error } = await query
+  const [{ data, error }, { data: config }] = await Promise.all([
+    query,
+    supabase.from('system_config').select('dias_notificacion_inicial').limit(1).maybeSingle(),
+  ])
   if (error) throw error
 
-  return data.map((c) => {
+  const diasAviso = config?.dias_notificacion_inicial ?? 2
+  const now = Date.now()
+
+  return data.map(({ envios, ...c }) => {
     const tipo = Array.isArray(c.tipos_encuesta) ? c.tipos_encuesta[0] : c.tipos_encuesta
     return {
       ...c,
@@ -36,6 +43,13 @@ export async function getCampanas(filtros?: { tipoEncuestaId?: string }) {
       pendientes:  c.encuestas.filter((e) => e.estado !== 'respondida' && e.estado !== 'sin_respuesta').length,
       tipoNombre:  tipo?.nombre ?? null,
       tipoSlug:    tipo?.slug ?? null,
+      recordatorio: calcularEstadoRecordatorio({
+        estadoCampana: c.estado,
+        envios,
+        sinResponder: c.encuestas.filter((e) => e.estado === 'pendiente' || e.estado === 'recordatorio_enviado').length,
+        diasAviso,
+        now,
+      }),
     }
   })
 }

@@ -1,4 +1,5 @@
 import type { Tables, TablesInsert } from '@/types/database.types'
+import type { EstadoRecordatorio } from '@/lib/utils/recordatorioEstado'
 
 export type Campana = Tables<'campanas'>
 export type CampanaInsert = TablesInsert<'campanas'>
@@ -10,6 +11,7 @@ export type CampanaConConteos = Campana & {
   pendientes: number
   tipoNombre: string | null
   tipoSlug: string | null
+  recordatorio: EstadoRecordatorio
 }
 
 export type EncuestaDeCampana = {

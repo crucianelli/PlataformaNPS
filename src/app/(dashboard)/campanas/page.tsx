@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { getCampanas, getTiposEncuesta } from '@/modules/campanas/services/campanas.service'
 import CampanasTable from '@/modules/campanas/components/CampanasTable'
+import RecordatoriosPendientesAviso from '@/modules/campanas/components/RecordatoriosPendientesAviso'
 import PageContainer from '@/components/layout/PageContainer'
 import Button from '@/components/ui/Button'
 import { Card, CardContent } from '@/components/ui/Card'
@@ -60,6 +61,8 @@ export default async function CampanasPage({ searchParams }: Props) {
             </span>
           )}
         </form>
+
+        <RecordatoriosPendientesAviso campanas={campanas} />
 
         <Card>
           <CardContent className="p-0">

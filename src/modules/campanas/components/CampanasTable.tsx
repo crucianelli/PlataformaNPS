@@ -3,6 +3,7 @@ import Badge from '@/components/ui/Badge'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/Table'
 import type { CampanaConConteos } from '../types/campana.types'
 import EliminarCampanaForm from './EliminarCampanaForm'
+import RecordatorioEstadoBadge from './RecordatorioEstadoBadge'
 
 const estadoBadge: Record<string, 'success' | 'info' | 'default'> = {
   activa:     'success',
@@ -40,6 +41,7 @@ export default function CampanasTable({ campanas }: CampanasTableProps) {
           <TableHead className="text-right">Respondidas</TableHead>
           <TableHead className="text-right">Pendientes</TableHead>
           <TableHead className="text-right">Tasa</TableHead>
+          <TableHead>Recordatorio</TableHead>
           <TableHead />
         </TableRow>
       </TableHeader>
@@ -70,6 +72,9 @@ export default function CampanasTable({ campanas }: CampanasTableProps) {
               <TableCell className="text-right tabular-nums text-green-700">{c.respondidas}</TableCell>
               <TableCell className="text-right tabular-nums text-yellow-700">{c.pendientes}</TableCell>
               <TableCell className="text-right tabular-nums font-medium">{tasa}%</TableCell>
+              <TableCell>
+                <RecordatorioEstadoBadge estado={c.recordatorio} />
+              </TableCell>
               <TableCell className="text-right">
                 <div className="flex flex-wrap items-center justify-end gap-3">
                   <Link
