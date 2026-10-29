@@ -1,8 +1,9 @@
 import { db } from '@/lib/db/client'
-import { campanas, clientes, encuestas, tiposEncuesta } from '@/lib/db/schema'
+import { campanas, clientes, encuestas, envios, systemConfig, tiposEncuesta } from '@/lib/db/schema'
 import { and, desc, eq, lte, sql } from 'drizzle-orm'
 import type { CampanaEstado } from '../types/campana.types'
 import type { Tecnologia } from '@/lib/utils/tecnologia'
+import { calcularEstadoRecordatorio, type EnvioParaEstado } from '@/lib/utils/recordatorioEstado'
 
 export type OFElegible = {
   clienteId: string
@@ -25,21 +26,57 @@ const campanaSelect = {
 }
 
 export async function getCampanas(filtros?: { tipoEncuestaId?: string }) {
-  return db
-    .select({
-      ...campanaSelect,
-      tipoNombre: tiposEncuesta.nombre,
-      tipoSlug: tiposEncuesta.slug,
-      total: sql<number>`count(${encuestas.id})::int`,
-      respondidas: sql<number>`count(${encuestas.id}) filter (where ${encuestas.estado} = 'respondida')::int`,
-      pendientes: sql<number>`count(${encuestas.id}) filter (where ${encuestas.estado} not in ('respondida', 'sin_respuesta'))::int`,
-    })
-    .from(campanas)
-    .leftJoin(tiposEncuesta, eq(campanas.tipoEncuestaId, tiposEncuesta.id))
-    .leftJoin(encuestas, eq(encuestas.campanaId, campanas.id))
-    .where(filtros?.tipoEncuestaId ? eq(campanas.tipoEncuestaId, filtros.tipoEncuestaId) : undefined)
-    .groupBy(campanas.id, tiposEncuesta.nombre, tiposEncuesta.slug)
-    .orderBy(desc(campanas.createdAt))
+  const [lista, enviosResumen, [config]] = await Promise.all([
+    db
+      .select({
+        ...campanaSelect,
+        tipoNombre: tiposEncuesta.nombre,
+        tipoSlug: tiposEncuesta.slug,
+        total: sql<number>`count(${encuestas.id})::int`,
+        respondidas: sql<number>`count(${encuestas.id}) filter (where ${encuestas.estado} = 'respondida')::int`,
+        pendientes: sql<number>`count(${encuestas.id}) filter (where ${encuestas.estado} not in ('respondida', 'sin_respuesta'))::int`,
+        sinResponder: sql<number>`count(${encuestas.id}) filter (where ${encuestas.estado} in ('pendiente', 'recordatorio_enviado'))::int`,
+      })
+      .from(campanas)
+      .leftJoin(tiposEncuesta, eq(campanas.tipoEncuestaId, tiposEncuesta.id))
+      .leftJoin(encuestas, eq(encuestas.campanaId, campanas.id))
+      .where(filtros?.tipoEncuestaId ? eq(campanas.tipoEncuestaId, filtros.tipoEncuestaId) : undefined)
+      .groupBy(campanas.id, tiposEncuesta.nombre, tiposEncuesta.slug)
+      .orderBy(desc(campanas.createdAt)),
+    // Un envío por cliente: alcanza con una fila por campaña + número + estado.
+    db
+      .select({
+        campanaId: envios.campanaId,
+        numero_recordatorio: envios.numeroRecordatorio,
+        estado_envio: envios.estadoEnvio,
+        fecha_envio: sql<string | null>`max(${envios.fechaEnvio})`,
+        created_at: sql<string | null>`min(${envios.createdAt})`,
+      })
+      .from(envios)
+      .groupBy(envios.campanaId, envios.numeroRecordatorio, envios.estadoEnvio),
+    db.select({ diasNotificacionInicial: systemConfig.diasNotificacionInicial }).from(systemConfig).limit(1),
+  ])
+
+  const enviosPorCampana = new Map<string, EnvioParaEstado[]>()
+  for (const { campanaId, ...envio } of enviosResumen) {
+    const actual = enviosPorCampana.get(campanaId) ?? []
+    actual.push(envio)
+    enviosPorCampana.set(campanaId, actual)
+  }
+
+  const diasAviso = config?.diasNotificacionInicial ?? 2
+  const now = Date.now()
+
+  return lista.map(({ sinResponder, ...c }) => ({
+    ...c,
+    recordatorio: calcularEstadoRecordatorio({
+      estadoCampana: c.estado,
+      envios: enviosPorCampana.get(c.id) ?? [],
+      sinResponder,
+      diasAviso,
+      now,
+    }),
+  }))
 }
 
 export async function getCampanaById(id: string) {
