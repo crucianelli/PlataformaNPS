@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader } from '@/components/ui/Card'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/Table'
 import CambiarEstadoForm from '@/modules/campanas/components/CambiarEstadoForm'
 import EliminarCampanaForm from '@/modules/campanas/components/EliminarCampanaForm'
+import RenombrarCampanaForm from '@/modules/campanas/components/RenombrarCampanaForm'
 import EliminarEncuestaForm from '@/modules/campanas/components/EliminarEncuestaForm'
 import RecordatoriosTimeline from '@/modules/recordatorios/components/RecordatoriosTimeline'
 import { getRecordatoriosByCampana, puedeCrearRecordatorio } from '@/modules/recordatorios/services/recordatorios.service'
@@ -68,6 +69,7 @@ export default async function CampanaDetallePage({
           >
             Exportar pendientes
           </a>
+          <RenombrarCampanaForm campanaId={id} campanaNombre={campana.nombre} />
           <EliminarCampanaForm campanaId={id} campanaNombre={campana.nombre} />
         </>
       }

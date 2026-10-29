@@ -46,6 +46,11 @@ const EliminarEncuestaSchema = z.object({
   encuesta_id: z.string().uuid('Encuesta inválida.'),
 })
 
+const RenombrarCampanaSchema = z.object({
+  id: z.string().uuid('Campaña inválida.'),
+  nombre: z.string().trim().min(1, 'El nombre no puede quedar vacío.').max(200, 'El nombre es muy largo (máximo 200 caracteres).'),
+})
+
 type ActionState = { error?: string }
 
 export async function crearCampanaAction(
@@ -177,6 +182,40 @@ export async function cambiarEstadoCampanaAction(
   revalidatePath(`/campanas/${parsed.data.id}`)
   revalidatePath('/campanas')
   return {}
+}
+
+export async function renombrarCampanaAction(
+  _prevState: ActionState & { ok?: boolean },
+  formData: FormData
+): Promise<ActionState & { ok?: boolean }> {
+  try {
+    await getRoleOrThrow()
+  } catch {
+    return { error: 'No tenés permisos para renombrar una campaña.' }
+  }
+
+  const parsed = RenombrarCampanaSchema.safeParse({
+    id: formData.get('campana_id'),
+    nombre: formData.get('nombre'),
+  })
+  if (!parsed.success) return { error: parsed.error.issues[0]?.message ?? 'Datos inválidos.' }
+
+  try {
+    const filas = await db
+      .update(campanas)
+      .set({ nombre: parsed.data.nombre })
+      .where(eq(campanas.id, parsed.data.id))
+      .returning({ id: campanas.id })
+    if (filas.length === 0) return { error: 'La campaña ya no existe.' }
+  } catch (e) {
+    console.error('renombrarCampanaAction', e)
+    return { error: 'No se pudo cambiar el nombre.' }
+  }
+
+  // El nombre aparece en el listado, los filtros del dashboard, respuestas y
+  // WhatsApp: se revalida todo.
+  revalidatePath('/', 'layout')
+  return { ok: true }
 }
 
 export async function eliminarCampanaAction(
