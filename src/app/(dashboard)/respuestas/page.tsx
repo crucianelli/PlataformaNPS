@@ -22,6 +22,7 @@ export default async function RespuestasPage({
   searchParams: Promise<{
     concesionario?: string
     campanaId?: string
+    tipoEncuestaId?: string
     q?: string
     fechaDesde?: string
     fechaHasta?: string
@@ -35,6 +36,7 @@ export default async function RespuestasPage({
   const {
     concesionario,
     campanaId,
+    tipoEncuestaId,
     q,
     fechaDesde,
     fechaHasta,
@@ -50,11 +52,14 @@ export default async function RespuestasPage({
   const estadoNpsFilter = normalizeNpsAnswerStatus(estadoNps)
   const npsDimensionFilter = normalizeNpsDimension(npsDimension)
   const canalFilter = canal === 'mensaje' || canal === 'llamado' ? canal : undefined
+  // Solo un UUID bien formado: otro valor haría fallar la consulta en Postgres.
+  const tipoEncuestaFilter = tipoEncuestaId && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(tipoEncuestaId) ? tipoEncuestaId : undefined
   const [options, respuestas] = await Promise.all([
     getDashboardFilterOptions(),
     getRespuestas({
       concesionario,
       campanaId,
+      tipoEncuestaId: tipoEncuestaFilter,
       q,
       fechaDesde,
       fechaHasta,
@@ -73,6 +78,7 @@ export default async function RespuestasPage({
   if (q) filterParams.set('q', q)
   if (concesionario) filterParams.set('concesionario', concesionario)
   if (campanaId) filterParams.set('campanaId', campanaId)
+  if (tipoEncuestaFilter) filterParams.set('tipoEncuestaId', tipoEncuestaFilter)
   if (fechaDesde) filterParams.set('fechaDesde', fechaDesde)
   if (fechaHasta) filterParams.set('fechaHasta', fechaHasta)
   if (tecnologiaFilter) filterParams.set('tecnologia', tecnologiaFilter)
@@ -106,6 +112,24 @@ export default async function RespuestasPage({
                     placeholder="Cliente, email, campaña..."
                     className="block w-full rounded-md border border-border bg-card px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
                   />
+                </div>
+                <div>
+                  <label htmlFor="tipoEncuestaId" className="mb-1 block text-sm font-medium text-foreground">
+                    Tipo de encuesta
+                  </label>
+                  <select
+                    id="tipoEncuestaId"
+                    name="tipoEncuestaId"
+                    defaultValue={tipoEncuestaFilter ?? ''}
+                    className="block w-full rounded-md border border-border bg-card px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+                  >
+                    <option value="">Todos</option>
+                    {options.tiposEncuesta.map((item) => (
+                      <option key={item.id} value={item.id}>
+                        {item.nombre}
+                      </option>
+                    ))}
+                  </select>
                 </div>
                 <div>
                   <label htmlFor="concesionario" className="mb-1 block text-sm font-medium text-foreground">
