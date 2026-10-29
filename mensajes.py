@@ -1,8 +1,13 @@
 import pyautogui as pg
 import time
+import ctypes
 import random
 import subprocess
+import win32api
 import win32clipboard
+import win32con
+import win32gui
+import win32process
 from PIL import Image
 import io
 import os
@@ -350,65 +355,283 @@ def cargar_imagen(ruta):
     output.close()
     return data
 
+# ─── Ventana de WhatsApp ────────────────────────────────────────────────────
+#
+# Hasta oct-2026 el chat se abría como una pestaña más, el script hacía clic en
+# un punto fijo de la pantalla (700, 500) y cerraba con Ctrl+W. Las tres cosas
+# caían sobre la ventana que estuviera al frente: si Chrome no había pasado
+# adelante (Windows a veces no lo deja) o si justo estabas usando otra cosa, el
+# clic, el texto y el Ctrl+W iban a parar a otro programa. Y aunque Chrome
+# estuviera al frente, ese punto queda en el medio del chat, donde puede haber
+# un link o una foto de un mensaje anterior.
+#
+# Ahora cada chat se abre en su propia ventana de Chrome y el script:
+#   - espera a que sueltes el mouse y el teclado antes de tomar la pantalla;
+#   - no aprieta nada si esa ventana no quedó al frente, y frena si en el medio
+#     pasás a otra;
+#   - hace clic en la caja de texto (abajo de todo), no en el medio del chat;
+#   - te devuelve el mouse a donde estaba y la ventana que estabas usando;
+#   - cierra ESA ventana, sin Ctrl+W.
+
+# Segundos sin tocar mouse ni teclado antes de tomar la pantalla.
+PC_LIBRE = 2.0
+
+class VentanaPerdida(Exception):
+    """La ventana del chat dejó de estar al frente: no se aprieta nada más."""
+
+
+def _ejecutable(hwnd):
+    _, pid = win32process.GetWindowThreadProcessId(hwnd)
+    kernel32 = ctypes.windll.kernel32
+    proceso = kernel32.OpenProcess(0x1000, False, pid)  # PROCESS_QUERY_LIMITED_INFORMATION
+    if not proceso:
+        return ''
+    try:
+        largo = ctypes.c_ulong(1024)
+        ruta = ctypes.create_unicode_buffer(largo.value)
+        if kernel32.QueryFullProcessImageNameW(proceso, 0, ruta, ctypes.byref(largo)):
+            return ruta.value
+        return ''
+    finally:
+        kernel32.CloseHandle(proceso)
+
+
+def ventanas_abiertas():
+    ventanas = set()
+    win32gui.EnumWindows(lambda hwnd, _: ventanas.add(hwnd) or True, None)
+    return ventanas
+
+
+def _es_el_chat(hwnd):
+    # Spotify, VS Code, Docker Desktop y otras apps usan la misma clase de
+    # ventana que Chrome: por eso se mira también el programa.
+    try:
+        return (
+            win32gui.IsWindowVisible(hwnd)
+            and win32gui.GetClassName(hwnd) == 'Chrome_WidgetWin_1'
+            and 'whatsapp' in win32gui.GetWindowText(hwnd).lower()
+            and os.path.basename(_ejecutable(hwnd)).lower() == os.path.basename(CHROME_PATH).lower()
+        )
+    except Exception:
+        return False
+
+
+def buscar_ventana_nueva(antes):
+    """La ventana del chat que se abrió después de la foto `antes`, o None."""
+    for hwnd in ventanas_abiertas() - antes:
+        if _es_el_chat(hwnd):
+            return hwnd
+    return None
+
+
+def al_frente(hwnd):
+    return win32gui.GetForegroundWindow() == hwnd
+
+
+def exigir_al_frente(hwnd):
+    if not al_frente(hwnd):
+        raise VentanaPerdida()
+
+
+def traer_al_frente(hwnd):
+    try:
+        win32gui.ShowWindow(hwnd, win32con.SW_MAXIMIZE)
+        # Que WhatsApp se acomode al tamaño nuevo antes de hacer clic.
+        time.sleep(1.0)
+    except Exception:
+        pass
+    for _ in range(4):
+        if al_frente(hwnd):
+            return True
+        try:
+            # Windows no deja que un programa pase una ventana al frente si no
+            # es el que estás usando. Un Alt simulado lo destraba; solo se
+            # manda si hace falta, porque en Chrome el Alt enfoca el menú.
+            pg.press('alt')
+            win32gui.SetForegroundWindow(hwnd)
+        except Exception:
+            pass
+        time.sleep(0.4)
+    return al_frente(hwnd)
+
+
+def segundos_sin_usar_la_pc():
+    return ((win32api.GetTickCount() - win32api.GetLastInputInfo()) & 0xFFFFFFFF) / 1000
+
+
+def esperar_pc_libre(ejecucion):
+    avisado = False
+    while segundos_sin_usar_la_pc() < PC_LIBRE:
+        if not avisado:
+            print("   ✋ Estás usando la PC: espero a que sueltes el mouse y el teclado un par de segundos.")
+            avisado = True
+        ejecucion.esperar(0.5)
+
+
+def devolver_mouse(posicion):
+    x, y = posicion
+    # Dejarlo justo en una esquina dispararía el freno de emergencia en la
+    # próxima acción del script.
+    if (x, y) in pg.FAILSAFE_POINTS:
+        ancho, alto = pg.size()
+        x = min(max(x, 5), ancho - 6)
+        y = min(max(y, 5), alto - 6)
+    try:
+        win32api.SetCursorPos((x, y))
+    except Exception:
+        pass
+
+
+def clic_en_caja_de_texto(hwnd):
+    """
+    Clic en la caja donde se escribe: abajo de todo, en el panel del chat.
+    Ahí no hay mensajes, links ni fotos que se puedan abrir por error.
+    """
+    izquierda, arriba, derecha, abajo = win32gui.GetClientRect(hwnd)
+    x0, _ = win32gui.ClientToScreen(hwnd, (izquierda, arriba))
+    x1, y1 = win32gui.ClientToScreen(hwnd, (derecha, abajo))
+    x = int(x0 + (x1 - x0) * 0.62)
+    y = y1 - 30
+    posicion = win32api.GetCursorPos()
+    try:
+        pg.click(x, y)
+    finally:
+        devolver_mouse(posicion)
+
+
+def cerrar_ventana(hwnd):
+    if not hwnd:
+        return
+    try:
+        if win32gui.IsWindow(hwnd):
+            win32gui.PostMessage(hwnd, win32con.WM_CLOSE, 0, 0)
+    except Exception:
+        return
+    for _ in range(15):
+        if not win32gui.IsWindow(hwnd):
+            return
+        time.sleep(0.2)
+
+
+def devolver_foco(anterior, ventana):
+    if not anterior or anterior == ventana:
+        return
+    try:
+        if win32gui.IsWindow(anterior) and not al_frente(anterior):
+            win32gui.SetForegroundWindow(anterior)
+    except Exception:
+        # Si Windows no lo deja, queda al frente la ventana que estaba atrás
+        # del chat, que casi siempre es la misma.
+        pass
+
 # ─── Envío ──────────────────────────────────────────────────────────────────
 
-def cerrar_pestana():
-    pg.hotkey('ctrl', 'w')
-
-def mandar_a(ejecucion, contacto, espera_carga, imagen):
-    nombre = contacto['nombre']
-
-    subprocess.Popen([CHROME_PATH, f"https://web.whatsapp.com/send?phone={contacto['celular']}"])
+def abrir_chat(ejecucion, contacto, espera_carga):
+    """
+    Abre el chat en una ventana nueva. Devuelve esa ventana (o None si no
+    apareció) y la que estabas usando antes de que se abriera.
+    """
+    anterior = win32gui.GetForegroundWindow()
+    antes = ventanas_abiertas()
+    subprocess.Popen([
+        CHROME_PATH, '--new-window',
+        f"https://web.whatsapp.com/send?phone={contacto['celular']}",
+    ])
+    ventana = None
     try:
         ejecucion.esperar(espera_carga)
-    except Corte as corte:
-        # El chat está abierto pero todavía no se escribió nada: se cierra la
-        # pestaña y no queda nada a medias. Si otra ventana tomó el job no se
-        # toca nada: el Ctrl+W podría cerrarle la pestaña a ella.
-        if corte.motivo == 'detenido':
-            cerrar_pestana()
+        # Normalmente ya está; si Chrome tardó en arrancar, un rato más.
+        for _ in range(10):
+            ventana = buscar_ventana_nueva(antes)
+            if ventana:
+                return ventana, anterior
+            ejecucion.esperar(1)
+        return None, anterior
+    except Corte:
+        # Todavía no se escribió nada: se cierra y no queda nada a medias. Es
+        # la ventana de esta corrida, así que no hay riesgo de cerrarle algo a
+        # otra.
+        cerrar_ventana(ventana or buscar_ventana_nueva(antes))
         raise
 
-    # De acá hasta el Enter no se corta: un "Detener" en el medio dejaría un
-    # mensaje a medio pegar en el chat del cliente. Son unos pocos segundos.
+
+def mandar_a(ejecucion, contacto, espera_carga, imagen):
+    """'enviado', 'error' o 'salteado' (no se mandó y queda pendiente)."""
+    nombre = contacto['nombre']
+
+    ventana, anterior = abrir_chat(ejecucion, contacto, espera_carga)
+    if not ventana:
+        print(f"⚠️  No encontré la ventana de WhatsApp de {nombre}. No toqué nada; queda pendiente.")
+        return 'salteado'
+
     try:
-        # Click en el chat, para que la ventana de Chrome tenga el foco.
-        pg.moveTo(700 + random.randint(-50, 50), 500 + random.randint(-50, 50), duration=random.uniform(0.5, 1.0))
-        pg.click()
-        time.sleep(random.uniform(0.8, 1.5))
+        esperar_pc_libre(ejecucion)
+    except Corte:
+        cerrar_ventana(ventana)
+        raise
 
-        # WhatsApp manda a la caja de texto cualquier tecla que se apriete con el
-        # chat abierto: la "x" la enfoca. Ctrl+A y borrar la deja vacía, por si
-        # había un borrador de antes que se mezclaría con el mensaje.
-        pg.press('x')
-        pg.hotkey('ctrl', 'a')
-        pg.press('backspace')
+    # De acá hasta el Enter no se corta por un "Detener": dejaría un mensaje a
+    # medio pegar en el chat del cliente. Son unos pocos segundos.
+    # La ventana a la que volver: la que estás usando ahora, o la de antes de
+    # abrir el chat si Chrome ya pasó al frente solo.
+    actual = win32gui.GetForegroundWindow()
+    if actual != ventana:
+        anterior = actual
+    resultado = 'salteado'
+    error = None
+    try:
+        if not traer_al_frente(ventana):
+            print(f"⚠️  Windows no dejó traer WhatsApp al frente. No toqué nada; {nombre} queda pendiente.")
+        else:
+            # El clic deja el foco en la caja de texto. Ctrl+A y borrar la
+            # vacía, por si había un borrador de antes que se mezclaría.
+            clic_en_caja_de_texto(ventana)
+            time.sleep(random.uniform(0.5, 1.0))
+            exigir_al_frente(ventana)
+            pg.press('x')
+            pg.hotkey('ctrl', 'a')
+            pg.press('backspace')
 
-        if imagen:
-            copiar_imagen(imagen)
+            if imagen:
+                exigir_al_frente(ventana)
+                copiar_imagen(imagen)
+                pg.hotkey('ctrl', 'v')
+                # Se abre la vista previa de la imagen, con el foco en el epígrafe.
+                time.sleep(random.uniform(3, 4))
+
+            exigir_al_frente(ventana)
+            copiar_texto(contacto['mensaje'])
             pg.hotkey('ctrl', 'v')
-            # Se abre la vista previa de la imagen, con el foco en el epígrafe.
-            time.sleep(random.uniform(3, 4))
+            time.sleep(random.uniform(1, 2))
 
-        copiar_texto(contacto['mensaje'])
-        pg.hotkey('ctrl', 'v')
-        time.sleep(random.uniform(1, 2))
-        pg.press('enter')
+            exigir_al_frente(ventana)
+            pg.press('enter')
+            resultado = 'enviado'
+    except VentanaPerdida:
+        # El mensaje puede haber quedado escrito sin mandar en ese chat; la
+        # próxima vez se borra con el Ctrl+A de arriba.
+        print(f"⚠️  Cambiaste de ventana mientras escribía el mensaje de {nombre}: no lo mandé, queda pendiente.")
     except pg.FailSafeException:
         # Mouse llevado a una esquina de la pantalla: freno de emergencia de
         # pyautogui. No es un error de este contacto, es "pará todo".
+        cerrar_ventana(ventana)
         raise
     except Exception as e:
         print(f"❌ Error con {nombre}: {e}")
-        reportar_contacto(ejecucion.job_id, contacto['id'], 'error', error=e)
-    else:
+        resultado, error = 'error', e
+
+    if resultado == 'error':
+        reportar_contacto(ejecucion.job_id, contacto['id'], 'error', error=error)
+    elif resultado == 'enviado':
         reportar_contacto(ejecucion.job_id, contacto['id'], 'enviado')
         print(f"✅ Enviado a {nombre}.")
+        # Darle tiempo a que salga (con imagen, a que se suba) antes de cerrar
+        # la ventana: cerrarla antes puede dejar el mensaje sin mandar.
+        time.sleep(random.uniform(4, 6) if imagen else random.uniform(2, 3))
 
-    # Darle tiempo a que salga (con imagen, a que se suba) antes de cerrar la
-    # pestaña: cerrarla antes puede dejar el mensaje sin mandar.
-    time.sleep(random.uniform(4, 6) if imagen else random.uniform(2, 3))
-    cerrar_pestana()
+    cerrar_ventana(ventana)
+    devolver_foco(anterior, ventana)
+    return resultado
 
 def _promedio(rango):
     return (rango[0] + rango[1]) / 2
@@ -465,6 +688,10 @@ def enviar(ejecucion, job):
 
     print(f"📋 Contactos pendientes: {total} — tiempo estimado: ~{minutos_estimados(total, bool(imagen))} min")
     print("   Para frenar: botón Detener en la plataforma, o cerrar esta ventana.")
+    print("   Por cada mensaje el script toma la pantalla unos segundos: en ese rato no toques nada.")
+    print("   Después te devuelve el mouse y la ventana en la que estabas.")
+
+    salteados = []
 
     for i, contacto in enumerate(contactos):
         if i > 0 and i % PAUSA_LARGA_CADA == 0:
@@ -477,13 +704,25 @@ def enviar(ejecucion, job):
 
         espera = random.uniform(*(ESPERA_PRIMER_CHAT if i == 0 else ESPERA_CARGA_CHAT))
         print(f"⏳ [{i+1}/{total}] Abriendo el chat de {contacto['nombre']}...")
-        mandar_a(ejecucion, contacto, espera, imagen)
+        if mandar_a(ejecucion, contacto, espera, imagen) == 'salteado':
+            salteados.append(contacto)
 
         # Después del último no hay nada que separar.
         if i < total - 1:
             entre = random.uniform(*ESPERA_ENTRE_MENSAJES)
             print(f"💤 Siguiente en {entre:.0f}s...")
             ejecucion.esperar(entre)
+
+    # Una vuelta más para los que no se mandaron (por ejemplo, porque pasaste a
+    # otra ventana justo mientras escribía). Los que fallen de nuevo quedan
+    # pendientes para Reanudar.
+    if salteados:
+        print(f"\n🔁 Vuelvo a intentar con {len(salteados)} que quedaron sin mandar...")
+        for contacto in salteados:
+            ejecucion.esperar(random.uniform(*ESPERA_ENTRE_MENSAJES))
+            ejecucion.senal(forzar=True)
+            print(f"⏳ Abriendo de nuevo el chat de {contacto['nombre']}...")
+            mandar_a(ejecucion, contacto, random.uniform(*ESPERA_CARGA_CHAT), imagen)
 
 # ─── Main ────────────────────────────────────────────────────────────────────
 
