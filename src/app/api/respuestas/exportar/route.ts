@@ -19,6 +19,8 @@ export async function GET(request: Request) {
   const q = searchParams.get('q') ?? undefined
   const concesionario = searchParams.get('concesionario') ?? undefined
   const campanaId = searchParams.get('campanaId') ?? undefined
+  const tipoParam = searchParams.get('tipoEncuestaId')
+  const tipoEncuestaId = tipoParam && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(tipoParam) ? tipoParam : undefined
   const fechaDesde = searchParams.get('fechaDesde') ?? undefined
   const fechaHasta = searchParams.get('fechaHasta') ?? undefined
   const tecnologia = normalizeTecnologiaInput(searchParams.get('tecnologia'))
@@ -31,6 +33,7 @@ export async function GET(request: Request) {
     q,
     concesionario,
     campanaId,
+    tipoEncuestaId,
     fechaDesde,
     fechaHasta,
     tecnologia: tecnologia ?? undefined,
