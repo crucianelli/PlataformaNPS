@@ -222,7 +222,7 @@ export default function FormularioEncuesta({ token, concesionario, maquina }: Fo
       {/* Intro */}
       <Card>
         <p className="text-sm leading-relaxed text-gray-600">
-          Gracias por participar. Completá esta breve encuesta para ayudarnos a mejorar el producto, la atención del concesionario y la experiencia general con Crucianelli. Tus respuestas son confidenciales.
+          Gracias por participar. Completá esta breve encuesta para ayudarnos a mejorar el producto, la atención del concesionario y la experiencia general con Crucianelli.
         </p>
       </Card>
 

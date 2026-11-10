@@ -1,4 +1,3 @@
-import { after } from 'next/server'
 import PageContainer from '@/components/layout/PageContainer'
 import IndicadoresPanel from '@/modules/dashboard/components/IndicadoresPanel'
 import { Card, CardContent, CardHeader } from '@/components/ui/Card'
@@ -9,17 +8,8 @@ import {
   getNpsResumenExtendido,
   getRespuestas,
 } from '@/modules/dashboard/services/dashboard.service'
-import { checkAvisosRecordatorio } from '@/modules/recordatorios/services/avisos.service'
 
 export default async function DashboardPage() {
-  // La revisión de avisos recorre todas las campañas activas y puede mandar un
-  // mail: corre después de enviar la página para no hacer esperar al usuario.
-  after(() =>
-    checkAvisosRecordatorio().catch((err) =>
-      console.error('[dashboard] checkAvisosRecordatorio falló:', err)
-    )
-  )
-
   const [resumen, efectividad, respuestas, npsPorTipo] = await Promise.all([
     getNpsResumenExtendido(),
     getEfectividadEnvios(),
