@@ -9,6 +9,10 @@ con el schema. Lo único que hubo que reemplazar es el que las llama.
 | `sync` | `sync_encuestas_necesidad_llamado()` | cada 15 min | Pasa encuestas de `recordatorio_enviado` a `necesidad_de_llamado` cuando vence el plazo de `system_config.dias_hasta_llamado`. Devuelve cuántas actualizó. |
 | `notificaciones` | `check_campanas_sin_actividad()` | diario 09:00 **UTC** | Inserta una notificación por campaña activa que lleva +7 días sin respuestas nuevas. Tiene guarda de 24h para no repetir. |
 
+> **2026-11-10: el job `notificaciones` se dio de baja.** Las notificaciones de "campaña sin
+> actividad" ya no se usan: se sacó del script y hay que borrar su línea del crontab de la VPS.
+> La función sigue en la base pero nadie la llama. Lo de abajo queda como registro.
+
 No hay endpoint HTTP de por medio a propósito: la lógica ya está en la base, así que
 un endpoint solo agregaría un salto de red, un secreto que proteger y la dependencia
 de que la app esté levantada.

@@ -1,7 +1,6 @@
 // Estado del ciclo de recordatorios de una campaña, para verlo desde el listado
-// sin entrar a cada una. Usa la misma regla que los avisos automáticos
-// (avisos.service): toca recordatorio cuando pasaron los días configurados desde
-// el último envío confirmado y quedan clientes sin responder.
+// sin entrar a cada una: toca recordatorio cuando pasaron los días configurados
+// desde el último envío confirmado y quedan clientes sin responder.
 
 export const MAX_RECORDATORIOS = 3
 const DAY_MS = 1000 * 60 * 60 * 24

@@ -47,7 +47,7 @@ function PageShell({ children }: { children: React.ReactNode }) {
       </main>
 
       <footer className="text-center text-xs text-gray-400 py-6 border-t border-gray-100">
-        Crucianelli © 2026 &nbsp;·&nbsp; Tus respuestas son confidenciales
+        Crucianelli © 2026
       </footer>
     </div>
   )

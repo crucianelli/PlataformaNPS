@@ -8,7 +8,8 @@
 #
 # Uso:
 #   nps-jobs.sh sync            -> sync_encuestas_necesidad_llamado()   (cada 15 min)
-#   nps-jobs.sh notificaciones  -> check_campanas_sin_actividad()       (diario)
+#
+# El job `notificaciones` (check_campanas_sin_actividad) se dio de baja el 2026-11-10.
 #
 # OJO: el cron de la VPS no soporta CRON_TZ, así que los horarios del crontab son
 # hora LOCAL (-03), no UTC. El timestamp que loguea este script sí es UTC.
@@ -31,9 +32,8 @@ LOCK_DIR="${NPS_LOCK_DIR:-/var/lock}"
 
 case "$JOB" in
   sync)           FN='SELECT public.sync_encuestas_necesidad_llamado();' ;;
-  notificaciones) FN='SELECT public.check_campanas_sin_actividad();' ;;
   *)
-    echo "uso: $(basename "$0") <sync|notificaciones>" >&2
+    echo "uso: $(basename "$0") sync" >&2
     exit 64
     ;;
 esac

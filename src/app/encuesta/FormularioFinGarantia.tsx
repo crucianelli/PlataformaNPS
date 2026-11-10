@@ -170,7 +170,7 @@ export default function FormularioFinGarantia({ token, concesionario, maquina }:
       {/* Intro */}
       <Card>
         <p className="text-sm leading-relaxed text-gray-600">
-          Ha pasado un año desde la puesta en marcha de tu máquina Crucianelli. Queremos saber cómo fue tu experiencia durante este tiempo. Tus respuestas son confidenciales y nos ayudan a mejorar.
+          Ha pasado un año desde la puesta en marcha de tu máquina Crucianelli. Queremos saber cómo fue tu experiencia durante este tiempo. Tus respuestas nos ayudan a mejorar.
         </p>
       </Card>
 
